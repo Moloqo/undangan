@@ -686,8 +686,8 @@
           <label class="flabel" for="f-ucapan">Ucapan &amp; Doa</label>
           <textarea id="f-ucapan" name="ucapan" placeholder="Tuliskan ucapan dan doa terbaik untuk kedua mempelai…" required></textarea>
         </div>
-        <button class="btn" type="submit" style="width:100%">Kirim Ucapan</button>
-        <p class="form-note">Ucapan Anda akan tampil di dinding ucapan di bawah ini.</p>
+        <button class="btn" type="submit" id="rsvpSubmit" style="width:100%">Kirim Ucapan</button>
+        <p class="form-note" id="rsvpNote">Ucapan Anda akan tampil di dinding ucapan di bawah ini.</p>
       </form>
 
       <div class="wall" id="wishWall" aria-live="polite"></div>
@@ -989,6 +989,24 @@
   addWish('Rara Sekar', 'hadir', 'Akhirnya lakon cinta kalian sampai juga di babak paling bahagia. Sampai jumpa di Yogyakarta, turut berbahagia untuk kalian berdua!', false);
   addWish('Bagus Pramudya', 'ragu', 'Barakallah untuk Bima & Sinta. Semoga lancar sampai hari H — sedang diusahakan bisa hadir langsung, doa terbaik tetap menyertai.', false);
 
+  /* ---------- RSVP via WhatsApp customer ----------
+     Diaktifkan oleh hydration (?t=) lewat window.__setWaRsvp bila token
+     customer punya nomor WA (data.waNumber). Tanpa itu, form berjalan
+     seperti biasa: ucapan hanya tampil di dinding ucapan. */
+  var waTarget = null;
+  window.__setWaRsvp = function(number, coupleNames){
+    var digits = String(number == null ? '' : number).replace(/\D/g, '');
+    if(digits.charAt(0) === '0') digits = '62' + digits.slice(1);
+    else if(digits.charAt(0) === '8') digits = '62' + digits;
+    if(digits.length < 9) return;
+    waTarget = { number: digits, couple: coupleNames || '' };
+    var btn = document.getElementById('rsvpSubmit') ||
+              document.querySelector('#rsvpForm button[type="submit"]');
+    if(btn) btn.textContent = 'Kirim via WhatsApp';
+    var note = document.getElementById('rsvpNote');
+    if(note) note.textContent = 'Ucapan akan tampil di dinding ucapan dan diteruskan ke WhatsApp mempelai.';
+  };
+
   document.getElementById('rsvpForm').addEventListener('submit', function(e){
     e.preventDefault();
     var name = document.getElementById('f-nama').value.trim();
@@ -996,6 +1014,17 @@
     var msg = document.getElementById('f-ucapan').value.trim();
     if(!name || !msg){ showToast('Mohon isi nama dan ucapan dulu ya'); return; }
     addWish(name, status, msg, true);
+    /* Teruskan ke WA customer — kecuali katalog sudah memasang jembatan
+       WA-nya sendiri pada form ini (flag __waWired), agar tidak dobel. */
+    if(waTarget && waTarget.number && !e.target.__waWired){
+      var sel = document.getElementById('f-hadir');
+      var attText = (sel && sel.options && sel.options[sel.selectedIndex])
+        ? sel.options[sel.selectedIndex].text : (labels[status] || status);
+      var waMsg = 'Halo ' + (waTarget.couple || 'kedua mempelai') + ', saya ' + name + '.\n' +
+        'Konfirmasi kehadiran: ' + attText + '.\n' +
+        'Ucapan: ' + msg;
+      window.open('https://wa.me/' + waTarget.number + '?text=' + encodeURIComponent(waMsg), '_blank');
+    }
     e.target.reset();
     document.getElementById('f-hadir').value = 'hadir';
     showToast('Matur nuwun, ucapan Anda terkirim');
@@ -1009,6 +1038,9 @@
 /* ============================================================
    HYDRATION DATA TAMU — hanya aktif jika URL mengandung ?t=KODE.
    Tanpa ?t=, halaman demo tidak diubah sama sekali.
+   Nomor WhatsApp customer (data.waNumber) mengubah tombol RSVP
+   menjadi "Kirim via WhatsApp": konfirmasi & ucapan tamu diteruskan
+   langsung ke WhatsApp customer lewat wa.me.
    ============================================================ */
 (function(){
   'use strict';
@@ -1070,6 +1102,13 @@
   function isHttp(u){ return typeof u === 'string' && /^https?:\/\//i.test(u); }
   function str(v){ return (typeof v === 'string' ? v : (v == null ? '' : String(v))).trim(); }
   function shortName(full){ var s = str(full); return s ? s.split(/\s+/)[0] : ''; }
+  /* Normalisasi nomor WA customer: 08xx -> 628xx, 8xx -> 628xx. */
+  function normalizeWa(v){
+    var digits = str(v).replace(/\D/g, '');
+    if(digits.charAt(0) === '0') digits = '62' + digits.slice(1);
+    else if(digits.charAt(0) === '8') digits = '62' + digits;
+    return digits.length >= 9 ? digits : '';
+  }
   function parseDateParts(s){
     var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(str(s));
     if(!m) return null;
@@ -1393,6 +1432,34 @@
     });
   }
 
+  /* ---------- RSVP via WhatsApp customer ---------- */
+  function wireWhatsapp(d, coupleNames){
+    var waNumber = normalizeWa(d.waNumber || d.wa || d.whatsappNumber || d.whatsapp);
+    if(!waNumber) return;
+    if(window.__setWaRsvp){ window.__setWaRsvp(waNumber, coupleNames); return; }
+    /* Cadangan bila helper utama tidak tersedia: ganti label tombol dan
+       tangkap nilai form pada fase capture (sebelum form dikosongkan). */
+    var btn = document.getElementById('rsvpSubmit') ||
+              document.querySelector('#rsvpForm button[type="submit"]');
+    if(btn) btn.textContent = 'Kirim via WhatsApp';
+    var form = document.getElementById('rsvpForm');
+    if(!form || form.__waFallbackWired) return;
+    form.__waFallbackWired = true;
+    document.addEventListener('submit', function(ev){
+      if(ev.target !== form) return;
+      var nm = document.getElementById('f-nama').value.trim();
+      var ws = document.getElementById('f-ucapan').value.trim();
+      if(!nm || !ws) return;
+      var sel = document.getElementById('f-hadir');
+      var attText = (sel && sel.options && sel.options[sel.selectedIndex])
+        ? sel.options[sel.selectedIndex].text : (sel ? sel.value : '');
+      var msg = 'Halo ' + (coupleNames || 'kedua mempelai') + ', saya ' + nm + '.\n' +
+        'Konfirmasi kehadiran: ' + attText + '.\n' +
+        'Ucapan: ' + ws;
+      window.open('https://wa.me/' + waNumber + '?text=' + encodeURIComponent(msg), '_blank');
+    }, true);
+  }
+
   /* ---------- terapkan data ---------- */
   function applyData(d){
     removeDemoMarks();
@@ -1484,6 +1551,9 @@
     /* amplop digital */
     var banks = normalizeBanks(d);
     if(banks.length) renderBanks(banks);
+
+    /* RSVP -> WhatsApp customer */
+    wireWhatsapp(d, coupleNames);
   }
 
   /* ---------- ambil data dari Firestore ---------- */
