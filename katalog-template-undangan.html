@@ -94,9 +94,20 @@
       .chips{ display:flex; flex-wrap:wrap; gap:8px; }
       .chip{ min-height:44px; padding:8px 18px; border-radius:999px; border:1.5px solid var(--line); background:var(--card); color:var(--ink-soft); font-weight:600; font-size:14.5px; }
       .chip[aria-pressed="true"]{ background:var(--brand); border-color:var(--brand); color:var(--brand-ink); }
+      .chip .cnt{ opacity:.65; font-weight:700; }
+      @media (max-width:760px){
+        .chips{ flex-wrap:nowrap; }
+        .chip{ flex:1 1 0; min-width:0; padding:8px 6px; font-size:13.5px; text-align:center; white-space:nowrap; }
+      }
 
       /* ---------- Cards ---------- */
       .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; padding-bottom:8px; }
+      .grid-head{ grid-column:1 / -1; display:flex; align-items:baseline; gap:14px; margin-top:14px; }
+      .grid-head:first-child{ margin-top:0; }
+      .grid-head h2{ font-family:"Playfair Display",serif; font-size:24px; font-weight:700; line-height:1.3; white-space:nowrap; }
+      .grid-head .cnt{ color:var(--ink-soft); font-size:14px; font-weight:600; white-space:nowrap; }
+      .grid-head::after{ content:""; flex:1; height:1px; background:var(--line); align-self:center; min-width:24px; }
+      .scene .cat-badge{ position:absolute; top:18px; left:18px; z-index:3; background:rgba(20,16,8,.58); color:#fff; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; padding:5px 11px; border-radius:999px; pointer-events:none; }
       .tcard{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column; }
       .scene{ position:relative; aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; overflow:hidden; }
       .scene svg.motif{ width:104px; height:104px; position:relative; z-index:1; }
@@ -212,6 +223,22 @@
       .history-list .actions-row{ display:flex; gap:8px; flex-wrap:wrap; margin-left:auto; }
       .admin-cta{ margin-top:14px; }
 
+      /* ---------- WA konsultasi ngambang ---------- */
+      .wa-float{ position:fixed; right:18px; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:40; display:inline-flex; align-items:center; gap:10px; background:#1da851; color:#fff; text-decoration:none; font-weight:700; font-size:15px; line-height:1.3; padding:13px 20px 13px 15px; border-radius:999px; box-shadow:0 12px 28px rgba(10,60,30,.35); min-height:54px; }
+      .wa-float svg{ flex:none; }
+      .wa-float:active{ transform:scale(.97); }
+      @media (max-width:480px){ .wa-float{ right:14px; padding:13px 16px 13px 13px; font-size:14px; } }
+
+      /* ---------- Daftar tamu & link personal ---------- */
+      .guest-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:16px; flex-wrap:wrap; }
+      .guest-head strong{ font-size:15px; }
+      .guest-list{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+      .guest-row{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--bg-soft); }
+      .guest-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+      .guest-top .gname{ font-weight:700; flex:1 1 130px; min-width:0; word-break:break-word; line-height:1.45; }
+      .guest-url{ margin-top:8px; font-size:12.5px; line-height:1.55; color:var(--ink-soft); word-break:break-all; }
+      .btn.wa-share{ background:#1da851; color:#fff; }
+
       /* ---------- Footer / modal / toast ---------- */
       footer{ border-top:1px solid var(--line); margin-top:56px; padding:28px 0 44px; text-align:center; color:var(--ink-soft); font-size:14.5px; }
       .admin-link{ background:none; border:none; color:var(--ink-soft); text-decoration:underline; min-height:48px; padding:10px 14px; font-size:14px; }
@@ -266,9 +293,10 @@
         <section class="hero">
           <div class="rule"><span>Katalog Template</span></div>
           <h1>Undangan Digital,<br /><em>Sesuai Gaya Kalian</em></h1>
-          <p class="lead">Pilih satu dari 15 template undangan pernikahan yang sudah kami buat, masukkan token dari admin, lalu sesuaikan nama, tanggal, dan foto kalian sendiri. Link undangan langsung siap dibagikan.</p>
+          <p class="lead">Pilih satu dari 16 template undangan pernikahan yang sudah kami buat, masukkan token dari admin, lalu sesuaikan nama, tanggal, dan foto kalian sendiri. Link undangan langsung siap dibagikan.</p>
           <ul class="stats">
-            <li><b>15</b> template siap pakai</li>
+            <li><b>16</b> template siap pakai</li>
+            <li><b>7</b> Pixel · <b>9</b> Klasik</li>
             <li><b>1 token</b> = 1 undangan</li>
             <li>Jatah revisi <b>sesuai token</b></li>
           </ul>
@@ -285,11 +313,10 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
             <input id="searchInput" type="search" placeholder="Cari template… misalnya “Bali” atau “pixel”" aria-label="Cari template" />
           </div>
-          <div class="chips" role="group" aria-label="Filter gaya">
-            <button class="chip" data-filter="all" aria-pressed="true">Semua</button>
-            <button class="chip" data-filter="pixel" aria-pressed="false">Pixel</button>
-            <button class="chip" data-filter="klasik" aria-pressed="false">Klasik &amp; Elegan</button>
-            <button class="chip" data-filter="unik" aria-pressed="false">Fantasi &amp; Unik</button>
+          <div class="chips" role="group" aria-label="Filter kategori">
+            <button class="chip" data-filter="all" aria-pressed="true">Semua <span class="cnt">· 16</span></button>
+            <button class="chip" data-filter="pixel" aria-pressed="false">Pixel <span class="cnt">· 7</span></button>
+            <button class="chip" data-filter="klasik" aria-pressed="false">Klasik <span class="cnt">· 9</span></button>
           </div>
         </div>
 
@@ -340,6 +367,11 @@
               <div class="field full">
                 <label for="fQuote">Kutipan / Quote</label>
                 <textarea id="fQuote" placeholder="cth. “Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu…”"></textarea>
+              </div>
+              <div class="field full">
+                <label for="fWa">Nomor WhatsApp — Tujuan RSVP Tamu</label>
+                <input id="fWa" type="tel" inputmode="tel" autocomplete="tel" placeholder="cth. 0812 3456 7890" />
+                <span class="hint">Saat tamu mengisi RSVP di undangan lalu menekan tombol <b>Kirim via WhatsApp</b>, konfirmasi kehadiran &amp; ucapannya langsung terkirim ke nomor WhatsApp ini. Berlaku untuk <b>semua template</b> — Pixel maupun Klasik — pada preview undangan dan file undangan mandiri hasil unduhan. Boleh ditulis format 08xx atau 628xx.</span>
               </div>
             </div>
 
@@ -402,6 +434,65 @@
               <button type="button" class="btn-add" id="addBankBtn">+ Tambah rekening</button>
             </fieldset>
 
+            <fieldset style="margin-top:24px;">
+              <legend>Musik Latar</legend>
+              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Undangan kalian tidak harus memakai musik bawaan template — pilih alunan lain di sini, atau <b>pakai musik kalian sendiri</b>: upload file lagunya, atau tempel link MP3-nya. Dengarkan dulu sebelum memutuskan.</p>
+              <div class="form-grid" style="margin-top:6px;">
+                <div class="field">
+                  <label for="fMusic">Pilihan Musik</label>
+                  <select id="fMusic">
+                    <option value="default">Bawaan Template (tidak diubah)</option>
+                    <option value="gamelan">Gamelan Jawa — saron &amp; gong</option>
+                    <option value="piano">Piano Romantis — arpeggio lembut</option>
+                    <option value="akustik">Petikan Akustik — hangat &amp; ringan</option>
+                    <option value="suling">Suling Bambu — tenang &amp; syahdu</option>
+                    <option value="custom">Musik Sendiri — upload file / link MP3</option>
+                    <option value="none">Tanpa Musik</option>
+                  </select>
+                  <span class="hint">Pilihan ini ikut tersimpan bersama data undangan kalian dan terpasang pada file undangan mandiri hasil unduhan.</span>
+                </div>
+                <div class="field">
+                  <label for="musicPreviewBtn">Dengar Dulu</label>
+                  <button type="button" class="btn ghost" id="musicPreviewBtn">Dengar Pratinjau</button>
+                  <span class="hint">Memutar musik pilihan kalian — termasuk musik sendiri yang sudah diupload / ditempel linknya — langsung di halaman ini.</span>
+                </div>
+              </div>
+              <div id="customMusicBox" hidden style="margin-top:18px; border:1px dashed var(--gold); border-radius:12px; padding:16px; background:var(--bg-soft);">
+                <div class="form-grid" style="margin-top:0;">
+                  <div class="field">
+                    <label for="upMusic">Upload File Musik Kalian</label>
+                    <input id="upMusic" type="file" accept="audio/*,.mp3,.m4a,.ogg,.wav,.aac" />
+                    <span class="hint">Maks. 8MB — format MP3 paling disarankan. File ini <b>ditanam langsung ke dalam file undangan mandiri</b> hasil unduhan, jadi lagu kalian sendiri yang bunyi saat tamu menekan tombol Putar Musik di undangan — tanpa perlu hosting tambahan.</span>
+                  </div>
+                  <div class="field">
+                    <label>File Terpilih</label>
+                    <p id="musicFileInfo" style="font-size:14px; line-height:1.6; color:var(--ink-soft); margin:0;">Belum ada file dipilih.</p>
+                    <div><button type="button" class="btn ghost small" id="removeMusicFileBtn" hidden>Hapus File</button></div>
+                  </div>
+                  <div class="field full">
+                    <label for="fMusicUrl">Atau Tempel Link Musik (MP3)</label>
+                    <input id="fMusicUrl" type="url" inputmode="url" placeholder="https://contoh.com/lagu-kami.mp3" />
+                    <span class="hint">Kalau lagu kalian sudah punya link MP3 yang bisa diakses publik, tempel di sini — link ini <b>ikut tersimpan</b> bersama data undangan dan dipakai juga di file mandiri. Kalau file upload dan link sama-sama diisi, file upload yang dipakai di file unduhan.</span>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset style="margin-top:24px;">
+              <legend>Daftar Tamu &amp; Link Personal</legend>
+              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Tulis nama tamu satu per baris. Tiap nama otomatis menjadi link undangan personal dengan nama tamu tersebut di sampulnya — tinggal salin, atau kirim satu-satu lewat WhatsApp. Daftar ini ikut tersimpan saat kalian menekan Simpan Undangan.</p>
+              <div class="field full">
+                <label for="fGuests">Nama-nama Tamu</label>
+                <textarea id="fGuests" rows="6" placeholder="Satu nama per baris, contoh:&#10;Keluarga Besar Hartono&#10;Bapak Andi Wijaya beserta Ibu&#10;Sinta Maharani"></textarea>
+              </div>
+              <div class="guest-head">
+                <strong id="guestCount"></strong>
+                <button type="button" class="btn ghost small" id="copyAllGuestLinksBtn">Salin Semua Link</button>
+              </div>
+              <div class="guest-list" id="guestLinksList"></div>
+              <p class="hint" id="guestLinksEmpty" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:10px;">Belum ada nama tamu — link personal akan muncul di sini otomatis begitu nama ditulis.</p>
+            </fieldset>
+
             <div class="preview-card" aria-live="polite">
               <h3>Pratinjau Data</h3>
               <dl id="previewList"></dl>
@@ -426,7 +517,7 @@
 
             <div class="export-box" id="exportBox">
               <h3>File Undangan Mandiri — Untuk Domain Sendiri</h3>
-              <p>Unduh satu file HTML yang sudah berisi <b>seluruh data kalian</b> — nama mempelai, semua acara, rangkaian acara, kisah cinta, foto galeri, dan semua rekening amplop digital. File ini berdiri sendiri: buka langsung di browser, atau hosting di domain kalian sendiri supaya alamat yang dilihat tamu adalah domain kalian.</p>
+              <p>Unduh satu file HTML yang sudah berisi <b>seluruh data kalian</b> — nama mempelai, semua acara, rangkaian acara, kisah cinta, foto galeri, semua rekening amplop digital, dan musik latar pilihan kalian (kalau memilih Musik Sendiri lewat upload file, lagunya ikut tertanam di dalam file ini). File ini berdiri sendiri: buka langsung di browser, atau hosting di domain kalian sendiri supaya alamat yang dilihat tamu adalah domain kalian.</p>
               <div class="row">
                 <button type="button" class="btn primary small" id="downloadHtmlBtn">Unduh File Undangan (.html)</button>
                 <button type="button" class="btn ghost small" id="toggleGuideBtn" aria-expanded="false">Cara Hosting Gratis</button>
@@ -553,6 +644,11 @@
       </div>
     </div>
 
+    <a class="wa-float" href="https://wa.me/6288210882762?text=Halo%2C%20saya%20mau%20konsultasi%20dulu%20tentang%20undangan%20digitalnya." target="_blank" rel="noopener" aria-label="Konsultasi lewat WhatsApp">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
+      <span>Konsultasi via WA</span>
+    </a>
+
     <div class="toast" id="toast" role="status"></div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -604,6 +700,11 @@
           url:"https://envito.netlify.app/undangan-wayang-kulit.html",
           bg:"linear-gradient(160deg,#1c1710,#0b0906)", fg:"#d9ae54",
           art: motif('<path d="M50 6 C66 26 76 44 76 62 A26 24 0 1 1 24 62 C24 44 34 26 50 6Z" fill="MOTIF"/><path d="M50 24 C58 36 62 46 62 58 A12 12 0 1 1 38 58 C38 46 42 36 50 24Z" fill="#14100a"/><circle cx="50" cy="56" r="4.5" fill="MOTIF"/>') },
+        { slug:"undangan-jawa-klasik", name:"Jawa Klasik", tag:"Klasik · Adat Jawa", group:"klasik",
+          desc:"Batik sogan cokelat-emas, gunungan kayon, dan aksara Jawa — adat Jawa yang tenang, lega, dan anggun.",
+          url:"https://envito.netlify.app/undangan-jawa-klasik.html",
+          bg:"linear-gradient(160deg,#3a2410,#1d1005)", fg:"#e0c078",
+          art: motif('<g ' + G + '><ellipse cx="50" cy="32" rx="10" ry="16"/><ellipse cx="50" cy="68" rx="10" ry="16"/><ellipse cx="32" cy="50" rx="16" ry="10"/><ellipse cx="68" cy="50" rx="16" ry="10"/></g><circle cx="50" cy="50" r="5" fill="MOTIF"/>') },
         { slug:"undangan-art-deco-gatsby", name:"Art Deco Gatsby", tag:"Klasik · 1920-an", group:"klasik",
           desc:"Glamor era 1920-an: geometri art deco, emas, dan pesta ala Gatsby.",
           url:"https://envito.netlify.app/undangan-art-deco-gatsby.html",
@@ -614,22 +715,22 @@
           url:"https://envito.netlify.app/undangan-arabian-nights.html",
           bg:"linear-gradient(160deg,#1a1440,#0d0a24)", fg:"#e3c878",
           art: motif('<path d="M62 14 A36 36 0 1 0 62 78 A28 28 0 1 1 62 14Z" fill="MOTIF"/><path d="M70 22 l2.2 5 5 2.2 -5 2.2 -2.2 5 -2.2 -5 -5 -2.2 5 -2.2Z" fill="MOTIF"/>') },
-        { slug:"undangan-rustic-kraft", name:"Rustic Kraft", tag:"Natural · Bohemian", group:"klasik",
+        { slug:"undangan-rustic-kraft", name:"Rustic Kraft", tag:"Klasik · Natural Bohemian", group:"klasik",
           desc:"Hangat dan membumi: kertas kraft, daun kering, dan nuansa bohemian.",
           url:"https://envito.netlify.app/undangan-rustic-kraft.html",
           bg:"linear-gradient(150deg,#8a6b4a,#5d4530)", fg:"#f3e3c2",
           art: motif('<path d="M50 84 C26 70 20 46 26 24 M50 84 C74 70 80 46 74 24" ' + G + '/><g fill="MOTIF"><ellipse cx="30" cy="34" rx="7" ry="3.6" transform="rotate(-38 30 34)"/><ellipse cx="27" cy="50" rx="7" ry="3.6" transform="rotate(-14 27 50)"/><ellipse cx="31" cy="65" rx="7" ry="3.6" transform="rotate(14 31 65)"/><ellipse cx="70" cy="34" rx="7" ry="3.6" transform="rotate(38 70 34)"/><ellipse cx="73" cy="50" rx="7" ry="3.6" transform="rotate(14 73 50)"/><ellipse cx="69" cy="65" rx="7" ry="3.6" transform="rotate(-14 69 65)"/></g><path d="M42 20 Q50 12 58 20 Q50 27 42 20Z" fill="MOTIF"/>') },
-        { slug:"undangan-retro-90an", name:"Retro 90an", tag:"Unik · 90an / Y2K", group:"unik",
+        { slug:"undangan-retro-90an", name:"Retro 90an", tag:"Klasik · 90an / Y2K", group:"klasik",
           desc:"Nostalgia VHS dan kaset: TV tabung, pola Memphis, dan warna neon 90-an.",
           url:"https://envito.netlify.app/undangan-retro-90an.html",
           bg:"linear-gradient(150deg,#31307e,#171740)", fg:"#ff77b7",
           art: motif('<rect x="14" y="30" width="72" height="44" rx="7" ' + G + '/><circle cx="36" cy="52" r="10" ' + G + '/><circle cx="64" cy="52" r="10" ' + G + '/><circle cx="36" cy="52" r="3" fill="MOTIF"/><circle cx="64" cy="52" r="3" fill="MOTIF"/><path d="M30 30 L42 16 M70 30 L58 16" stroke="MOTIF" stroke-width="3" stroke-linecap="round"/><path d="M24 86 l8 -6 8 6 8 -6 8 6 8 -6 8 6" stroke="#57d9c5" stroke-width="3" fill="none" stroke-linecap="round"/>') },
-        { slug:"undangan-vintage-bioskop", name:"Vintage Bioskop", tag:"Unik · Sinema Klasik", group:"unik",
+        { slug:"undangan-vintage-bioskop", name:"Vintage Bioskop", tag:"Klasik · Sinema Vintage", group:"klasik",
           desc:"Marquee bertabur lampu, tirai beludru, dan tiket ADMIT ONE ala bioskop lawas.",
           url:"https://envito.netlify.app/undangan-vintage-bioskop.html",
           bg:"linear-gradient(160deg,#67182a,#38090f)", fg:"#f0cd7e",
           art: motif('<rect x="16" y="28" width="68" height="46" rx="6" ' + G + '/><g fill="MOTIF"><rect x="22" y="34" width="6" height="6" rx="1.6"/><rect x="22" y="48" width="6" height="6" rx="1.6"/><rect x="22" y="62" width="6" height="6" rx="1.6"/><rect x="72" y="34" width="6" height="6" rx="1.6"/><rect x="72" y="48" width="6" height="6" rx="1.6"/><rect x="72" y="62" width="6" height="6" rx="1.6"/></g><path d="M44 40 L62 51 L44 62 Z" fill="MOTIF"/>') },
-        { slug:"undangan-kastil-dongeng", name:"Kastil Dongeng", tag:"Unik · Dongeng", group:"unik",
+        { slug:"undangan-kastil-dongeng", name:"Kastil Dongeng", tag:"Klasik · Dongeng", group:"klasik",
           desc:"Kastil di atas awan, kereta labu, dan sepatu kaca — dongeng yang jadi nyata.",
           url:"https://envito.netlify.app/undangan-kastil-dongeng.html",
           bg:"linear-gradient(160deg,#87aacd,#587ba6)", fg:"#fdf3d0",
@@ -700,18 +801,29 @@
 
       /* ================= KATALOG ================= */
       var activeFilter = "all";
+      var GROUP_LABEL = { pixel: "Template Pixel", klasik: "Template Klasik" };
+      function groupCount(g){ var n = 0; TEMPLATES.forEach(function(t){ if (t.group === g) n++; }); return n; }
       function renderCatalog(){
         var q = $("searchInput").value.trim().toLowerCase();
         var grid = $("templateGrid"); grid.innerHTML = "";
         var shown = 0;
+        var lastGroup = "";
         TEMPLATES.forEach(function(t){
           if (activeFilter !== "all" && t.group !== activeFilter) return;
           if (q && (t.name + " " + t.tag + " " + t.desc).toLowerCase().indexOf(q) === -1) return;
           shown++;
+          if (t.group !== lastGroup) {
+            lastGroup = t.group;
+            var gh = document.createElement("div"); gh.className = "grid-head";
+            var ghH = document.createElement("h2"); ghH.textContent = GROUP_LABEL[t.group] || t.group;
+            var ghC = document.createElement("span"); ghC.className = "cnt"; ghC.textContent = groupCount(t.group) + " template";
+            gh.appendChild(ghH); gh.appendChild(ghC);
+            grid.appendChild(gh);
+          }
           var card = document.createElement("article"); card.className = "tcard";
           var scene = document.createElement("div"); scene.className = "scene" + (t.group === "pixel" ? " pixel" : "");
           scene.style.background = t.bg;
-          scene.innerHTML = '<div class="grain"></div>' + t.art.replace(/MOTIF/g, t.fg) + '<div class="frame"></div>' + '<img class="thumb" src="thumb-' + t.slug + '.jpg" alt="Preview ' + t.name + '" loading="lazy" onerror="this.style.display=\'none\'">';
+          scene.innerHTML = '<div class="grain"></div>' + t.art.replace(/MOTIF/g, t.fg) + '<div class="frame"></div>' + '<img class="thumb" src="assets/thumb-' + t.slug + '.jpg" alt="Preview ' + t.name + '" loading="lazy" onerror="this.style.display=\'none\'">' + '<span class="cat-badge">' + (t.group === "pixel" ? "Pixel" : "Klasik") + '</span>';
           var body = document.createElement("div"); body.className = "body";
           var tag = document.createElement("p"); tag.className = "tag"; tag.textContent = t.tag;
           var h = document.createElement("h3"); h.textContent = t.name;
@@ -734,7 +846,7 @@
       function fillTemplateSelect(sel){
         sel.innerHTML = "";
         TEMPLATES.forEach(function(t){
-          var o = document.createElement("option"); o.value = t.slug; o.textContent = t.name; sel.appendChild(o);
+          var o = document.createElement("option"); o.value = t.slug; o.textContent = (t.group === "pixel" ? "Pixel · " : "Klasik · ") + t.name; sel.appendChild(o);
         });
       }
       fillTemplateSelect($("tokenTemplate"));
@@ -847,6 +959,233 @@
         }
         return [{ title: "", year: "", text: "" }];
       }
+      /* ---------- Musik latar: pilihan customer ---------- */
+      var MUSIC_LABELS = {
+        "default": "Bawaan Template",
+        gamelan: "Gamelan Jawa — saron & gong",
+        piano: "Piano Romantis — arpeggio lembut",
+        akustik: "Petikan Akustik — hangat & ringan",
+        suling: "Suling Bambu — tenang & syahdu",
+        custom: "Musik Sendiri (file / link pribadi)",
+        none: "Tanpa Musik"
+      };
+      /* Tema generatif WebAudio: tanpa file audio eksternal, jadi pilihan
+         musik bisa diputar di pratinjau editor maupun di file mandiri. */
+      var MUSIC_THEMES = {
+        gamelan: { scale: [220, 261.63, 293.66, 349.23, 392, 440, 523.25, 587.33], melody: [4, 2, 3, 2, 4, 5, 4, 3, 2, 1, 2, 3], tempo: 450, wave: "sine", overtone: 2.76, gain: 0.15, dur: 1.5, gong: true },
+        piano: { scale: [261.63, 293.66, 329.63, 392, 440, 523.25], melody: [0, 2, 4, 3, 2, 4, 5, 4, 2, 1, 2, 0], tempo: 560, wave: "triangle", overtone: 2, gain: 0.10, dur: 2.2, gong: false },
+        akustik: { scale: [196, 220, 246.94, 293.66, 329.63, 392], melody: [0, 2, 3, 4, 3, 2, 4, 5, 4, 3, 2, 1], tempo: 400, wave: "triangle", overtone: 3.01, gain: 0.085, dur: 1.1, gong: false },
+        suling: { scale: [293.66, 329.63, 369.99, 440, 493.88, 587.33], melody: [2, 3, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3], tempo: 620, wave: "sine", overtone: 2, gain: 0.07, dur: 2.6, gong: false }
+      };
+      function musicLabel(id){ return MUSIC_LABELS[id] || MUSIC_LABELS["default"]; }
+
+      /* ---------- Daftar tamu ---------- */
+      function parseGuestNames(text){
+        var seen = {}, out = [];
+        String(text || "").split(/\r?\n/).forEach(function(line){
+          var n = line.trim().replace(/\s+/g, " ");
+          if (!n) return;
+          var k = n.toLowerCase();
+          if (seen[k]) return;
+          seen[k] = 1; out.push(n);
+        });
+        return out;
+      }
+      function normalizeGuests(d){
+        if (d && Array.isArray(d.guests)) {
+          return d.guests.map(function(g){ return String(g || "").trim(); }).filter(Boolean);
+        }
+        if (d && typeof d.guests === "string") return parseGuestNames(d.guests);
+        return [];
+      }
+      function collectGuests(){
+        var el = $("fGuests");
+        return el ? parseGuestNames(el.value) : [];
+      }
+      function guestLinkFor(name){
+        var t = templateBySlug(current.slug);
+        var base = t ? t.url : "";
+        return base + "?t=" + current.code + "&to=" + encodeURIComponent(name).replace(/%20/g, "+");
+      }
+      function guestWaUrl(name){
+        var d = current.data || {};
+        var couple = [d.groomName, d.brideName].filter(Boolean).join(" & ") || "kedua mempelai";
+        var msg = "Halo " + name + ",\n\nKami mengundang Bapak/Ibu/Saudara/i untuk hadir di acara pernikahan kami, " + couple + ".\n\nBerikut link undangan personal untuk " + name + ":\n" + guestLinkFor(name) + "\n\nMerupakan suatu kehormatan apabila berkenan hadir dan memberikan doa restu. Terima kasih.";
+        return "https://api.whatsapp.com/send?text=" + encodeURIComponent(msg);
+      }
+      function renderGuestLinks(){
+        var box = $("guestLinksList");
+        if (!box) return;
+        box.innerHTML = "";
+        var names = collectGuests();
+        $("guestCount").textContent = names.length ? names.length + " tamu — link personal siap dibagikan" : "";
+        $("guestLinksEmpty").hidden = names.length !== 0;
+        var allBtn = $("copyAllGuestLinksBtn");
+        if (allBtn) allBtn.disabled = !names.length;
+        names.forEach(function(name){
+          var link = guestLinkFor(name);
+          var row = document.createElement("div"); row.className = "guest-row";
+          var top = document.createElement("div"); top.className = "guest-top";
+          var nm = document.createElement("span"); nm.className = "gname"; nm.textContent = name;
+          var cp = document.createElement("button"); cp.type = "button"; cp.className = "btn ghost small"; cp.textContent = "Salin Link";
+          cp.addEventListener("click", function(){ copyText(link, "Link untuk " + name + " disalin."); });
+          var wa = document.createElement("a"); wa.className = "btn wa-share small"; wa.textContent = "Kirim WA"; wa.href = guestWaUrl(name); wa.target = "_blank"; wa.rel = "noopener";
+          top.appendChild(nm); top.appendChild(cp); top.appendChild(wa);
+          var url = document.createElement("div"); url.className = "guest-url"; url.textContent = link;
+          row.appendChild(top); row.appendChild(url);
+          box.appendChild(row);
+        });
+      }
+
+      /* ---------- Pratinjau musik di editor (WebAudio) ---------- */
+      var mpState = { ctx: null, on: false, timer: null, step: 0, theme: "" };
+      function mpNote(freq, time, dur, gainVal, wave, overtone){
+        var ctx = mpState.ctx;
+        if (!ctx) return;
+        try {
+          var osc = ctx.createOscillator();
+          var osc2 = ctx.createOscillator();
+          var g = ctx.createGain();
+          var g2 = ctx.createGain();
+          osc.type = wave; osc.frequency.value = freq;
+          osc2.type = "sine"; osc2.frequency.value = freq * overtone;
+          g2.gain.value = 0.22;
+          g.gain.setValueAtTime(0, time);
+          g.gain.linearRampToValueAtTime(gainVal, time + 0.015);
+          g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+          osc.connect(g); osc2.connect(g2); g2.connect(g); g.connect(ctx.destination);
+          osc.start(time); osc2.start(time);
+          osc.stop(time + dur + 0.05); osc2.stop(time + dur + 0.05);
+        } catch (e) {}
+      }
+      function mpSchedule(){
+        if (!mpState.on) return;
+        var th = MUSIC_THEMES[mpState.theme];
+        if (!th) { stopMusicPreview(); return; }
+        var now = mpState.ctx.currentTime;
+        var f = th.scale[th.melody[mpState.step % th.melody.length] % th.scale.length];
+        mpNote(f, now, th.dur, th.gain, th.wave, th.overtone);
+        if (mpState.step % 2 === 0) mpNote(f / 2, now, th.dur, th.gain * 0.35, th.wave, th.overtone);
+        if (th.gong && mpState.step % 12 === 0) mpNote(110, now, 3.4, 0.12, "sine", 1);
+        mpState.step++;
+        mpState.timer = setTimeout(mpSchedule, th.tempo);
+      }
+      /* ---------- Musik sendiri customer (upload file / link MP3) ----------
+         File audio TIDAK diunggah ke server: file yang dipilih dibaca
+         lokal di perangkat customer dan ditanam (base64) ke dalam file
+         undangan mandiri saat diunduh. Yang ikut tersimpan di data token
+         hanya nama file (musicFileName) dan / atau link MP3 (musicUrl). */
+      var customMusicLocal = { file: null, name: "", size: 0, objectUrl: "", dataUrl: "" };
+      var customAudio = null;
+      function fmtBytes(n){
+        if (!n && n !== 0) return "";
+        if (n < 1024) return n + " B";
+        if (n < 1024 * 1024) return (n / 1024).toFixed(1).replace(".", ",") + " KB";
+        return (n / (1024 * 1024)).toFixed(2).replace(".", ",") + " MB";
+      }
+      function customMusicPreviewSrc(){
+        if (customMusicLocal.objectUrl) return customMusicLocal.objectUrl;
+        var el = $("fMusicUrl");
+        return el ? el.value.trim() : "";
+      }
+      function updateCustomMusicUI(){
+        var sel = $("fMusic");
+        var box = $("customMusicBox");
+        if (!sel || !box) return;
+        box.hidden = sel.value !== "custom";
+        var info = $("musicFileInfo");
+        var rm = $("removeMusicFileBtn");
+        if (!info) return;
+        if (customMusicLocal.file) {
+          info.textContent = customMusicLocal.name + " · " + fmtBytes(customMusicLocal.size) + " — siap didengar lewat tombol Dengar Pratinjau dan ditanam ke file undangan saat kalian mengunduhnya.";
+          if (rm) rm.hidden = false;
+        } else if (current.data && current.data.musicFileName) {
+          info.textContent = "Sebelumnya pernah dipilih: " + current.data.musicFileName + ". File audionya sendiri tidak ikut tersimpan di server, jadi pilih ulang file-nya di sini kalau mau ditanam ke unduhan baru — atau pakai link MP3 di bawah yang ikut tersimpan.";
+          if (rm) rm.hidden = true;
+        } else {
+          info.textContent = "Belum ada file dipilih.";
+          if (rm) rm.hidden = true;
+        }
+      }
+      function clearCustomMusicFile(){
+        stopMusicPreview();
+        if (customMusicLocal.objectUrl) { try { URL.revokeObjectURL(customMusicLocal.objectUrl); } catch (e) {} }
+        customMusicLocal = { file: null, name: "", size: 0, objectUrl: "", dataUrl: "" };
+        if (current.data) current.data.musicFileName = "";
+        var inp = $("upMusic");
+        if (inp) inp.value = "";
+        updateCustomMusicUI();
+        updatePreview();
+      }
+      function handleMusicFile(file){
+        if (!file) return;
+        var okType = (file.type && file.type.indexOf("audio/") === 0) || /\.(mp3|m4a|ogg|wav|aac)$/i.test(file.name || "");
+        if (!okType) { showMsg($("editorError"), "File “" + file.name + "” bukan file audio. Pilih file MP3, M4A, OGG, atau WAV ya."); return; }
+        if (file.size > 8 * 1024 * 1024) { showMsg($("editorError"), "File musik “" + file.name + "” berukuran " + fmtBytes(file.size) + " — lebih dari batas 8MB. Pakai MP3 yang lebih kecil / kompres dulu ya, supaya file undangannya tidak terlalu besar."); return; }
+        hideMsg($("editorError"));
+        stopMusicPreview();
+        if (customMusicLocal.objectUrl) { try { URL.revokeObjectURL(customMusicLocal.objectUrl); } catch (e) {} }
+        customMusicLocal = { file: file, name: file.name, size: file.size, objectUrl: URL.createObjectURL(file), dataUrl: "" };
+        if (current.data) current.data.musicFileName = file.name;
+        updateCustomMusicUI();
+        updatePreview();
+        toast("Musik kalian siap — dengar lewat “Dengar Pratinjau”, lalu unduh file undangannya.");
+      }
+      function readCustomMusicDataUrl(){
+        if (!customMusicLocal.file) return Promise.resolve("");
+        if (customMusicLocal.dataUrl) return Promise.resolve(customMusicLocal.dataUrl);
+        return new Promise(function(resolve, reject){
+          var rd = new FileReader();
+          rd.onload = function(){ customMusicLocal.dataUrl = String(rd.result || ""); resolve(customMusicLocal.dataUrl); };
+          rd.onerror = function(){ reject(rd.error || new Error("Gagal membaca file musik")); };
+          rd.readAsDataURL(customMusicLocal.file);
+        });
+      }
+      function startCustomMusicPreview(){
+        var src = customMusicPreviewSrc();
+        if (!src) { toast("Pilih file musiknya dulu, atau tempel link MP3-nya ya."); return; }
+        try {
+          if (!customAudio) { customAudio = new Audio(); customAudio.loop = true; customAudio.preload = "auto"; }
+          if (customAudio.getAttribute("data-src") !== src) {
+            customAudio.src = src;
+            customAudio.setAttribute("data-src", src);
+          }
+          var p = customAudio.play();
+          if (p && typeof p.catch === "function") {
+            p.catch(function(){ toast("Musiknya belum bisa diputar — periksa file atau link MP3-nya ya."); stopMusicPreview(); });
+          }
+          mpState.on = true; mpState.theme = "custom";
+          $("musicPreviewBtn").textContent = "Berhenti";
+        } catch (e) { toast("Audio tidak tersedia di browser ini."); }
+      }
+      function startMusicPreview(){
+        var id = $("fMusic").value;
+        if (id === "custom") { startCustomMusicPreview(); return; }
+        if (!MUSIC_THEMES[id]) {
+          toast(id === "none" ? "Pilihan ini tanpa musik — tidak ada yang diputar." : "Itu musik bawaan template — pilih tema lain untuk mendengar contohnya.");
+          return;
+        }
+        try {
+          if (!mpState.ctx) {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) { toast("Audio tidak tersedia di browser ini."); return; }
+            mpState.ctx = new AC();
+          }
+          if (mpState.ctx.state === "suspended") mpState.ctx.resume();
+          mpState.on = true; mpState.theme = id; mpState.step = 0;
+          $("musicPreviewBtn").textContent = "Berhenti";
+          mpSchedule();
+        } catch (e) { toast("Audio tidak tersedia di browser ini."); }
+      }
+      function stopMusicPreview(){
+        mpState.on = false;
+        mpState.theme = "";
+        if (mpState.timer) clearTimeout(mpState.timer);
+        if (customAudio) { try { customAudio.pause(); } catch (e) {} }
+        var b = $("musicPreviewBtn");
+        if (b) b.textContent = "Dengar Pratinjau";
+      }
+
       function makeField(labelText, inputEl, full){
         var wrap = document.createElement("div"); wrap.className = "field" + (full ? " full" : "");
         var lab = document.createElement("label"); lab.textContent = labelText;
@@ -1061,6 +1400,17 @@
         $("editorMeta").textContent = "Token " + code + " · Template " + (t ? t.name : slug) + ". Ubah data di bawah, lalu tekan Simpan. Tamu akan melihat data terbaru lewat link undangan kalian.";
         setVal("fGroom", d.groomName); setVal("fBride", d.brideName);
         setVal("fQuote", d.quote);
+        setVal("fWa", d.waNumber);
+        $("fMusic").value = MUSIC_LABELS[d.music] ? d.music : "default";
+        setVal("fMusicUrl", d.musicUrl);
+        /* File musik lokal sesi sebelumnya tidak dibawa antar-sesi editor:
+           yang dipulihkan hanya nama file & link dari data tersimpan. */
+        if (customMusicLocal.objectUrl) { try { URL.revokeObjectURL(customMusicLocal.objectUrl); } catch (e) {} }
+        customMusicLocal = { file: null, name: "", size: 0, objectUrl: "", dataUrl: "" };
+        var upM = $("upMusic"); if (upM) upM.value = "";
+        stopMusicPreview();
+        updateCustomMusicUI();
+        setVal("fGuests", normalizeGuests(d).join("\n"));
         renderEventsList(normalizeEvents(d));
         renderRundownList(normalizeRundown(d));
         renderLoveStoryList(normalizeLoveStory(d));
@@ -1084,12 +1434,17 @@
         updatePreview();
         showView("editor");
       }
-      $("editorBackBtn").addEventListener("click", function(){ showView("catalog"); });
+      $("editorBackBtn").addEventListener("click", function(){ stopMusicPreview(); showView("catalog"); });
 
       function collectData(){
         var d = current.data;
         d.groomName = getVal("fGroom"); d.brideName = getVal("fBride");
         d.quote = getVal("fQuote");
+        d.waNumber = getVal("fWa");
+        d.music = $("fMusic") ? $("fMusic").value : "default";
+        d.musicUrl = $("fMusicUrl") ? getVal("fMusicUrl") : (d.musicUrl || "");
+        d.musicFileName = customMusicLocal.name || d.musicFileName || "";
+        d.guests = collectGuests();
         d.events = collectEvents();
         d.rundown = collectRundown();
         d.loveStory = collectLoveStory();
@@ -1120,6 +1475,16 @@
         var d = collectData();
         var dl = $("previewList"); dl.innerHTML = "";
         setPreviewRow(dl, "Mempelai", (d.groomName || "…") + " & " + (d.brideName || "…"));
+        setPreviewRow(dl, "WhatsApp RSVP", d.waNumber);
+        var musTxt = musicLabel(d.music);
+        if (d.music === "custom") {
+          if (customMusicLocal.file) musTxt += " — file: " + customMusicLocal.name + " (" + fmtBytes(customMusicLocal.size) + ")";
+          else if (d.musicUrl) musTxt += " — link: " + d.musicUrl;
+          else if (d.musicFileName) musTxt += " — file: " + d.musicFileName + " (pilih ulang untuk ditanam ke unduhan)";
+          else musTxt += " — belum ada file / link";
+        }
+        setPreviewRow(dl, "Musik Latar", musTxt);
+        setPreviewRow(dl, "Daftar Tamu", d.guests && d.guests.length ? d.guests.length + " tamu" : "—");
         (d.events || []).forEach(function(ev, i){
           var label = "Acara " + (i + 1) + (ev.title ? " · " + ev.title : "");
           var parts = [];
@@ -1154,10 +1519,26 @@
           var val = s.text ? (s.text.length > 180 ? s.text.slice(0, 180) + "…" : s.text) : ((s.title || s.year) ? "judul & tahun terisi, cerita belum" : "belum diisi");
           setPreviewRow(dl, label, val);
         });
+        renderGuestLinks();
         schedulePreviewRender();
       }
-      ["fGroom","fBride","fQuote"].forEach(function(id){
+      ["fGroom","fBride","fQuote","fWa","fGuests","fMusicUrl"].forEach(function(id){
         $(id).addEventListener("input", updatePreview);
+      });
+      $("fMusic").addEventListener("change", function(){ stopMusicPreview(); updateCustomMusicUI(); updatePreview(); });
+      $("upMusic").addEventListener("change", function(){
+        var file = this.files && this.files[0]; this.value = "";
+        if (file) handleMusicFile(file);
+      });
+      $("removeMusicFileBtn").addEventListener("click", function(){ clearCustomMusicFile(); });
+      $("fMusicUrl").addEventListener("input", function(){ if (mpState.theme === "custom") stopMusicPreview(); });
+      $("musicPreviewBtn").addEventListener("click", function(){
+        if (mpState.on) stopMusicPreview(); else startMusicPreview();
+      });
+      $("copyAllGuestLinksBtn").addEventListener("click", function(){
+        var names = collectGuests();
+        if (!names.length) { toast("Isi dulu nama tamunya ya."); return; }
+        copyText(names.map(function(n){ return n + ": " + guestLinkFor(n); }).join("\n"), names.length + " link tamu disalin.");
       });
       $("addEventBtn").addEventListener("click", function(){
         $("eventsList").appendChild(buildEventItem({ title: "", date: "", time: "", venue: "", address: "", mapsUrl: "" }));
@@ -1390,10 +1771,13 @@
         }
         /* Urutan sumber: file template di folder yang sama (produksi:
            Netlify / GitHub Pages / Vercel — satu origin, pasti ketemu),
-           lalu alamat template resmi katalog, terakhir mirror GitHub Pages
-           (untuk lingkungan dev/audit tempat file template tidak satu
-           folder). Hanya SATU yang berhasil dipakai, hasilnya di-cache. */
+           lalu salinan template yang terbundel di folder assets/ katalog
+           (mis. Jawa Klasik), lalu alamat template resmi katalog, terakhir
+           mirror GitHub Pages (untuk lingkungan dev/audit tempat file
+           template tidak satu folder). Hanya SATU yang berhasil dipakai,
+           hasilnya di-cache. */
         var chain = grab(slug + ".html");
+        chain = chain.catch(function(){ return grab("assets/" + slug + ".html"); });
         if (tpl && tpl.url) chain = chain.catch(function(){ return grab(tpl.url); });
         chain = chain.catch(function(){ return grab("https://moloqo.github.io/undangan/" + slug + ".html"); });
         var p = chain.then(function(html){ return html; });
@@ -1415,10 +1799,58 @@
           + "fs.FieldValue={serverTimestamp:function(){return null;},increment:function(n){return n;},delete:function(){return null;},arrayUnion:function(){return null;},arrayRemove:function(){return null;}};"
           + "window.firebase={apps:[],initializeApp:function(){if(!window.firebase.apps.length)window.firebase.apps.push({});return window.firebase.apps[0];},firestore:fs};"
           + "})();<\/script>";
+        /* Jembatan WhatsApp universal: cadangan untuk template yang
+           BELUM menyambungkan sendiri form RSVP-nya ke nomor WhatsApp
+           customer (data.waNumber dari token) — tombol kirim diganti
+           jadi "Kirim via WhatsApp" dan isi form (nama tamu, konfirmasi
+           kehadiran, ucapan) diteruskan ke wa.me customer.
+           Ke-16 template katalog saat ini SUDAH menyambungkan sendiri
+           (termasuk Jawa Klasik), jadi jembatan ini dilewati untuk
+           semuanya — kalau tidak, handler katalog dan handler bawaan
+           template sama-sama jalan dan WhatsApp terbuka dua kali saat
+           preview. Sebagai pengaman ganda, salinan template yang di
+           HTML-nya sudah menyebut waNumber juga selalu dilewati, apa
+           pun slug-nya. File undangan mandiri hasil unduhan membawa
+           tombol WhatsApp-nya sendiri lewat buildStandaloneHTML. */
+        var NATIVE_WA_SLUGS = {
+          "undangan-pernikahan-digital": 1, "undangan-pernikahan-minangkabau": 1,
+          "undangan-pixel-bali": 1, "undangan-pixel-betawi": 1,
+          "undangan-pixel-sunda": 1, "undangan-pixel-sakura": 1,
+          "undangan-pixel-luar-angkasa": 1, "undangan-wayang-kulit": 1,
+          "undangan-jawa-klasik": 1, "undangan-art-deco-gatsby": 1,
+          "undangan-arabian-nights": 1, "undangan-rustic-kraft": 1,
+          "undangan-retro-90an": 1, "undangan-vintage-bioskop": 1,
+          "undangan-kastil-dongeng": 1, "undangan-parisian-love-letter": 1
+        };
+        var bridge = "";
+        var waNumB = waDigits(draftData && draftData.waNumber);
+        var templateWiresWaItself = !!NATIVE_WA_SLUGS[current.slug] ||
+          String(templateHtml).indexOf("waNumber") !== -1;
+        if (waNumB && !templateWiresWaItself) {
+          var shortOfB = function(v){ var s = String(v || "").trim(); return s ? s.split(/\s+/)[0] : ""; };
+          var coupleB = [shortOfB(draftData.groomName), shortOfB(draftData.brideName)].filter(Boolean).join(" & ");
+          bridge = "<script>(function(){"
+            + "var WA=" + JSON.stringify(waNumB) + ",COUPLE=" + JSON.stringify(coupleB) + ";"
+            + "function fld(f,re){var els=f.querySelectorAll('input');for(var i=0;i<els.length;i++){var k=(els[i].id||'')+' '+(els[i].name||'')+' '+(els[i].getAttribute('placeholder')||'');if(re.test(k))return els[i];}return null;}"
+            + "function wire(){var f=document.getElementById('rsvpForm')||document.querySelector('form.rsvp');if(!f)return false;if(f.__waWired)return true;f.__waWired=true;"
+            + "var b=f.querySelector('#rsvpSubmit')||f.querySelector('button[type=submit]')||f.querySelector('input[type=submit]')||f.querySelector('button');"
+            + "if(b){if(b.tagName==='INPUT')b.value='Kirim via WhatsApp';else b.textContent='Kirim via WhatsApp';}"
+            + "f.addEventListener('submit',function(){var nE=fld(f,/nama|name/i)||f.querySelector('input[type=text]')||f.querySelector('input:not([type])');var wE=f.querySelector('textarea');var aE=f.querySelector('select');"
+            + "var nm=nE?nE.value.trim():'';var ws=wE?wE.value.trim():'';if(!nm&&!ws)return;"
+            + "var at=aE?((aE.options&&aE.options[aE.selectedIndex])?aE.options[aE.selectedIndex].text:aE.value):'';"
+            + "var msg='Halo '+(COUPLE||'kedua mempelai')+', saya '+(nm||'tamu undangan')+'.';"
+            + "if(at)msg+='\\nKonfirmasi kehadiran: '+at+'.';"
+            + "if(ws)msg+='\\nUcapan: '+ws;"
+            + "window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(msg),'_blank');});"
+            + "return true;}"
+            + "function tryWire(){if(wire())return;var n=0;var iv=setInterval(function(){n++;if(wire()||n>40)clearInterval(iv);},250);}"
+            + "if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tryWire);else tryWire();"
+            + "})();<\/script>";
+        }
         var html = String(templateHtml).replace(/<script[^>]*src=["'][^"']*firebasejs[^"']*["'][^>]*>\s*<\/script>/gi, "");
         var m = /<head[^>]*>/i.exec(html);
-        if (m) return html.slice(0, m.index + m[0].length) + shim + html.slice(m.index + m[0].length);
-        return shim + html;
+        if (m) return html.slice(0, m.index + m[0].length) + shim + bridge + html.slice(m.index + m[0].length);
+        return shim + bridge + html;
       }
       function buildPreviewData(){
         var d = JSON.parse(JSON.stringify(collectData() || {}));
@@ -1537,7 +1969,38 @@
       function slugifyFile(v){
         return String(v || "undangan").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "undangan";
       }
-      function buildStandaloneHTML(rawData, tpl){
+      /* Normalisasi nomor WhatsApp customer: 08xx -> 628xx, 8xx -> 628xx. */
+      function waDigits(v){
+        var digits = String(v || "").replace(/\D/g, "");
+        if (digits.charAt(0) === "0") digits = "62" + digits.slice(1);
+        else if (digits.charAt(0) === "8") digits = "62" + digits;
+        return digits.length >= 9 ? digits : "";
+      }
+      /* Skrip musik generatif untuk file mandiri: memainkan tema pilihan
+         customer (data.music) lewat WebAudio — tanpa file audio eksternal. */
+      function buildMusicScript(theme){
+        return "(function(){"
+          + "var S=" + JSON.stringify(theme.scale) + ",M=" + JSON.stringify(theme.melody) + ",T=" + theme.tempo + ",W=" + JSON.stringify(theme.wave) + ",G=" + theme.gain + ",D=" + theme.dur + ",OV=" + theme.overtone + ",GONG=" + (theme.gong ? 1 : 0) + ";"
+          + "var ctx=null,on=false,timer=null,step=0;"
+          + "var btn=document.getElementById('musikBtn');if(!btn)return;"
+          + "function note(f,t,dur,g,w){try{var o=ctx.createOscillator(),o2=ctx.createOscillator(),gn=ctx.createGain(),g2=ctx.createGain();o.type=w;o.frequency.value=f;o2.type='sine';o2.frequency.value=f*OV;g2.gain.value=0.22;gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g,t+0.015);gn.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(gn);o2.connect(g2);g2.connect(gn);gn.connect(ctx.destination);o.start(t);o2.start(t);o.stop(t+dur+0.05);o2.stop(t+dur+0.05);}catch(e){}}"
+          + "function sched(){if(!on||!ctx)return;var now=ctx.currentTime;var f=S[M[step%M.length]%S.length];note(f,now,D,G,W);if(step%2===0)note(f/2,now,D,G*0.35,W);if(GONG&&step%12===0)note(110,now,3.4,0.12,'sine');step++;timer=setTimeout(sched,T);}"
+          + "function start(){try{if(!ctx){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=new AC();}if(ctx.state==='suspended')ctx.resume();if(!on){on=true;btn.textContent='Jeda Musik';sched();}}catch(e){}}"
+          + "function stop(){on=false;btn.textContent='Putar Musik';if(timer)clearTimeout(timer);}"
+          + "btn.addEventListener('click',function(){if(on)stop();else start();});"
+          + "})();";
+      }
+      /* Skrip musik sendiri untuk file mandiri: memutar elemen <audio>
+         berisi file upload customer (ditanam sebagai data URL) atau
+         link MP3 customer, berulang (loop) lewat tombol Putar Musik. */
+      function buildCustomMusicScript(){
+        return "(function(){"
+          + "var a=document.getElementById('musikAudio');var btn=document.getElementById('musikBtn');if(!a||!btn)return;"
+          + "btn.addEventListener('click',function(){if(a.paused){var p=a.play();if(p&&p.catch)p.catch(function(){});btn.textContent='Jeda Musik';}else{a.pause();btn.textContent='Putar Musik';}});"
+          + "a.addEventListener('ended',function(){btn.textContent='Putar Musik';});"
+          + "})();";
+      }
+      function buildStandaloneHTML(rawData, tpl, customMusicSrcOverride){
         var d = JSON.parse(JSON.stringify(rawData || {}));
         var events = normalizeEvents(d);
         var banks = normalizeBanks(d).filter(function(b){ return b.bank || b.number || b.holder; });
@@ -1589,7 +2052,20 @@
         }).join("") + '</section>' : "";
         var coverImg = ph.cover ? '<img class="cover" src="' + escHtml(ph.cover) + '" alt="Foto ' + escHtml(names) + '">' : "";
         var quoteHtml = d.quote ? '<section class="card quote"><p>“' + escHtml(d.quote) + '”</p></section>' : "";
+        var waNum = waDigits(d.waNumber);
+        var waHtml = waNum ? '<section class="card"><h2>Konfirmasi Kehadiran</h2><p>Konfirmasi kehadiran &amp; ucapan doa bisa langsung dikirim ke WhatsApp kami — tekan tombol di bawah, lalu kirim pesan yang sudah terisi otomatis.</p><p style="margin-top:14px"><a class="btn" href="https://wa.me/' + waNum + '?text=' + encodeURIComponent("Halo " + names + ", saya tamu undangan pernikahan kalian. Saya konfirmasi akan hadir. Terima kasih atas undangannya.") + '" target="_blank" rel="noopener">Kirim via WhatsApp</a></p></section>' : "";
         var cdHtml = firstDate ? '<section class="card"><h2>Menghitung Hari</h2><div class="cd" id="cd"><div><b id="cdD">–</b><span>Hari</span></div><div><b id="cdH">–</b><span>Jam</span></div><div><b id="cdM">–</b><span>Menit</span></div><div><b id="cdS">–</b><span>Detik</span></div></div></section>' : "";
+        var musicTheme = d.music === "custom" ? null : (MUSIC_THEMES[d.music] || null);
+        var customSrc = d.music === "custom" ? String(customMusicSrcOverride || d.musicUrl || "").trim() : "";
+        var musicHtml = "";
+        var musicScript = "";
+        if (customSrc) {
+          musicHtml = '<audio id="musikAudio" loop preload="auto" src="' + escHtml(customSrc) + '"></audio><button type="button" id="musikBtn">Putar Musik</button>';
+          musicScript = buildCustomMusicScript();
+        } else if (musicTheme) {
+          musicHtml = '<button type="button" id="musikBtn">Putar Musik</button>';
+          musicScript = buildMusicScript(musicTheme);
+        }
         var lines = [
           '<!doctype html>',
           '<html lang="id"><head><meta charset="utf-8">',
@@ -1618,31 +2094,52 @@
           '.bank{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid #ddd2bd;border-radius:12px;padding:14px 16px;margin-top:12px;font-family:Arial,sans-serif;font-size:14.5px}',
           '.bank .num{font-weight:700;letter-spacing:.04em}',
           '.copybtn{background:#b98a2f;color:#221806;border:none;font-weight:700;padding:11px 16px;border-radius:9px;cursor:pointer;min-height:46px;font-family:Arial,sans-serif}',
+          '#musikBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:20;background:#1f4d3a;color:#fff;border:none;border-radius:999px;padding:13px 22px;font-family:Arial,sans-serif;font-weight:700;font-size:14.5px;min-height:50px;box-shadow:0 10px 24px rgba(0,0,0,.28);cursor:pointer}',
           'footer{text-align:center;color:#5d5344;font-size:14.5px;padding:10px 4px 0}',
           '@media (prefers-color-scheme:dark){body{background:#171a17;color:#f0ead9}.card{background:#22261f;border-color:#3d4234}.card p,.cd span,footer{color:#c4bba6}.card .when,.card .venue,.quote p{color:#f0ead9}.cd div{background:#1f2420}}',
           '</style></head><body><main>',
           '<header><p class="theme">Undangan Pernikahan · ' + escHtml(themeName) + '</p>' + coverImg + '<h1>' + escHtml(groom) + '<br>&amp;<br>' + escHtml(bride) + '</h1>' + (firstDate ? '<p class="date">' + escHtml(fmtDate(firstDate)) + '</p>' : '') + '</header>',
-          quoteHtml, cdHtml, evHtml, rundownHtml, loveHtml, galHtml, bankHtml,
+          quoteHtml, cdHtml, evHtml, rundownHtml, loveHtml, galHtml, bankHtml, waHtml, musicHtml,
           '<footer><p>Merupakan suatu kehormatan &amp; kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p><p style="margin-top:12px"><strong>' + escHtml(names) + '</strong></p></footer>',
           '</main>',
           '<script>',
           'document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var t=b.getAttribute("data-copy");if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){b.textContent="Tersalin ✓";setTimeout(function(){b.textContent="Salin"},1800);});}});});',
+          musicScript,
           firstDate ? '(function(){var target=new Date("' + firstDate + 'T08:00:00");function tick(){var diff=target-new Date();if(diff<0)diff=0;var d=Math.floor(diff/864e5),h=Math.floor(diff/36e5)%24,m=Math.floor(diff/6e4)%60,s=Math.floor(diff/1e3)%60;var e=function(id,v){var n=document.getElementById(id);if(n)n.textContent=v;};e("cdD",d);e("cdH",h);e("cdM",m);e("cdS",s);}tick();setInterval(tick,1000);})();' : '',
           '<\/script></body></html>'
         ];
         return lines.join("\n");
       }
       function downloadStandalone(rawData, tpl){
-        var html = buildStandaloneHTML(rawData, tpl);
         var d = rawData || {};
-        var fname = "undangan-" + slugifyFile((d.groomName || "") + "-" + (d.brideName || "")) + ".html";
-        var blob = new Blob([html], { type: "text/html;charset=utf-8" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url; a.download = fname;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-        toast("File undangan diunduh: " + fname);
+        function finish(customSrc){
+          var html = buildStandaloneHTML(rawData, tpl, customSrc || "");
+          var fname = "undangan-" + slugifyFile((d.groomName || "") + "-" + (d.brideName || "")) + ".html";
+          var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url; a.download = fname;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+          toast(customSrc && String(customSrc).indexOf("data:") === 0
+            ? "File undangan diunduh dengan musik kalian tertanam di dalamnya: " + fname
+            : "File undangan diunduh: " + fname);
+        }
+        /* Musik sendiri dari file upload hanya ditanam saat unduhan
+           berasal dari editor yang sedang membuka data ini (rawData ===
+           current.data) — ekspor admin memakai link MP3 tersimpan saja,
+           supaya file customer lain tidak ketukar musik sesi editor. */
+        if (d.music === "custom" && rawData === current.data && customMusicLocal.file) {
+          toast("Menyiapkan musik kalian ke dalam file undangan…");
+          readCustomMusicDataUrl().then(function(dataUrl){
+            finish(dataUrl || "");
+          }).catch(function(){
+            showMsg($("editorError"), "File musiknya gagal dibaca di perangkat ini — file undangan tetap diunduh, coba upload ulang musiknya ya.");
+            finish("");
+          });
+          return;
+        }
+        finish("");
       }
 
       /* ================= ADMIN ================= */
@@ -1895,6 +2392,16 @@
           renderHistory();
           var d = doc.data || {};
           setPreviewRow(dl, "Mempelai", ((d.groomName || "…") + " & " + (d.brideName || "…")));
+          setPreviewRow(dl, "WhatsApp RSVP", d.waNumber || "—");
+          var mTxt = musicLabel(d.music);
+          if (d.music === "custom") {
+            if (d.musicUrl) mTxt += " — link: " + d.musicUrl;
+            else if (d.musicFileName) mTxt += " — file: " + d.musicFileName + " (tertanam di unduhan customer)";
+            else mTxt += " — belum ada file / link";
+          }
+          setPreviewRow(dl, "Musik Latar", mTxt);
+          var guestList = normalizeGuests(d);
+          setPreviewRow(dl, "Daftar Tamu", guestList.length ? guestList.length + " tamu — " + guestList.slice(0, 3).join(", ") + (guestList.length > 3 ? ", …" : "") : "—");
           var evList = normalizeEvents(d);
           evList.forEach(function(ev, i){
             var parts = [];
