@@ -477,7 +477,7 @@ footer .f-names{font-family:"Press Start 2P",monospace; color:var(--red); font-s
         </select>
         <label for="f-msg">Ucapan &amp; Doa</label>
         <textarea id="f-msg" name="msg" placeholder="Tulis ucapan terbaik buat Jali &amp; Sari…" maxlength="300"></textarea>
-        <button class="btn" type="submit">KIRIM UCAPAN</button>
+        <button class="btn" type="submit" id="rsvpSubmit">KIRIM UCAPAN</button>
       </form>
     </div>
     <h3 class="pixel" style="font-size:15px; line-height:1.8; text-align:center; margin:34px 0 20px;">DINDING UCAPAN</h3>
@@ -626,6 +626,15 @@ footer .f-names{font-family:"Press Start 2P",monospace; color:var(--red); font-s
   }
 
   /* ---------- RSVP (createElement + textContent only) ---------- */
+  var hydWaNumber = "";
+  function hydNormWa(raw){
+    var d = String(raw || "").replace(/\D/g, "");
+    if (!d) return "";
+    if (d.charAt(0) === "0") d = "62" + d.slice(1);
+    else if (d.charAt(0) === "8") d = "62" + d;
+    return d.length >= 9 ? d : "";
+  }
+  var waAttendText = {hadir:"Hadir, insya Allah", ragu:"Masih ragu", tidak:"Berhalangan hadir"};
   var counts = {hadir:0, ragu:0, tidak:0};
   var form = document.getElementById('rsvpForm');
   var wall = document.getElementById('wall');
@@ -651,8 +660,15 @@ footer .f-names{font-family:"Press Start 2P",monospace; color:var(--red); font-s
     var p = document.createElement('p'); p.textContent = msg;
     box.appendChild(head); box.appendChild(p);
     wall.insertBefore(box, wall.firstChild);
+    var waTarget = hydWaNumber;
     form.reset();
-    showToast('Makasih! Ucapan Abang/Mpok udah nempel di dinding');
+    if (waTarget){
+      var waText = 'Halo, saya ' + name + '.\nKonfirmasi kehadiran: ' + (waAttendText[attend] || attend) + '\nUcapan & doa: ' + msg;
+      window.open('https://wa.me/' + waTarget + '?text=' + encodeURIComponent(waText), '_blank');
+      showToast('Membuka WhatsApp — ucapan juga nempel di dinding');
+    } else {
+      showToast('Makasih! Ucapan Abang/Mpok udah nempel di dinding');
+    }
   });
 
 
@@ -942,6 +958,13 @@ footer .f-names{font-family:"Press Start 2P",monospace; color:var(--red); font-s
       var ls = d.loveStory.filter(function(ch){ return ch && (hydStr(ch.text) || hydStr(ch.title)); });
       if (ls.length) hydRenderLoveStory(ls);
     }
+    /* WhatsApp tujuan RSVP (nomor customer dari data token) */
+    var waNum = hydNormWa(hydStr(d.waNumber) || hydStr(d.wa) || hydStr(d.whatsapp) || hydStr(d.wa_number));
+    if (waNum) {
+      hydWaNumber = waNum;
+      var rsvpBtn = document.getElementById("rsvpSubmit");
+      if (rsvpBtn) rsvpBtn.textContent = "KIRIM VIA WHATSAPP";
+    }
     /* Bersihkan label demo */
     var badges = document.querySelectorAll(".demo-badge");
     for (var bi = 0; bi < badges.length; bi++) badges[bi].style.display = "none";
@@ -972,7 +995,9 @@ footer .f-names{font-family:"Press Start 2P",monospace; color:var(--red); font-s
         if (!snap.exists) { hydInvalid(); return; }
         var doc = snap.data() || {};
         if (doc.status !== "active") { hydInvalid(); return; }
-        hydApply(doc.data || {});
+        var payload = doc.data || {};
+        if (doc.waNumber && !payload.waNumber) payload.waNumber = doc.waNumber;
+        hydApply(payload);
       }).catch(function(){ /* gagal jaringan → biarkan tampilan demo */ });
     } catch (e) { /* SDK/init gagal → biarkan tampilan demo */ }
   }

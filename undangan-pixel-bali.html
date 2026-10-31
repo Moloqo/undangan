@@ -1222,6 +1222,18 @@ body.opened #bottomNav{display:grid;}
     }
     if (status !== 'Hadir') guests = 0;
     addWish(name, status, guests, message, true);
+    /* Nomor WA customer terpasang (lewat data token ?t=) → teruskan
+       konfirmasi & ucapan ke WhatsApp customer via wa.me. Nilai dibaca
+       dari variabel yang sudah ditangkap sebelum form direset. */
+    if (window.__waNumber) {
+      var attSel = document.getElementById('fHadir');
+      var attText = (attSel && attSel.options && attSel.options[attSel.selectedIndex]) ? attSel.options[attSel.selectedIndex].text : status;
+      var waMsg = 'Halo ' + (window.__waCouple || 'kedua mempelai') + ', saya ' + name + '.\n' +
+        'Konfirmasi kehadiran: ' + attText + '.\n' +
+        (status === 'Hadir' && guests > 0 ? 'Jumlah tamu: ' + guests + ' orang.\n' : '') +
+        'Ucapan: ' + message;
+      window.open('https://wa.me/' + window.__waNumber + '?text=' + encodeURIComponent(waMsg), '_blank');
+    }
     form.reset();
     document.getElementById('fHadir').value = 'Hadir';
     document.getElementById('fJumlah').value = '1';
@@ -1309,6 +1321,33 @@ body.opened #bottomNav{display:grid;}
     var m = /(\d{1,2})[.:](\d{2})/.exec(txt(s));
     return m ? { h: +m[1], min: +m[2] } : null;
   }
+  /* Normalisasi nomor WA customer: 08xx -> 628xx, 8xx -> 628xx. */
+  function normalizeWa(v){
+    var digits = txt(v).replace(/\D/g, "");
+    if (digits.charAt(0) === "0") digits = "62" + digits.slice(1);
+    else if (digits.charAt(0) === "8") digits = "62" + digits;
+    return digits.length >= 9 ? digits : "";
+  }
+  /* Nomor WA customer (data.waNumber) mengubah tombol RSVP menjadi
+     "Kirim via WhatsApp": handler kirim utama membaca window.__waNumber
+     dan meneruskan nama tamu, konfirmasi kehadiran, jumlah tamu, dan
+     ucapan ke wa.me customer. */
+  function wireWhatsapp(waNumber, gShort, bShort){
+    window.__waNumber = waNumber;
+    window.__waCouple = (gShort && bShort) ? (gShort + " & " + bShort) : (gShort || bShort || "kedua mempelai");
+    var form = document.getElementById("rsvpForm");
+    if (!form) return;
+    form.__waWired = true;
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.textContent = "KIRIM VIA WHATSAPP";
+    var note = document.getElementById("formNote");
+    if (note) note.textContent = "Ucapan tampil di dinding ucapan dan diteruskan ke WhatsApp mempelai.";
+  }
+  window.__applyWaNumber = function(raw, gShort, bShort){
+    var n = normalizeWa(raw);
+    if (n) wireWhatsapp(n, gShort, bShort);
+    return n;
+  };
   function canangSpan(){
     var s = el("span", "canang");
     s.setAttribute("aria-hidden", "true");
@@ -1323,6 +1362,9 @@ body.opened #bottomNav{display:grid;}
     var gShort = groom ? groom.short : "Made";
     var bShort = bride ? bride.short : "Ayu";
     var gUp = gShort.toUpperCase(), bUp = bShort.toUpperCase();
+
+    /* ---- WhatsApp RSVP customer ---- */
+    window.__applyWaNumber(d.waNumber, gShort, bShort);
 
     /* ---- nama ---- */
     if (groom || bride) {
