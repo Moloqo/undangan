@@ -1254,6 +1254,7 @@
 
   /* ---- RSVP wall (createElement + textContent only) ---- */
   var counts = { hadir: 0, tidak: 0, total: 0 };
+  var waDigits = ""; /* nomor WA customer dari token (mode live); kosong = demo */
   var wall = $("#wishWall");
   function renderWish(name, attend, msg){
     var card = document.createElement("article");
@@ -1293,6 +1294,11 @@
     if(!name){ status.textContent = "Mohon isi nama Anda terlebih dahulu."; $("#fNama").focus(); return; }
     if(!msg){ status.textContent = "Mohon tulis ucapan untuk kedua mempelai."; $("#fUcapan").focus(); return; }
     var attend = document.querySelector('input[name="kehadiran"]:checked').value;
+    /* nomor WA customer terisi (mode live) → kirim juga ke WhatsApp customer */
+    if(waDigits){
+      var waText = "Halo, saya " + name + ".\nKehadiran: " + attend + "\nUcapan: " + msg;
+      window.open("https://wa.me/" + waDigits + "?text=" + encodeURIComponent(waText), "_blank");
+    }
     renderWish(name, attend, msg);
     counts.total++;
     if(attend === "Hadir"){ counts.hadir++; } else { counts.tidak++; }
@@ -1436,6 +1442,13 @@
 
     /* ---------- helpers ---------- */
     function isHttp(u){ return typeof u === "string" && /^https?:\/\//i.test(u.trim()); }
+    function normalizeWa(num){
+      var dig = String(num || "").replace(/\D/g, "");
+      if(!dig) return "";
+      if(dig.charAt(0) === "0"){ dig = "62" + dig.slice(1); }
+      else if(dig.charAt(0) === "8"){ dig = "62" + dig; }
+      return dig.length >= 8 ? dig : "";
+    }
     function firstWord(s){ var p = (s || "").trim().split(/\s+/); return p[0] || ""; }
     function parseDateStr(s){
       if(!s) return null;
@@ -1855,6 +1868,14 @@
           });
           applied = true;
         }
+      }
+
+      /* nomor WhatsApp tujuan RSVP (opsional) — tombol kirim jadi "Kirim via WhatsApp" */
+      var waNum = normalizeWa(d.waNumber);
+      if(waNum){
+        waDigits = waNum;
+        var submitBtn = document.querySelector('#rsvpForm button[type="submit"]');
+        if(submitBtn) submitBtn.textContent = "Kirim via WhatsApp";
       }
 
       /* token valid & ada data live → badge demo disembunyikan */

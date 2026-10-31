@@ -621,7 +621,7 @@
         <label for="fUcapan">Ucapan &amp; Doa</label>
         <textarea id="fUcapan" name="ucapan" placeholder="Tuliskan ucapan selamat untuk kedua mempelai…" maxlength="400"></textarea>
       </div>
-      <button class="btn" type="submit" style="width:100%">Kirim Konfirmasi</button>
+      <button class="btn" type="submit" id="rsvpSubmitBtn" style="width:100%">Kirim Konfirmasi</button>
       <p class="form-msg" id="formMsg" role="status"></p>
     </form>
 
@@ -835,6 +835,25 @@
   var stats = { hadir: 0, tamu: 0, ucapan: 0 };
   var statusLabel = { hadir: 'Hadir', ragu: 'Masih Ragu', tidak: 'Berhalangan' };
 
+  /* ---------- WHATSAPP TUJUAN RSVP (nomor customer dari data token) ---------- */
+  var waNumber = '';
+  var coupleLabel = '';
+  function normalizeWaNumber(raw){
+    var digits = String(raw === null || raw === undefined ? '' : raw).replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.charAt(0) === '0') digits = '62' + digits.slice(1);
+    else if (digits.charAt(0) === '8') digits = '62' + digits;
+    if (digits.length < 9 || digits.length > 15) return '';
+    return digits;
+  }
+  function applyWaNumber(raw){
+    var n = normalizeWaNumber(raw);
+    if (!n) return;
+    waNumber = n;
+    var btn = document.getElementById('rsvpSubmitBtn');
+    if (btn) btn.textContent = 'Kirim via WhatsApp';
+  }
+
   function renderCounters(){
     cntHadir.textContent = stats.hadir;
     cntTamu.textContent = stats.tamu;
@@ -902,7 +921,17 @@
     }
     formMsg.classList.remove('err');
     addWish(name, status, status === 'hadir' ? guests : 0, msg, true);
-    formMsg.textContent = 'Terima kasih, ' + name + '! Konfirmasi & ucapan Anda sudah terpajang di dinding ucapan.';
+    if (waNumber) {
+      var waText = 'Halo, saya ' + name + '.\n' +
+        'Konfirmasi kehadiran: ' + (statusLabel[status] || status) +
+        (status === 'hadir' ? '\nJumlah tamu: ' + guests + ' orang' : '') +
+        '\nUcapan: ' + msg +
+        (coupleLabel ? '\n— untuk pernikahan ' + coupleLabel : '');
+      window.open('https://wa.me/' + waNumber + '?text=' + encodeURIComponent(waText), '_blank');
+      formMsg.textContent = 'Terima kasih, ' + name + '! Membuka WhatsApp untuk mengirim konfirmasi & ucapan Anda…';
+    } else {
+      formMsg.textContent = 'Terima kasih, ' + name + '! Konfirmasi & ucapan Anda sudah terpajang di dinding ucapan.';
+    }
     form.reset();
     document.getElementById('fHadir').value = 'hadir';
     document.getElementById('fJumlah').value = '1';
@@ -1149,6 +1178,10 @@
     /* Nama tamu di sampul (opsional ?to=) */
     var coverGuest = document.getElementById('coverGuest');
     if (coverGuest) coverGuest.textContent = guestName || 'Tamu Undangan';
+
+    /* ---- WhatsApp tujuan RSVP (nomor WA customer) ---- */
+    applyWaNumber(d.waNumber || d.wa || d.whatsapp || d.noWa || '');
+    if (groom || bride) coupleLabel = gFirst + ' & ' + bFirst;
 
     /* ---- Quote ---- */
     if (hStr(d.quote)) document.getElementById('heroQuote').textContent = hStr(d.quote);
@@ -1476,7 +1509,15 @@
     var params;
     try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
     var rawCode = params.get('t');
-    if (!rawCode) return; /* tanpa ?t= → demo persis seperti semula */
+    var waParam = '';
+    try { waParam = (params.get('wa') || '').trim(); } catch (e) { waParam = ''; }
+    if (waParam) applyWaNumber(waParam);
+    try {
+      var emb = window.__INVITATION_DATA__ || window.__EMBEDDED_DATA__ || null;
+      if (emb && typeof emb === 'object') applyWaNumber(emb.waNumber || emb.wa || emb.whatsapp || '');
+      if (typeof window.__WA_NUMBER__ === 'string') applyWaNumber(window.__WA_NUMBER__);
+    } catch (e) {}
+    if (!rawCode) return; /* tanpa ?t= → demo persis seperti semula (kecuali ?wa= di atas) */
     var code = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (!code) return;
     var guestName = '';

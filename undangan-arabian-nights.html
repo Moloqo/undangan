@@ -475,6 +475,7 @@ footer .names{font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--
     {title:"Resepsi",date:"2027-08-28",time:"11.00 – 13.00 WIB",venue:"The Opus Grand Ballroom",address:"Jl. Jenderal Sudirman Kav. 52–53, Jakarta Selatan",mapsUrl:"https://www.google.com/maps/search/?api=1&query=The+Opus+Grand+Ballroom+Jakarta"}
   ];
   var coupleNames={groom:"Amir",bride:"Yasmin"};
+  var WA_NUMBER=""; /* nomor WA customer (dari data token katalog) — kosong = perilaku lama */
 
   /* countdown */
   var target=new Date("2027-08-28T08:00:00+07:00").getTime();
@@ -581,7 +582,15 @@ footer .names{font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--
     wall.insertBefore(card, wall.firstChild);
     counts[attend]++; updateCounts();
     e.target.reset();
-    showToast("Terima kasih atas ucapannya ✦");
+    if(WA_NUMBER){
+      try{
+        var wa="https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent("Halo "+coupleNames.groom+" & "+coupleNames.bride+", saya "+name+".\nKonfirmasi: "+labels[attend]+"\nUcapan: "+msg);
+        window.open(wa,"_blank","noopener");
+        showToast("Membuka WhatsApp… ✦");
+      }catch(err){ showToast("Terima kasih atas ucapannya ✦"); }
+    } else {
+      showToast("Terima kasih atas ucapannya ✦");
+    }
   });
 
   /* ===== Hydration data tamu (?t=KODE dari Firestore) =====
@@ -733,6 +742,17 @@ footer .names{font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--
     }
     if(d.quote&&String(d.quote).trim()){
       var q=document.getElementById("quoteText"); if(q){ q.textContent=String(d.quote).trim(); applied=true; }
+    }
+    /* Nomor WA customer — RSVP diteruskan ke WhatsApp nomor ini */
+    if(d.waNumber){
+      var waDigits=String(d.waNumber).replace(/\D/g,"");
+      if(waDigits){
+        if(waDigits.charAt(0)==="0") waDigits="62"+waDigits.slice(1);
+        WA_NUMBER=waDigits;
+        var sb=document.querySelector("#rsvpForm .btn[type=submit]");
+        if(sb) sb.textContent="Kirim via WhatsApp ✦";
+        applied=true;
+      }
     }
     var evs=normalizeEvents(d);
     if(evs&&evs.some(function(ev){ return ev.title||ev.date||ev.venue; })){
