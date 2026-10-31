@@ -698,7 +698,7 @@
               <span class="lbl">Ucapan &amp; Doa</span>
               <textarea id="fMsg" maxlength="300" placeholder="Tulis ucapanmu di sini…" required></textarea>
             </label>
-            <button class="btn btn-pink" type="submit" style="width:100%;">Kirim Ucapan</button>
+            <button class="btn btn-pink" type="submit" id="rsvpSubmitBtn" style="width:100%;">Kirim Ucapan</button>
           </form>
         </div>
 
@@ -1051,16 +1051,36 @@
         addWish("Rizky Ramadhan", "yes", "Siap hadir bawa kamera analog. Jangan lupa putar lagu-lagu 90an pas resepsi!");
         addWish("Salsa Amelia", "no", "Maaf belum bisa hadir, tapi doa terbaik buat kalian berdua. Bahagia selalu sampai kakek-nenek!");
 
+        /* ---------- WhatsApp tujuan RSVP (dari data customer) ---------- */
+        var LIVE_WA_NUMBER = "";
+        function normalizeWaNumber(raw){
+          var digits = String(raw == null ? "" : raw).replace(/\D/g, "");
+          if(!digits) return "";
+          if(digits.charAt(0) === "0") digits = "62" + digits.slice(1);
+          return digits;
+        }
+        function activateWaButton(){
+          var btn = document.getElementById("rsvpSubmitBtn");
+          if(btn && LIVE_WA_NUMBER) btn.textContent = "Kirim via WhatsApp";
+        }
+
         document.getElementById("rsvpForm").addEventListener("submit", function(ev){
           ev.preventDefault();
           var name = document.getElementById("fName").value.trim();
           var attend = document.getElementById("fAttend").value;
           var msg = document.getElementById("fMsg").value.trim();
           if(!name || !msg){ toast("Isi nama dan ucapan dulu ya."); return; }
+          if(LIVE_WA_NUMBER){
+            var waText = "Halo, saya " + name + ".\n" +
+              "Konfirmasi kehadiran: " + (attend === "yes" ? "Hadir" : "Berhalangan") + "\n" +
+              "Ucapan: " + msg + "\n\n" +
+              "— via Undangan " + (window.__COUPLE__ || "Kami");
+            window.open("https://wa.me/" + LIVE_WA_NUMBER + "?text=" + encodeURIComponent(waText), "_blank");
+          }
           addWish(name.slice(0, 40), attend, msg.slice(0, 300), true);
           ev.target.reset();
           confetti(10);
-          toast("Ucapan terkirim. Terima kasih!");
+          toast(LIVE_WA_NUMBER ? "Membuka WhatsApp…" : "Ucapan terkirim. Terima kasih!");
         });
 
         /* ================= DATA TAMU DARI FIRESTORE (?t=KODE) =================
@@ -1348,6 +1368,15 @@
           var gShort = firstName(groomFull), bShort = firstName(brideFull);
           var gUp = (gShort || "GILANG").toUpperCase(), bUp = (bShort || "PUTRI").toUpperCase();
           var coupleLabel = (gShort || "Mempelai Pria") + " & " + (bShort || "Mempelai Wanita");
+
+          /* Nomor WA customer: tombol RSVP berubah jadi kirim via WhatsApp. */
+          var waNorm = normalizeWaNumber(d.waNumber);
+          if(waNorm){
+            LIVE_WA_NUMBER = waNorm;
+            window.__LIVE_WA__ = waNorm;
+            window.__COUPLE__ = coupleLabel;
+            activateWaButton();
+          }
 
           document.querySelectorAll(".demo-chip").forEach(function(c){ c.style.display = "none"; });
 
