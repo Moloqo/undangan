@@ -874,6 +874,7 @@ img{image-rendering:pixelated}
           <textarea id="fMsg" placeholder="Tulis ucapan Anda di sini, avec amour…" required></textarea>
         </div>
         <button class="submit-btn" type="submit">KIRIM BALASAN SURAT ✦</button>
+        <p id="waHint" hidden style="text-align:center; font-family:'Jost',sans-serif; font-size:15px; line-height:1.6; color:var(--muted); margin:12px auto 0; max-width:440px">Konfirmasi &amp; ucapan akan diteruskan ke WhatsApp kedua mempelai.</p>
         <div class="counter-row">
           <div class="counter-box"><b id="countYes">12</b><span>Hadir (contoh)</span></div>
           <div class="counter-box"><b id="countWishes">3</b><span>Ucapan</span></div>
@@ -1109,6 +1110,27 @@ img{image-rendering:pixelated}
   /* RSVP — wall built with createElement + textContent only (guest text never parsed as HTML) */
   var attending = true, wishCount = 0, yesCount = 12;
   var wall = $("#wishWall");
+
+  /* RSVP via WhatsApp customer — hanya aktif di mode live (?t=) bila
+     token customer punya data.waNumber yang valid. Di mode demo,
+     liveWaNumber tetap kosong dan perilaku RSVP tidak berubah. */
+  var liveWaNumber = "", liveCoupleNames = "";
+  function normalizeWaNumber(v){
+    var digits = String(v || "").replace(/\D/g, "");
+    if(digits.charAt(0) === "0") digits = "62" + digits.slice(1);
+    else if(digits.charAt(0) === "8") digits = "62" + digits;
+    return digits.length >= 9 ? digits : "";
+  }
+  function wireWhatsapp(waRaw, coupleNames){
+    var n = normalizeWaNumber(waRaw);
+    if(!n) return;
+    liveWaNumber = n;
+    if(coupleNames) liveCoupleNames = coupleNames;
+    var btn = $("#rsvpForm .submit-btn");
+    if(btn) btn.textContent = "Kirim via WhatsApp";
+    var hint = $("#waHint");
+    if(hint) hint.hidden = false;
+  }
   function addWish(name, tag, msg, isDemo){
     var card = document.createElement("div"); card.className = "wish";
     var head = document.createElement("div");
@@ -1133,6 +1155,13 @@ img{image-rendering:pixelated}
     if(!name || !msg) return;
     addWish(name.slice(0,60), attending ? "Hadir" : "Berhalangan", msg.slice(0,400), false);
     if(attending){ yesCount++; $("#countYes").textContent = yesCount; }
+    if(liveWaNumber){
+      var attText = attending ? "Hadir" : "Berhalangan";
+      var waMsg = "Halo " + (liveCoupleNames || "kedua mempelai") + ", saya " + name.slice(0,60) + ".\n" +
+        "Konfirmasi kehadiran: " + attText + ".\n" +
+        "Ucapan: " + msg.slice(0,400);
+      window.open("https://wa.me/" + liveWaNumber + "?text=" + encodeURIComponent(waMsg), "_blank");
+    }
     $("#fName").value = ""; $("#fMsg").value = "";
     var btn = $("#rsvpForm .submit-btn"); var old = btn.textContent;
     btn.textContent = "TERIMA KASIH — SURAT TERKIRIM ✦";
@@ -1428,6 +1457,10 @@ img{image-rendering:pixelated}
           letters.forEach(function(c){ c.remove(); });
         }
       }
+
+      /* --- RSVP via WhatsApp customer (data.waNumber dari token) --- */
+      var shortPairWa = [bride, groom].map(function(n){ return (n || "").trim().split(/\s+/)[0] || ""; }).filter(Boolean).join(" & ");
+      wireWhatsapp(d.waNumber, shortPairWa || pair);
 
       /* --- Bersihkan label demo di mode live --- */
       $$(".demo-badge").forEach(function(el){ el.style.display = "none"; });

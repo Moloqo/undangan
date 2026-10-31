@@ -324,8 +324,9 @@ footer .script{font-size:36px; color:var(--kraft-deep)}
             <option value="Berhalangan">Berhalangan hadir</option>
           </select></div>
         <div><label for="f-pesan">Ucapan &amp; Doa</label><textarea id="f-pesan" name="pesan" required maxlength="400" placeholder="Tuliskan doa terbaik untuk Dimas &amp; Kirana…"></textarea></div>
-        <button class="btn" type="submit">KIRIM UCAPAN</button>
+        <button class="btn" id="rsvpSubmit" type="submit">KIRIM UCAPAN</button>
       </form>
+      <p id="waHint" hidden style="text-align:center; font-family:'Nunito Sans',sans-serif; font-size:13.5px; line-height:1.6; color:var(--muted); margin:14px 0 0">Konfirmasi &amp; ucapan akan diteruskan ke WhatsApp kedua mempelai.</p>
     </div>
     <div class="wall" id="wishWall"></div>
     <p class="empty-note" id="wallEmpty">Belum ada ucapan. Jadilah yang pertama menulis di jurnal kami.</p>
@@ -467,9 +468,22 @@ footer .script{font-size:36px; color:var(--kraft-deep)}
     var status=document.getElementById('f-status').value;
     var pesan=document.getElementById('f-pesan').value.trim();
     if(!nama||!pesan){showToast('Isi nama dan ucapan dulu ya'); return;}
+    /* WhatsApp customer: nomor & nama pasangan diisi hidrasi (?t=KODE)
+       lewat window.__rkWaNumber / window.__rkWaCouple. Tanpa keduanya
+       (mode demo) perilaku kirim ucapan tidak berubah sama sekali. */
+    var waNum=window.__rkWaNumber||'';
+    var waUrl='';
+    if(waNum){
+      var sel=document.getElementById('f-status');
+      var attText=(sel&&sel.options&&sel.options[sel.selectedIndex])?sel.options[sel.selectedIndex].text:status;
+      var couple=window.__rkWaCouple||'';
+      var msg='Halo '+(couple||'kedua mempelai')+', saya '+nama+'.\nKonfirmasi kehadiran: '+attText+'.\nUcapan: '+pesan;
+      waUrl='https://wa.me/'+waNum+'?text='+encodeURIComponent(msg);
+    }
     addWish(nama,status,pesan);
     e.target.reset();
     showToast('Terima kasih, ucapanmu sudah tertulis di jurnal kami');
+    if(waUrl) window.open(waUrl,'_blank');
     wall.scrollIntoView({behavior:'smooth', block:'nearest'});
   });
   /* ---------- music: soft acoustic WebAudio ---------- */
@@ -517,7 +531,10 @@ footer .script{font-size:36px; color:var(--kraft-deep)}
   "use strict";
   /* ================= HYDRATION DATA TAMU (?t=KODE) =================
      Tanpa ?t= -> halaman demo tidak diubah sama sekali.
-     Gagal jaringan/SDK -> demo tetap tampil apa adanya. */
+     Gagal jaringan/SDK -> demo tetap tampil apa adanya.
+     Nomor WhatsApp customer (data.waNumber) mengubah tombol RSVP
+     menjadi "Kirim via WhatsApp": konfirmasi & ucapan tamu diteruskan
+     langsung ke WhatsApp customer lewat wa.me. */
   function onReady(fn){
     if(document.readyState!=='loading') fn();
     else document.addEventListener('DOMContentLoaded', fn);
@@ -784,6 +801,29 @@ footer .script{font-size:36px; color:var(--kraft-deep)}
         });
       }
     }
+
+    /* --- RSVP via WhatsApp customer (data.waNumber) ---
+       Tombol kirim berubah jadi "Kirim via WhatsApp": nama tamu,
+       konfirmasi kehadiran & ucapan diteruskan ke wa.me customer.
+       Handler submit utama membaca window.__rkWaNumber sebelum
+       form di-reset, jadi tidak ada balapan nilai kosong.
+       Jika jembatan WhatsApp katalog sudah memasang form ini
+       (form.__waWired), hidrasi tidak memasang ulang agar
+       WhatsApp tidak terbuka dua kali di preview katalog. */
+    (function wireWhatsapp(){
+      var digits=str(d.waNumber).replace(/\D/g,'');
+      if(digits.charAt(0)==='0') digits='62'+digits.slice(1);
+      else if(digits.charAt(0)==='8') digits='62'+digits;
+      if(digits.length<9) return;
+      var form=document.getElementById('rsvpForm'); if(!form) return;
+      var btn=document.getElementById('rsvpSubmit')||form.querySelector('button[type="submit"]');
+      if(btn) btn.textContent='Kirim via WhatsApp';
+      var hint=document.getElementById('waHint'); if(hint) hint.hidden=false;
+      if(form.__waWired) return;
+      form.__waWired=true;
+      window.__rkWaNumber=digits;
+      window.__rkWaCouple=pair||'';
+    })();
   }
 
   function renderEvents(events){
