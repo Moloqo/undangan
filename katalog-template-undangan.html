@@ -148,6 +148,9 @@
       .btn.ghost{ background:transparent; border-color:var(--line); color:var(--ink); font-weight:500; }
       @media (hover:hover){ .btn.ghost:hover{ border-color:var(--gold); } }
       .btn.gold{ background:var(--gold); color:#fffdf4; }
+      .btn.wa-buy{ background:#1da851; color:#fff; }
+      @media (hover:hover){ .btn.wa-buy:hover{ background:#178a43; } }
+      .btn.wa-buy svg{ flex:none; }
       .btn.danger{ background:var(--danger-bg); color:var(--danger); border-color:var(--danger); }
       .btn.small{ min-height:40px; padding:7px 16px; font-size:13.5px; }
       .btn.demo{ min-height:40px; padding:7px 4px; border:none; border-radius:0; background:transparent; color:var(--brand); font-weight:600; font-size:14px; letter-spacing:.02em; white-space:nowrap; }
@@ -333,7 +336,7 @@
         .grid{ gap:26px; }
         .grid-head{ margin-top:32px; }
         .tcard .actions{ gap:8px; }
-        .tcard .actions .btn.primary{ min-height:44px; padding:9px 16px; font-size:14.5px; }
+        .tcard .actions .btn.primary,.tcard .actions .btn.wa-buy{ min-height:44px; padding:9px 16px; font-size:14.5px; }
         .tcard .actions .btn.demo{ min-height:44px; font-size:13.5px; }
         .token-row{ flex-direction:column; }
         .token-row select,.token-row input{ flex:none; width:100%; }
@@ -363,7 +366,7 @@
         </section>
 
         <section class="steps" aria-label="Cara menggunakan">
-          <div class="step"><div class="num">1</div><h3>Pilih Template</h3><p>Ketuk gambar tema untuk melihat landing page-nya fullscreen, lalu klik Gunakan Template.</p></div>
+          <div class="step"><div class="num">1</div><h3>Pilih Template</h3><p>Ketuk gambar tema untuk melihat landing page-nya fullscreen, lalu pesan lewat tombol Beli via WhatsApp.</p></div>
           <div class="step"><div class="num">2</div><h3>Masukkan Token</h3><p>Kode token dari admin, satu untuk satu undangan.</p></div>
           <div class="step"><div class="num">3</div><h3>Edit &amp; Bagikan</h3><p>Isi data, simpan, bagikan linknya.</p></div>
         </section>
@@ -434,6 +437,34 @@
                 <span class="hint">RSVP tamu terkirim ke nomor ini lewat tombol <b>Kirim via WhatsApp</b>. Berlaku di semua template. Format 08xx atau 628xx.</span>
               </div>
             </div>
+
+            <fieldset style="margin-top:34px;">
+              <legend>Orang Tua &amp; Keluarga Besar</legend>
+              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Nama ayah &amp; ibu dari masing-masing mempelai — tampil di undangan sebagai “Putra / Putri dari Bapak … &amp; Ibu …”. Tulis nama lengkapnya saja; kata Bapak / Ibu ditambahkan otomatis.</p>
+              <div class="form-grid" style="margin-top:6px;">
+                <div class="field">
+                  <label for="fGroomFather">Nama Ayah — Mempelai Pria</label>
+                  <input id="fGroomFather" type="text" placeholder="cth. Hartono Wijaya" />
+                </div>
+                <div class="field">
+                  <label for="fGroomMother">Nama Ibu — Mempelai Pria</label>
+                  <input id="fGroomMother" type="text" placeholder="cth. Sri Hartini" />
+                </div>
+                <div class="field">
+                  <label for="fBrideFather">Nama Ayah — Mempelai Wanita</label>
+                  <input id="fBrideFather" type="text" placeholder="cth. Bambang Sutrisno" />
+                </div>
+                <div class="field">
+                  <label for="fBrideMother">Nama Ibu — Mempelai Wanita</label>
+                  <input id="fBrideMother" type="text" placeholder="cth. Ratna Dewi" />
+                </div>
+                <div class="field full">
+                  <label for="fFamilyName">Nama Keluarga Besar (jika ada)</label>
+                  <input id="fFamilyName" type="text" placeholder="cth. Keluarga Besar Hartono &amp; Keluarga Besar Sutrisno" />
+                  <span class="hint">Opsional — diisi kalau undangan mau menampilkan nama keluarga besar, misalnya di penutup “Kami yang berbahagia”. Boleh dikosongkan.</span>
+                </div>
+              </div>
+            </fieldset>
 
             <fieldset style="margin-top:34px;">
               <legend>Acara &amp; Tempat</legend>
@@ -936,6 +967,11 @@
       $("fsCloseBtn").addEventListener("click", closeFullscreen);
       $("fsUseBtn").addEventListener("click", function(){ if (fsCurrent) pickTemplate(fsCurrent.slug); });
       document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeFullscreen(); });
+      /* ---------- Beli via WhatsApp (nomor sales) ---------- */
+      var SALES_WA = "6288210882762";
+      function buyWaUrl(t){
+        return "https://wa.me/" + SALES_WA + "?text=" + encodeURIComponent("Halo, saya mau beli template undangan *" + (t ? t.name : "") + "*");
+      }
       function renderCatalog(){
         var q = $("searchInput").value.trim().toLowerCase();
         var grid = $("templateGrid"); grid.innerHTML = "";
@@ -964,8 +1000,8 @@
           var d = document.createElement("p"); d.className = "desc"; d.textContent = t.desc;
           var actions = document.createElement("div"); actions.className = "actions";
           var demo = document.createElement("a"); demo.className = "btn demo"; demo.href = t.url; demo.target = "_blank"; demo.rel = "noopener"; demo.textContent = "Lihat Demo";
-          var use = document.createElement("button"); use.className = "btn primary flex"; use.textContent = "Gunakan Template";
-          use.addEventListener("click", function(){ pickTemplate(t.slug); });
+          var use = document.createElement("a"); use.className = "btn wa-buy flex"; use.href = buyWaUrl(t); use.target = "_blank"; use.rel = "noopener"; use.setAttribute("aria-label", "Beli template " + t.name + " via WhatsApp");
+          use.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>Beli via WhatsApp';
           actions.appendChild(demo); actions.appendChild(use);
           body.appendChild(tag); body.appendChild(h); body.appendChild(d); body.appendChild(actions);
           card.appendChild(scene); card.appendChild(body);
@@ -1067,6 +1103,38 @@
           return [{ bank: d.bank || "", number: d.number || d.accountNumber || "", holder: d.holder || d.accountName || "" }];
         }
         return [{ bank: "", number: "", holder: "" }];
+      }
+      /* ---------- Orang tua & keluarga besar ----------
+         Field datar di data token: groomFather, groomMother, brideFather,
+         brideMother, familyName. Cermin bersarang d.parents dan alias
+         d.extendedFamily ikut ditulis, supaya template yang membaca pola
+         mana pun tetap dapat datanya. Pembacaan menerima semua pola itu
+         (termasuk token lama yang belum punya field ini). */
+      function normalizeFamily(d){
+        d = d || {};
+        var p = (d.parents && typeof d.parents === "object") ? d.parents : {};
+        var pg = (p.groom && typeof p.groom === "object") ? p.groom : {};
+        var pb = (p.bride && typeof p.bride === "object") ? p.bride : {};
+        function pick(){
+          for (var i = 0; i < arguments.length; i++) {
+            var v = arguments[i];
+            if (typeof v === "string" && v.trim()) return v.trim();
+          }
+          return "";
+        }
+        return {
+          groomFather: pick(d.groomFather, d.groomFatherName, pg.father),
+          groomMother: pick(d.groomMother, d.groomMotherName, pg.mother),
+          brideFather: pick(d.brideFather, d.brideFatherName, pb.father),
+          brideMother: pick(d.brideMother, d.brideMotherName, pb.mother),
+          familyName: pick(d.familyName, d.extendedFamily, d.bigFamily)
+        };
+      }
+      function parentsLine(father, mother){
+        var parts = [];
+        if (father) parts.push("Bapak " + father);
+        if (mother) parts.push("Ibu " + mother);
+        return parts.join(" & ");
       }
       function normalizeEvents(d){
         if (d && Array.isArray(d.events) && d.events.length) {
@@ -1529,6 +1597,10 @@
         $("editorTitle").textContent = "Editor — " + (t ? t.name : slug);
         $("editorMeta").textContent = "Token " + code + " · Template " + (t ? t.name : slug);
         setVal("fGroom", d.groomName); setVal("fBride", d.brideName);
+        var fam0 = normalizeFamily(d);
+        setVal("fGroomFather", fam0.groomFather); setVal("fGroomMother", fam0.groomMother);
+        setVal("fBrideFather", fam0.brideFather); setVal("fBrideMother", fam0.brideMother);
+        setVal("fFamilyName", fam0.familyName);
         setVal("fQuote", d.quote);
         setVal("fWa", d.waNumber);
         $("fMusic").value = MUSIC_LABELS[d.music] ? d.music : "default";
@@ -1569,6 +1641,14 @@
       function collectData(){
         var d = current.data;
         d.groomName = getVal("fGroom"); d.brideName = getVal("fBride");
+        d.groomFather = getVal("fGroomFather"); d.groomMother = getVal("fGroomMother");
+        d.brideFather = getVal("fBrideFather"); d.brideMother = getVal("fBrideMother");
+        d.familyName = getVal("fFamilyName");
+        d.extendedFamily = d.familyName;
+        d.parents = {
+          groom: { father: d.groomFather, mother: d.groomMother },
+          bride: { father: d.brideFather, mother: d.brideMother }
+        };
         d.quote = getVal("fQuote");
         d.waNumber = getVal("fWa");
         d.music = $("fMusic") ? $("fMusic").value : "default";
@@ -1605,6 +1685,9 @@
         var d = collectData();
         var dl = $("previewList"); dl.innerHTML = "";
         setPreviewRow(dl, "Mempelai", (d.groomName || "…") + " & " + (d.brideName || "…"));
+        setPreviewRow(dl, "Orang Tua Pria", parentsLine(d.groomFather, d.groomMother));
+        setPreviewRow(dl, "Orang Tua Wanita", parentsLine(d.brideFather, d.brideMother));
+        setPreviewRow(dl, "Keluarga Besar", d.familyName);
         setPreviewRow(dl, "WhatsApp RSVP", d.waNumber);
         var musTxt = musicLabel(d.music);
         if (d.music === "custom") {
@@ -1652,7 +1735,7 @@
         renderGuestLinks();
         schedulePreviewRender();
       }
-      ["fGroom","fBride","fQuote","fWa","fGuests","fMusicUrl"].forEach(function(id){
+      ["fGroom","fBride","fGroomFather","fGroomMother","fBrideFather","fBrideMother","fFamilyName","fQuote","fWa","fGuests","fMusicUrl"].forEach(function(id){
         $(id).addEventListener("input", updatePreview);
       });
       $("fMusic").addEventListener("change", function(){ stopMusicPreview(); updateCustomMusicUI(); updatePreview(); });
@@ -2182,6 +2265,12 @@
         }).join("") + '</section>' : "";
         var coverImg = ph.cover ? '<img class="cover" src="' + escHtml(ph.cover) + '" alt="Foto ' + escHtml(names) + '">' : "";
         var quoteHtml = d.quote ? '<section class="card quote"><p>“' + escHtml(d.quote) + '”</p></section>' : "";
+        var fam = normalizeFamily(d);
+        var famLines = "";
+        if (fam.groomFather || fam.groomMother) famLines += '<p style="margin-top:14px"><strong style="color:#2a241c">' + escHtml(groom) + '</strong><br>Putra dari ' + escHtml(parentsLine(fam.groomFather, fam.groomMother)) + '</p>';
+        if (fam.brideFather || fam.brideMother) famLines += '<p style="margin-top:14px"><strong style="color:#2a241c">' + escHtml(bride) + '</strong><br>Putri dari ' + escHtml(parentsLine(fam.brideFather, fam.brideMother)) + '</p>';
+        if (fam.familyName) famLines += '<p class="when" style="margin-top:16px">Kami yang berbahagia<br>' + escHtml(fam.familyName) + '</p>';
+        var famHtml = famLines ? '<section class="card"><h2>Mempelai &amp; Keluarga</h2>' + famLines + '</section>' : "";
         var waNum = waDigits(d.waNumber);
         var waHtml = waNum ? '<section class="card"><h2>Konfirmasi Kehadiran</h2><p>Konfirmasi kehadiran &amp; ucapan doa bisa langsung dikirim ke WhatsApp kami — tekan tombol di bawah, lalu kirim pesan yang sudah terisi otomatis.</p><p style="margin-top:14px"><a class="btn" href="https://wa.me/' + waNum + '?text=' + encodeURIComponent("Halo " + names + ", saya tamu undangan pernikahan kalian. Saya konfirmasi akan hadir. Terima kasih atas undangannya.") + '" target="_blank" rel="noopener">Kirim via WhatsApp</a></p></section>' : "";
         var cdHtml = firstDate ? '<section class="card"><h2>Menghitung Hari</h2><div class="cd" id="cd"><div><b id="cdD">–</b><span>Hari</span></div><div><b id="cdH">–</b><span>Jam</span></div><div><b id="cdM">–</b><span>Menit</span></div><div><b id="cdS">–</b><span>Detik</span></div></div></section>' : "";
@@ -2229,7 +2318,7 @@
           '@media (prefers-color-scheme:dark){body{background:#171a17;color:#f0ead9}.card{background:#22261f;border-color:#3d4234}.card p,.cd span,footer{color:#c4bba6}.card .when,.card .venue,.quote p{color:#f0ead9}.cd div{background:#1f2420}}',
           '</style></head><body><main>',
           '<header><p class="theme">Undangan Pernikahan · ' + escHtml(themeName) + '</p>' + coverImg + '<h1>' + escHtml(groom) + '<br>&amp;<br>' + escHtml(bride) + '</h1>' + (firstDate ? '<p class="date">' + escHtml(fmtDate(firstDate)) + '</p>' : '') + '</header>',
-          quoteHtml, cdHtml, evHtml, rundownHtml, loveHtml, galHtml, bankHtml, waHtml, musicHtml,
+          quoteHtml, famHtml, cdHtml, evHtml, rundownHtml, loveHtml, galHtml, bankHtml, waHtml, musicHtml,
           '<footer><p>Merupakan suatu kehormatan &amp; kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p><p style="margin-top:12px"><strong>' + escHtml(names) + '</strong></p></footer>',
           '</main>',
           '<script>',
@@ -2680,6 +2769,10 @@
           renderHistory();
           var d = doc.data || {};
           setPreviewRow(dl, "Mempelai", ((d.groomName || "…") + " & " + (d.brideName || "…")));
+          var famM = normalizeFamily(d);
+          setPreviewRow(dl, "Orang Tua Pria", parentsLine(famM.groomFather, famM.groomMother) || "—");
+          setPreviewRow(dl, "Orang Tua Wanita", parentsLine(famM.brideFather, famM.brideMother) || "—");
+          setPreviewRow(dl, "Keluarga Besar", famM.familyName || "—");
           setPreviewRow(dl, "WhatsApp RSVP", d.waNumber || "—");
           var mTxt = musicLabel(d.music);
           if (d.music === "custom") {
