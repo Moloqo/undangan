@@ -272,6 +272,48 @@
       .guest-url{ margin-top:8px; font-size:12.5px; line-height:1.55; color:var(--ink-soft); word-break:break-all; }
       .btn.wa-share{ background:#1da851; color:#fff; }
 
+      /* ---------- Buku tamu & kartu QR ---------- */
+      .book{ margin-top:26px; }
+      .book-cover{ text-align:center; border:1px solid var(--gold); border-radius:14px; padding:52px 26px; background:var(--bg-soft); }
+      .book-cover .book-title{ font-family:"Playfair Display",serif; font-size:30px; font-weight:700; line-height:1.25; }
+      .book-cover .book-couple{ font-family:"Playfair Display",serif; font-size:24px; font-weight:700; margin-top:20px; color:var(--brand); line-height:1.35; }
+      .book-cover .book-date{ color:var(--ink-soft); margin-top:6px; font-size:15.5px; }
+      .wish-block{ border-bottom:1px solid var(--line); padding:20px 4px; transition:opacity .15s ease; }
+      .wish-block.excluded{ opacity:.42; }
+      .wish-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+      .wish-name{ font-size:16.5px; }
+      .wish-badge{ background:var(--gold-soft); color:var(--ink); text-transform:none; letter-spacing:.02em; font-size:12.5px; }
+      .wish-toggle{ margin-left:auto; display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; color:var(--ink-soft); cursor:pointer; min-height:40px; }
+      .wish-toggle input{ width:19px; height:19px; min-height:19px; accent-color:var(--brand); flex:none; }
+      .wish-text{ margin-top:6px; line-height:1.7; white-space:pre-wrap; word-break:break-word; }
+      .wish-date{ margin-top:6px; font-size:13px; color:var(--ink-soft); }
+      .qr-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:24px; }
+      .qr-card{ border:1.5px dashed var(--ink-soft); border-radius:6px; padding:26px 18px; text-align:center; background:var(--card); }
+      .qr-to{ font-size:13.5px; color:var(--ink-soft); letter-spacing:.04em; }
+      .qr-name{ font-weight:700; font-size:17px; line-height:1.4; margin-top:2px; word-break:break-word; }
+      .qr-box{ display:flex; align-items:center; justify-content:center; margin:16px auto 6px; min-height:168px; }
+      .qr-box img{ display:block; }
+      .qr-couple{ font-family:"Playfair Display",serif; font-weight:700; font-size:18px; line-height:1.35; margin-top:8px; }
+      .qr-scan{ font-size:13px; color:var(--ink-soft); margin-top:2px; }
+      @media (max-width:560px){ .qr-grid{ grid-template-columns:1fr; } }
+
+      /* ---------- Cetak: hanya area buku tamu / kartu QR ---------- */
+      @media print{
+        @page{ size:A4; margin:12mm; }
+        body{ background:#fff; }
+        .no-print,.wa-float,.toast,.overlay,.pv-overlay,.fs-overlay{ display:none !important; }
+        #viewGuestBook,#viewQrCards{ color:#262119; }
+        #viewGuestBook .wrap,#viewQrCards .wrap{ max-width:none; padding:0; }
+        #viewGuestBook .panel,#viewQrCards .panel{ border:none; box-shadow:none; padding:0; margin:0; background:#fff; }
+        .book{ margin-top:0; }
+        .book-cover{ background:#fff; break-after:page; page-break-after:always; }
+        .wish-block{ break-inside:avoid; page-break-inside:avoid; }
+        .wish-block.excluded{ display:none !important; }
+        .wish-badge{ background:#f3ead2; color:#262119; }
+        .qr-grid{ grid-template-columns:repeat(2,1fr); margin-top:0; }
+        .qr-card{ background:#fff; break-inside:avoid; page-break-inside:avoid; }
+      }
+
       /* ---------- Footer / modal / toast ---------- */
       footer{ border-top:1px solid var(--line); margin-top:64px; padding:36px 0 52px; text-align:center; color:var(--ink-soft); font-size:14.5px; }
       .admin-link{ background:none; border:none; color:var(--ink-soft); text-decoration:underline; min-height:48px; padding:10px 14px; font-size:14px; }
@@ -481,6 +523,26 @@
             </fieldset>
 
             <fieldset style="margin-top:34px;">
+              <legend>Informasi untuk Tamu</legend>
+              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Info praktis untuk tamu di hari acara — semua opsional, kosongkan saja yang tidak perlu.</p>
+              <div class="form-grid" style="margin-top:6px;">
+                <div class="field">
+                  <label for="fDressCode">Dress Code</label>
+                  <input id="fDressCode" type="text" placeholder="cth. Batik / Earth tone" />
+                </div>
+                <div class="field full">
+                  <label for="fInfoNotes">Catatan untuk Tamu</label>
+                  <textarea id="fInfoNotes" placeholder="cth. Harap tiba 30 menit sebelumnya. Area parkir di sisi timur gedung."></textarea>
+                  <span class="hint">Aturan bawa anak, info parkir / shuttle, dan hal lain yang perlu tamu tahu.</span>
+                </div>
+                <div class="field full">
+                  <label for="fGiftAddress">Alamat Kirim Kado</label>
+                  <input id="fGiftAddress" type="text" placeholder="Alamat kirim kado fisik (opsional)" />
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset style="margin-top:34px;">
               <legend>Kisah Cinta</legend>
               <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Perjalanan kalian bab demi bab. Boleh dikosongkan.</p>
               <div class="dynamic-list" id="loveStoryList"></div>
@@ -578,7 +640,10 @@
               </div>
               <div class="guest-head">
                 <strong id="guestCount"></strong>
-                <button type="button" class="btn ghost small" id="copyAllGuestLinksBtn">Salin Semua Link</button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button type="button" class="btn ghost small" id="copyAllGuestLinksBtn">Salin Semua Link</button>
+                  <button type="button" class="btn ghost small" id="printQrCardsBtn">Cetak Kartu QR</button>
+                </div>
               </div>
               <div class="guest-list" id="guestLinksList"></div>
               <p class="hint" id="guestLinksEmpty" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:10px;">Link personal muncul di sini begitu nama ditulis.</p>
@@ -587,6 +652,11 @@
             <div class="preview-card" aria-live="polite">
               <h3>Pratinjau Data</h3>
               <dl id="previewList"></dl>
+            </div>
+
+            <div class="preview-card" id="infoPreviewCard" hidden>
+              <h3>Informasi</h3>
+              <dl id="infoPreviewList"></dl>
             </div>
 
             <div class="msg err" id="editorError" role="alert"></div>
@@ -692,6 +762,10 @@
                 <div class="msg ok" id="manageOk"></div>
                 <button class="btn gold" id="manageExportBtn" style="margin-top:14px; width:100%;">Unduh File Undangan Customer (.html)</button>
                 <p style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:8px;">File mandiri berisi data customer ini.</p>
+                <button class="btn primary" id="guestBookBtn" style="margin-top:14px; width:100%;">Cetak Buku Tamu</button>
+                <p style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:8px;">Semua ucapan tamu token ini, disusun jadi buku siap cetak / simpan PDF.</p>
+                <button class="btn ghost" id="manageQrBtn" style="margin-top:14px; width:100%;">Cetak Kartu QR</button>
+                <p style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:8px;">Kartu QR per tamu dari daftar tamu token ini — siap dicetak &amp; ditempel di undangan fisik.</p>
                 <button class="btn danger" id="revokeBtn" style="margin-top:14px; width:100%;">Cabut Token Ini (Revoke)</button>
               </div>
             </div>
@@ -706,6 +780,44 @@
           <div class="msg err" id="historySyncError" role="alert"></div>
           <ul class="history-list" id="historyList"></ul>
           <p class="empty-note" id="historyEmpty">Belum ada token. Buat token pertama lewat form Buat Token Baru di atas.</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- ================= VIEW: BUKU TAMU ================= -->
+    <main id="viewGuestBook" hidden>
+      <div class="wrap">
+        <button class="backlink no-print" id="gbBackBtn">← Kembali ke Panel Admin</button>
+        <section class="panel" style="margin-top:6px;">
+          <h2 class="no-print">Buku Tamu &amp; Ucapan</h2>
+          <p class="sub no-print">Semua ucapan tamu untuk token ini, disusun jadi buku kenang-kenangan. Hilangkan centang “Sertakan” pada ucapan yang tidak ingin ikut tercetak, lalu cetak atau simpan sebagai PDF.</p>
+          <div class="no-print" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+            <button type="button" class="btn primary" id="gbPrintBtn">Cetak / Simpan PDF</button>
+          </div>
+          <p class="history-sync no-print" id="gbStatus" role="status" style="margin-top:14px;">Memuat ucapan…</p>
+          <div class="book">
+            <div class="book-cover">
+              <h3 class="book-title">Buku Tamu &amp; Ucapan</h3>
+              <p class="book-couple" id="gbCouple"></p>
+              <p class="book-date" id="gbDate"></p>
+            </div>
+            <div id="gbWishes"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- ================= VIEW: KARTU QR ================= -->
+    <main id="viewQrCards" hidden>
+      <div class="wrap">
+        <button class="backlink no-print" id="qrBackBtn">← Kembali</button>
+        <section class="panel" style="margin-top:6px;">
+          <h2 class="no-print">Kartu QR Undangan Fisik</h2>
+          <p class="sub no-print">Satu kartu per tamu, plus satu kartu umum tanpa nama. Cetak di kertas A4 (2 kolom), potong mengikuti garis putus-putus, lalu tempel di undangan fisik — tamu tinggal scan untuk membuka undangan digitalnya.</p>
+          <div class="no-print" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+            <button type="button" class="btn primary" id="qrPrintBtn">Cetak / Simpan PDF</button>
+          </div>
+          <div class="qr-grid" id="qrGrid"></div>
         </section>
       </div>
     </main>
@@ -769,6 +881,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script>
       "use strict";
 
@@ -912,6 +1025,8 @@
         $("viewCatalog").hidden = name !== "catalog";
         $("viewEditor").hidden = name !== "editor";
         $("viewAdmin").hidden = name !== "admin";
+        $("viewGuestBook").hidden = name !== "guestbook";
+        $("viewQrCards").hidden = name !== "qrcards";
         window.scrollTo({ top: 0 });
       }
 
@@ -1128,6 +1243,21 @@
           brideFather: pick(d.brideFather, d.brideFatherName, pb.father),
           brideMother: pick(d.brideMother, d.brideMotherName, pb.mother),
           familyName: pick(d.familyName, d.extendedFamily, d.bigFamily)
+        };
+      }
+      /* ---------- Informasi untuk tamu ----------
+         Objek info:{dressCode,notes,giftAddress} di data token, sejajar
+         dengan banks & parents. Pembacaan juga menerima field datar
+         (dressCode / infoNotes / giftAddress) supaya token lama yang
+         mungkin menyimpannya di luar objek info tetap terbaca. */
+      function normalizeInfo(d){
+        d = d || {};
+        var inf = (d.info && typeof d.info === "object") ? d.info : {};
+        function s(v){ return typeof v === "string" ? v.trim() : ""; }
+        return {
+          dressCode: s(inf.dressCode) || s(d.dressCode),
+          notes: s(inf.notes) || s(d.infoNotes),
+          giftAddress: s(inf.giftAddress) || s(d.giftAddress)
         };
       }
       function parentsLine(father, mother){
@@ -1601,6 +1731,8 @@
         setVal("fGroomFather", fam0.groomFather); setVal("fGroomMother", fam0.groomMother);
         setVal("fBrideFather", fam0.brideFather); setVal("fBrideMother", fam0.brideMother);
         setVal("fFamilyName", fam0.familyName);
+        var info0 = normalizeInfo(d);
+        setVal("fDressCode", info0.dressCode); setVal("fInfoNotes", info0.notes); setVal("fGiftAddress", info0.giftAddress);
         setVal("fQuote", d.quote);
         setVal("fWa", d.waNumber);
         $("fMusic").value = MUSIC_LABELS[d.music] ? d.music : "default";
@@ -1650,6 +1782,7 @@
           bride: { father: d.brideFather, mother: d.brideMother }
         };
         d.quote = getVal("fQuote");
+        d.info = { dressCode: getVal("fDressCode"), notes: getVal("fInfoNotes"), giftAddress: getVal("fGiftAddress") };
         d.waNumber = getVal("fWa");
         d.music = $("fMusic") ? $("fMusic").value : "default";
         d.musicUrl = $("fMusicUrl") ? getVal("fMusicUrl") : (d.musicUrl || "");
@@ -1732,10 +1865,17 @@
           var val = s.text ? (s.text.length > 180 ? s.text.slice(0, 180) + "…" : s.text) : ((s.title || s.year) ? "judul & tahun terisi, cerita belum" : "belum diisi");
           setPreviewRow(dl, label, val);
         });
+        var infoNow = d.info || { dressCode: "", notes: "", giftAddress: "" };
+        var infoDl = $("infoPreviewList"); infoDl.innerHTML = "";
+        var infoAny = false;
+        if (infoNow.dressCode) { setPreviewRow(infoDl, "Dress Code", infoNow.dressCode); infoAny = true; }
+        if (infoNow.notes) { setPreviewRow(infoDl, "Catatan untuk Tamu", infoNow.notes); infoAny = true; }
+        if (infoNow.giftAddress) { setPreviewRow(infoDl, "Alamat Kirim Kado", infoNow.giftAddress); infoAny = true; }
+        $("infoPreviewCard").hidden = !infoAny;
         renderGuestLinks();
         schedulePreviewRender();
       }
-      ["fGroom","fBride","fGroomFather","fGroomMother","fBrideFather","fBrideMother","fFamilyName","fQuote","fWa","fGuests","fMusicUrl"].forEach(function(id){
+      ["fGroom","fBride","fGroomFather","fGroomMother","fBrideFather","fBrideMother","fFamilyName","fQuote","fWa","fGuests","fMusicUrl","fDressCode","fInfoNotes","fGiftAddress"].forEach(function(id){
         $(id).addEventListener("input", updatePreview);
       });
       $("fMusic").addEventListener("change", function(){ stopMusicPreview(); updateCustomMusicUI(); updatePreview(); });
@@ -2271,6 +2411,12 @@
         if (fam.brideFather || fam.brideMother) famLines += '<p style="margin-top:14px"><strong style="color:#2a241c">' + escHtml(bride) + '</strong><br>Putri dari ' + escHtml(parentsLine(fam.brideFather, fam.brideMother)) + '</p>';
         if (fam.familyName) famLines += '<p class="when" style="margin-top:16px">Kami yang berbahagia<br>' + escHtml(fam.familyName) + '</p>';
         var famHtml = famLines ? '<section class="card"><h2>Mempelai &amp; Keluarga</h2>' + famLines + '</section>' : "";
+        var infoD = normalizeInfo(d);
+        var infoParts = "";
+        if (infoD.dressCode) infoParts += '<p style="text-align:left"><strong style="color:#2a241c">Dress Code:</strong> ' + escHtml(infoD.dressCode) + '</p>';
+        if (infoD.notes) infoParts += '<p style="text-align:left"><strong style="color:#2a241c">Catatan untuk Tamu:</strong> ' + escHtml(infoD.notes).replace(/\n/g, "<br>") + '</p>';
+        if (infoD.giftAddress) infoParts += '<p style="text-align:left"><strong style="color:#2a241c">Alamat Kirim Kado:</strong> ' + escHtml(infoD.giftAddress) + '</p>';
+        var infoHtml = infoParts ? '<section class="card"><h2>Informasi</h2>' + infoParts + '</section>' : "";
         var waNum = waDigits(d.waNumber);
         var waHtml = waNum ? '<section class="card"><h2>Konfirmasi Kehadiran</h2><p>Konfirmasi kehadiran &amp; ucapan doa bisa langsung dikirim ke WhatsApp kami — tekan tombol di bawah, lalu kirim pesan yang sudah terisi otomatis.</p><p style="margin-top:14px"><a class="btn" href="https://wa.me/' + waNum + '?text=' + encodeURIComponent("Halo " + names + ", saya tamu undangan pernikahan kalian. Saya konfirmasi akan hadir. Terima kasih atas undangannya.") + '" target="_blank" rel="noopener">Kirim via WhatsApp</a></p></section>' : "";
         var cdHtml = firstDate ? '<section class="card"><h2>Menghitung Hari</h2><div class="cd" id="cd"><div><b id="cdD">–</b><span>Hari</span></div><div><b id="cdH">–</b><span>Jam</span></div><div><b id="cdM">–</b><span>Menit</span></div><div><b id="cdS">–</b><span>Detik</span></div></div></section>' : "";
@@ -2318,7 +2464,7 @@
           '@media (prefers-color-scheme:dark){body{background:#171a17;color:#f0ead9}.card{background:#22261f;border-color:#3d4234}.card p,.cd span,footer{color:#c4bba6}.card .when,.card .venue,.quote p{color:#f0ead9}.cd div{background:#1f2420}}',
           '</style></head><body><main>',
           '<header><p class="theme">Undangan Pernikahan · ' + escHtml(themeName) + '</p>' + coverImg + '<h1>' + escHtml(groom) + '<br>&amp;<br>' + escHtml(bride) + '</h1>' + (firstDate ? '<p class="date">' + escHtml(fmtDate(firstDate)) + '</p>' : '') + '</header>',
-          quoteHtml, famHtml, cdHtml, evHtml, rundownHtml, loveHtml, galHtml, bankHtml, waHtml, musicHtml,
+          quoteHtml, famHtml, cdHtml, evHtml, rundownHtml, loveHtml, infoHtml, galHtml, bankHtml, waHtml, musicHtml,
           '<footer><p>Merupakan suatu kehormatan &amp; kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p><p style="margin-top:12px"><strong>' + escHtml(names) + '</strong></p></footer>',
           '</main>',
           '<script>',
@@ -2548,13 +2694,27 @@
             var tt = templateBySlug(item.template);
             copyText((tt ? tt.url : "") + "?t=" + item.code, "Link tamu disalin.");
           });
+          var buku = document.createElement("button"); buku.className = "btn ghost small"; buku.textContent = "Buku Tamu";
+          buku.addEventListener("click", function(){
+            if (!db) { toast("Koneksi database belum tersedia."); return; }
+            buku.disabled = true; buku.textContent = "Memuat…";
+            db.collection("tokens").doc(item.code).get().then(function(snap){
+              buku.disabled = false; buku.textContent = "Buku Tamu";
+              if (!snap.exists) { toast("Token tidak ditemukan di database."); return; }
+              var docH = snap.data() || {};
+              openGuestBook(item.code, docH.data || {});
+            }).catch(function(){
+              buku.disabled = false; buku.textContent = "Buku Tamu";
+              toast("Gagal memuat data token — coba lagi sebentar.");
+            });
+          });
           var kelola = document.createElement("button"); kelola.className = "btn ghost small"; kelola.textContent = "Kelola";
           kelola.addEventListener("click", function(){
             $("manageInput").value = item.code;
             $("manageInput").scrollIntoView({ behavior: "smooth", block: "center" });
             $("lookupBtn").click();
           });
-          actions.appendChild(cp); actions.appendChild(cl); actions.appendChild(kelola);
+          actions.appendChild(cp); actions.appendChild(cl); actions.appendChild(buku); actions.appendChild(kelola);
           li.appendChild(code); li.appendChild(meta); li.appendChild(actions);
           ul.appendChild(li);
         });
@@ -2791,6 +2951,11 @@
             if (ev.venue) parts.push(ev.venue);
             setPreviewRow(dl, "Acara " + (i + 1) + (ev.title ? " · " + ev.title : ""), parts.length ? parts.join(" — ") : "belum diisi");
           });
+          var infoM = normalizeInfo(d);
+          if (infoM.dressCode) setPreviewRow(dl, "Dress Code", infoM.dressCode);
+          if (infoM.notes) setPreviewRow(dl, "Catatan Tamu", infoM.notes);
+          if (infoM.giftAddress) setPreviewRow(dl, "Alamat Kirim Kado", infoM.giftAddress);
+          if (!infoM.dressCode && !infoM.notes && !infoM.giftAddress) setPreviewRow(dl, "Informasi Tamu", "—");
           var bkList = normalizeBanks(d);
           setPreviewRow(dl, "Jumlah Rekening", String(bkList.filter(function(b){ return b.bank || b.number; }).length) + " rekening");
           $("revokeBtn").disabled = doc.status === "revoked";
@@ -2838,6 +3003,165 @@
           showMsg($("manageError"), "Gagal mencabut: " + (e && e.message ? e.message : "coba lagi") + ". Kalau pesan menyebut izin/rules, PIN mungkin tidak cocok atau rules Firestore belum versi terbaru.");
         });
       });
+
+      /* ================= CETAK BUKU TAMU =================
+         Membaca subkoleksi tokens/{code}/wishes (urut createdAt menaik).
+         Semua teks tamu ditulis lewat textContent — tidak pernah
+         innerHTML — supaya ucapan tampil apa adanya dan aman. Bila
+         bacaan gagal (mis. rules Firestore belum mengizinkan subkoleksi
+         wishes) tampilkan pesan ramah, jangan lempar error. */
+      function wishGuestName(w){
+        return String((w && (w.name || w.guestName || w.guest || w.from)) || "").trim();
+      }
+      function wishMessage(w){
+        return String((w && (w.message || w.wish || w.text || w.ucapan)) || "").trim();
+      }
+      function wishAttendanceLabel(w){
+        var a = String((w && (w.attendance || w.status || w.rsvp || w.kehadiran)) || "").toLowerCase();
+        if (!a) return "";
+        if (/ragu|maybe|mungkin|belum/.test(a)) return "Masih Ragu";
+        if (/tidak|berhalangan|absen|not|cannot|can't/.test(a)) return "Berhalangan";
+        if (/hadir|attend|yes|pasti|insya/.test(a)) return "Hadir";
+        return "";
+      }
+      function buildWishBlock(w){
+        var block = document.createElement("div"); block.className = "wish-block";
+        var head = document.createElement("div"); head.className = "wish-head";
+        var nm = document.createElement("strong"); nm.className = "wish-name";
+        nm.textContent = wishGuestName(w) || "Tamu";
+        head.appendChild(nm);
+        var att = wishAttendanceLabel(w);
+        if (att) {
+          var bd = document.createElement("span"); bd.className = "badge wish-badge"; bd.textContent = att;
+          head.appendChild(bd);
+        }
+        var lab = document.createElement("label"); lab.className = "wish-toggle no-print";
+        var cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = true;
+        cb.setAttribute("aria-label", "Sertakan ucapan ini saat dicetak");
+        cb.addEventListener("change", function(){ block.classList.toggle("excluded", !cb.checked); });
+        var labTxt = document.createElement("span"); labTxt.textContent = "Sertakan";
+        lab.appendChild(cb); lab.appendChild(labTxt);
+        head.appendChild(lab);
+        block.appendChild(head);
+        var txt = document.createElement("p"); txt.className = "wish-text";
+        txt.textContent = wishMessage(w);
+        block.appendChild(txt);
+        var iso = tsToISO(w && w.createdAt);
+        if (iso) {
+          var dt = new Date(iso);
+          if (!isNaN(dt.getTime())) {
+            var dp = document.createElement("p"); dp.className = "wish-date";
+            dp.textContent = dt.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+            block.appendChild(dp);
+          }
+        }
+        return block;
+      }
+      function renderGuestBookWishes(docs){
+        var listEl = $("gbWishes"); listEl.innerHTML = "";
+        docs.forEach(function(w){ listEl.appendChild(buildWishBlock(w)); });
+        $("gbStatus").textContent = docs.length + " ucapan terbaca — hilangkan centang “Sertakan” pada ucapan yang tidak ingin ikut tercetak.";
+      }
+      function openGuestBook(code, data){
+        var d = data || {};
+        var couple = [d.groomName, d.brideName].filter(Boolean).join(" & ");
+        $("gbCouple").textContent = couple || "Kedua Mempelai";
+        var evs = normalizeEvents(d);
+        var dateTxt = "";
+        for (var i = 0; i < evs.length; i++) { if (evs[i].date) { dateTxt = fmtDate(evs[i].date); break; } }
+        $("gbDate").textContent = dateTxt;
+        $("gbWishes").innerHTML = "";
+        var status = $("gbStatus");
+        var failMsg = "Belum ada ucapan tersimpan / perlu update rules Firestore";
+        showView("guestbook");
+        if (!db) { status.textContent = failMsg; return; }
+        status.textContent = "Memuat ucapan…";
+        var ref = db.collection("tokens").doc(code).collection("wishes");
+        ref.orderBy("createdAt", "asc").get().then(function(snap){
+          if (!snap.empty) {
+            var docs = [];
+            snap.forEach(function(ds){ docs.push(ds.data() || {}); });
+            renderGuestBookWishes(docs);
+            return;
+          }
+          /* Cadangan: ucapan lama yang belum punya field createdAt tidak
+             ikut hasil query orderBy — baca tanpa urutan, lalu urutkan
+             createdAt menaik di sini. */
+          return ref.get().then(function(snap2){
+            if (snap2.empty) { status.textContent = failMsg; return; }
+            var docs2 = [];
+            snap2.forEach(function(ds){ docs2.push(ds.data() || {}); });
+            docs2.sort(function(a, b){
+              var x = tsToISO(a.createdAt), y = tsToISO(b.createdAt);
+              return x < y ? -1 : (x > y ? 1 : 0);
+            });
+            renderGuestBookWishes(docs2);
+          });
+        }).catch(function(){ status.textContent = failMsg; });
+      }
+      $("guestBookBtn").addEventListener("click", function(){
+        if (!manageCode) { showMsg($("manageError"), "Lihat data tokennya dulu ya, baru cetak buku tamunya."); return; }
+        openGuestBook(manageCode, manageData || {});
+      });
+      $("gbBackBtn").addEventListener("click", function(){ showView("admin"); });
+      $("gbPrintBtn").addEventListener("click", function(){ window.print(); });
+
+      /* ================= CETAK KARTU QR =================
+         Satu kartu per tamu dari daftar tamu token + satu kartu umum
+         tanpa ?to=. QR dirender lokal dengan qrcodejs; bila library
+         gagal dimuat, cadangannya gambar dari api.qrserver.com. */
+      var qrReturnView = "editor";
+      function qrUrlFor(slug, code, name){
+        var u = "https://invito.std.ai.id/" + slug + ".html?t=" + code;
+        if (name) u += "&to=" + encodeURIComponent(name);
+        return u;
+      }
+      function renderQrInto(el, url){
+        el.innerHTML = "";
+        if (typeof QRCode !== "undefined") {
+          try {
+            new QRCode(el, { text: url, width: 168, height: 168, correctLevel: (QRCode.CorrectLevel ? QRCode.CorrectLevel.M : 0) });
+            return;
+          } catch (e) {}
+        }
+        var img = document.createElement("img");
+        img.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(url);
+        img.alt = "Kode QR undangan digital";
+        img.width = 168; img.height = 168;
+        el.appendChild(img);
+      }
+      function buildQrCard(name, url, couple){
+        var card = document.createElement("div"); card.className = "qr-card";
+        var to = document.createElement("p"); to.className = "qr-to"; to.textContent = "Kepada Yth.";
+        var nm = document.createElement("p"); nm.className = "qr-name"; nm.textContent = name;
+        var box = document.createElement("div"); box.className = "qr-box";
+        var cp = document.createElement("p"); cp.className = "qr-couple"; cp.textContent = couple;
+        var sc = document.createElement("p"); sc.className = "qr-scan"; sc.textContent = "Scan untuk membuka undangan digital";
+        card.appendChild(to); card.appendChild(nm); card.appendChild(box); card.appendChild(cp); card.appendChild(sc);
+        renderQrInto(box, url);
+        return card;
+      }
+      function openQrCards(code, slug, data, guests, returnView){
+        qrReturnView = returnView || "editor";
+        var d = data || {};
+        var couple = [d.groomName, d.brideName].filter(Boolean).join(" & ") || "Kedua Mempelai";
+        var grid = $("qrGrid"); grid.innerHTML = "";
+        var names = (guests || []).map(function(g){ return String(g || "").trim(); }).filter(Boolean);
+        names.forEach(function(name){
+          grid.appendChild(buildQrCard(name, qrUrlFor(slug, code, name), couple));
+        });
+        grid.appendChild(buildQrCard("Tamu Undangan", qrUrlFor(slug, code, ""), couple));
+        showView("qrcards");
+      }
+      $("printQrCardsBtn").addEventListener("click", function(){
+        openQrCards(current.code, current.slug, collectData(), collectGuests(), "editor");
+      });
+      $("manageQrBtn").addEventListener("click", function(){
+        if (!manageCode) { showMsg($("manageError"), "Lihat data tokennya dulu ya, baru cetak kartu QR-nya."); return; }
+        openQrCards(manageCode, manageSlug, manageData || {}, normalizeGuests(manageData || {}), "admin");
+      });
+      $("qrBackBtn").addEventListener("click", function(){ showView(qrReturnView); });
+      $("qrPrintBtn").addEventListener("click", function(){ window.print(); });
     </script>
   </body>
 </html>
