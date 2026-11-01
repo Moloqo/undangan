@@ -644,9 +644,9 @@
           </div>
 
           <h3 style="font-size:18px; margin:30px 0 6px;">Riwayat Token</h3>
-          <p class="sub" style="margin-bottom:6px;">Semua token tersimpan di database — riwayat ini kebuka di HP / browser mana pun setelah masuk Panel Admin, bukan cuma di perangkat tempat token dibuat.</p>
+          <p class="sub" style="margin-bottom:6px;">Token tersimpan aman di database. Daftar kodenya tercatat di perangkat ini, dan tombol Sinkronkan membaca ulang tiap token langsung dari database — status &amp; revisinya selalu yang terbaru.</p>
           <div class="history-toolbar">
-            <p class="history-sync" id="historySyncStatus" role="status">Menampilkan riwayat tersimpan di perangkat ini. Sinkronkan untuk memuat semua token dari database.</p>
+            <p class="history-sync" id="historySyncStatus" role="status">Menampilkan riwayat tersimpan di perangkat ini. Sinkronkan untuk membaca ulang status tiap token dari database.</p>
             <button type="button" class="btn ghost small" id="historyRefreshBtn">Sinkronkan dari Database</button>
           </div>
           <div class="msg err" id="historySyncError" role="alert"></div>
@@ -2196,23 +2196,18 @@
         for (var j=0;j<10;j++) out += CODE_ALPHABET[arr[j] % CODE_ALPHABET.length];
         return out;
       }
-      /* ================= RIWAYAT TOKEN — TERSIMPAN DI DATABASE =================
-         Dulu riwayat cuma disimpan di localStorage browser, jadi hilang saat
-         ganti HP / browser / alamat web. Sekarang sumber kebenarannya adalah
-         Firestore:
-         1) Koleksi "tokens" itu sendiri — tiap dokumen token sudah berisi
-            template, customer, createdAt, maxRevisions, revisionsUsed, status.
-            Riwayat = daftar dokumen di koleksi itu (dibaca saat Panel Admin
-            dibuka, sesudah PIN dimasukkan).
-         2) Cadangan: dokumen indeks meta/token_history (satu dokumen, dibaca
-            dengan get — bukan list) berisi ringkasan per kode di field byCode.
-            Ditulis best-effort tiap token dibuat / diubah, supaya riwayat tetap
-            kebaca walau rules koleksi tokens hanya mengizinkan get, bukan list.
-         3) localStorage sekarang HANYA cache tampilan + fallback offline —
-            bukan satu-satunya tempat riwayat disimpan.
-         Gabungan ketiganya digabung (merge) berdasarkan kode, data Firestore
-         menang atas cache lokal. Token lama yang "hilang" dari panel akan
-         muncul lagi otomatis karena dokumennya masih ada di koleksi tokens. */
+      /* ================= RIWAYAT TOKEN — DISINKRONKAN DARI DATABASE =================
+         Token aslinya selalu aman di Firestore (koleksi "tokens"); yang disimpan
+         di perangkat hanyalah daftar kodenya (localStorage "kt_admin_tokens").
+         Sinkronisasi membaca ULANG tiap dokumen token satu per satu dengan get
+         per dokumen — persis operasi yang dipakai menu Kelola Token — lalu
+         memperbarui status / revisi / nama di daftar riwayat. Security rules
+         memang TIDAK mengizinkan list koleksi tokens maupun dokumen indeks
+         terpisah, jadi halaman ini sengaja tidak memakai keduanya: tidak ada
+         query list, tidak ada dokumen meta — hanya get per kode yang sudah
+         dikenal perangkat ini. Token yang dibuat di perangkat lain otomatis
+         ikut tersimpan di riwayat perangkat ini begitu kodenya pernah dibuka
+         lewat menu Kelola Token di sini. */
       var historyCache = null;
       var historySyncing = false;
       function tsToISO(v){
@@ -2292,52 +2287,15 @@
         el.textContent = text;
         el.className = "history-sync" + (kind ? " " + kind : "");
       }
-      function historyIndexRef(){ return db.collection("meta").doc("token_history"); }
-      function historyIndexUpsert(item){
-        /* Best-effort: kegagalan menulis indeks TIDAK boleh menggagalkan
-           pembuatan / pengelolaan token — dokumen tokennya sendiri tetap
-           jadi sumber riwayat utama. Pola adminKey sama seperti tokens:
-           kirim PIN, lalu hapus lagi dari dokumen. */
-        var clean = normalizeHistoryItem(item);
-        if (!db || !clean) return Promise.resolve(false);
-        try {
-          var byCode = {}; byCode[clean.code] = clean;
-          var payload = { byCode: byCode, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
-          if (adminPin) payload.adminKey = adminPin;
-          var ref = historyIndexRef();
-          return ref.set(payload, { merge: true }).then(function(){
-            if (!adminPin) return true;
-            return ref.update({ adminKey: firebase.firestore.FieldValue.delete() })
-              .then(function(){ return true; }).catch(function(){ return true; });
-          }).catch(function(){ return false; });
-        } catch(e){ return Promise.resolve(false); }
-      }
-      function historyIndexLoad(){
-        if (!db) return Promise.resolve([]);
-        return historyIndexRef().get().then(function(snap){
-          if (!snap.exists) return [];
-          var d = snap.data() || {};
-          var by = d.byCode || d.items || {};
-          var out = [];
-          if (Array.isArray(by)) out = by;
-          else for (var k in by) { if (Object.prototype.hasOwnProperty.call(by, k)) out.push(by[k]); }
-          return out.map(normalizeHistoryItem).filter(Boolean);
-        }).catch(function(){ return []; });
-      }
-      function historyTokensLoad(){
-        if (!db) return Promise.reject(new Error("Firebase belum terhubung."));
-        function collect(snap){
-          var out = [];
-          snap.forEach(function(doc){ out.push(docToHistoryItem(doc.id, doc.data())); });
-          return out.filter(Boolean);
-        }
-        return db.collection("tokens").orderBy("createdAt", "desc").limit(300).get()
-          .then(collect)
-          .catch(function(firstErr){
-            /* Cadangan tanpa urutan (mis. ada dokumen lama tanpa createdAt). */
-            return db.collection("tokens").limit(300).get().then(collect)
-              .catch(function(){ throw firstErr; });
-          });
+      /* Baca ulang SATU dokumen token lewat get per dokumen (operasi yang
+         diizinkan rules, sama seperti menu Kelola Token). Mengembalikan item
+         riwayat terbaru, null kalau dokumennya sudah tidak ada, dan melempar
+         error hanya untuk kegagalan koneksi — tidak pernah untuk izin. */
+      function historyTokenFetch(code){
+        return db.collection("tokens").doc(code).get().then(function(snap){
+          if (!snap.exists) return null;
+          return docToHistoryItem(code, snap.data() || {});
+        });
       }
       function syncHistoryFromFirestore(){
         if (historySyncing) return Promise.resolve(false);
@@ -2345,38 +2303,47 @@
           historySetStatus("Tidak bisa sinkron: koneksi database belum tersedia. Menampilkan riwayat dari perangkat ini.", "err");
           return Promise.resolve(false);
         }
+        var known = historyLoad();
+        if (!known.length) {
+          historySetStatus("Belum ada token yang dikenal di perangkat ini. Buat token baru di atas, atau buka kode token lama lewat menu Kelola Token — token itu akan ikut tersimpan di riwayat perangkat ini.", "");
+          return Promise.resolve(false);
+        }
         historySyncing = true;
         var btn = $("historyRefreshBtn");
         if (btn) { btn.disabled = true; btn.textContent = "Menyinkronkan…"; }
         historySetStatus("Menyinkronkan riwayat dari database…", "");
         hideMsg($("historySyncError"));
-        var tokensList = null, tokensErr = null, indexList = [];
-        return historyTokensLoad()
-          .then(function(list){ tokensList = list; }, function(e){ tokensErr = e; })
-          .then(function(){ return historyIndexLoad(); })
-          .then(function(idx){ indexList = idx || []; })
-          .then(function(){
-            var merged = tokensList
-              ? mergeHistoryLists(historyLoad(), indexList, tokensList)
-              : mergeHistoryLists(historyLoad(), indexList);
-            historySave(merged);
-            renderHistory();
-            historySyncing = false;
-            if (btn) { btn.disabled = false; btn.textContent = "Sinkronkan dari Database"; }
-            var jam = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-            if (tokensList) {
-              historySetStatus("Tersinkron dari database · " + merged.length + " token · " + jam + " — riwayat ini sama di semua perangkat.", "ok");
-              return true;
-            }
-            if (indexList.length) {
-              historySetStatus("Sebagian tersinkron lewat indeks database · " + merged.length + " token. Daftar lengkap dari koleksi token belum bisa dibaca.", "err");
-            } else {
-              historySetStatus("Belum bisa membaca riwayat dari database. Menampilkan " + merged.length + " token dari perangkat ini.", "err");
-            }
-            showMsg($("historySyncError"), "Sinkron database gagal" + (tokensErr && tokensErr.message ? ": " + tokensErr.message : "") + ". Token aslinya tetap aman di database dan link tamu tetap jalan. Kalau pesan menyebut permission / rules, Firestore rules perlu mengizinkan admin membaca (list) koleksi tokens dan membaca / menulis dokumen meta/token_history — izinkan read/list untuk riwayat ini, atau samakan pola adminKey (PIN) seperti operasi token yang sudah ada.");
-            refreshHistoryRevisions();
-            return false;
-          });
+        var read = 0, missing = 0, failed = 0;
+        var jobs = known.map(function(item){
+          return historyTokenFetch(item.code).then(function(fresh){
+            if (!fresh) { missing++; return; }
+            read++;
+            historyPatch(item.code, {
+              maxRevisions: fresh.maxRevisions,
+              revisionsUsed: fresh.revisionsUsed,
+              status: fresh.status,
+              customer: fresh.customer,
+              template: fresh.template,
+              createdAt: fresh.createdAt
+            });
+          }).catch(function(){ failed++; });
+        });
+        return Promise.all(jobs).then(function(){
+          renderHistory();
+          historySyncing = false;
+          if (btn) { btn.disabled = false; btn.textContent = "Sinkronkan dari Database"; }
+          var jam = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+          if (read) {
+            historySetStatus("Tersinkron dari database · " + read + " token terbaca · " + jam + " — status & revisi selalu yang terbaru dari database." + (missing ? " " + missing + " kode tidak ditemukan lagi di database (daftar lokalnya tetap ditampilkan)." : ""), "ok");
+            return true;
+          }
+          if (missing === known.length) {
+            historySetStatus("Tidak ada token yang terbaca dari database — dokumen tokennya tidak ditemukan. Daftar dari perangkat ini tetap ditampilkan apa adanya.", "err");
+          } else {
+            historySetStatus("Sinkron belum berhasil — koneksi ke database bermasalah. Daftar dari perangkat ini tetap ditampilkan; coba lagi sebentar.", "err");
+          }
+          return false;
+        });
       }
       function renderHistory(){
         var list = historyLoad();
@@ -2427,27 +2394,7 @@
           }
           updated = it;
         });
-        if (changed) { historySave(list); if (updated) historyIndexUpsert(updated); }
-      }
-      function refreshHistoryRevisions(){
-        if (!db) return;
-        var list = historyLoad();
-        if (!list.length) return;
-        var jobs = list.map(function(item){
-          return db.collection("tokens").doc(item.code).get().then(function(snap){
-            if (!snap.exists) return;
-            var fresh = docToHistoryItem(item.code, snap.data() || {});
-            historyPatch(item.code, {
-              maxRevisions: fresh.maxRevisions,
-              revisionsUsed: fresh.revisionsUsed,
-              status: fresh.status,
-              customer: fresh.customer,
-              template: fresh.template,
-              createdAt: fresh.createdAt
-            });
-          }).catch(function(){});
-        });
-        Promise.all(jobs).then(function(){ renderHistory(); });
+        if (changed) { historySave(list); }
       }
       /* Operasi admin dua langkah: kirim perubahan + adminKey (PIN),
          lalu hapus adminKey dari dokumen. Keduanya harus sukses. */
@@ -2511,8 +2458,8 @@
         if (!pendingCode) { pendingCode = generateCode(); $("newCodeDisplay").textContent = pendingCode; }
         renderHistory();
         showView("admin");
-        /* Riwayat sekarang ditarik dari database (bukan cuma perangkat ini):
-           token lama yang dulu "hilang" akan muncul lagi dari koleksi tokens. */
+        /* Segarkan status tiap token yang dikenal perangkat ini langsung
+           dari dokumennya di database (get per dokumen). */
         syncHistoryFromFirestore();
         pinSubmitting = false;
       }
@@ -2584,10 +2531,7 @@
           var list = historyLoad();
           list.push(newItem);
           historySave(list); renderHistory();
-          /* Tulis juga ke indeks database (meta/token_history) supaya riwayat
-             token ini kebaca dari perangkat lain, bukan cuma dari sini. */
-          historyIndexUpsert(newItem);
-          historySetStatus("Token " + code + " tersimpan di database — akan muncul di riwayat perangkat mana pun.", "ok");
+          historySetStatus("Token " + code + " tersimpan di database. Kodenya juga tercatat di riwayat perangkat ini.", "ok");
           var revTxt = maxRev === null ? "revisi tanpa batas" : ("maksimal revisi " + maxRev + "×");
           showMsg($("adminCreateOk"), "Token " + code + " untuk " + customer + " berhasil dibuat (" + (templateBySlug(slug) || {}).name + ", " + revTxt + "). Salin kodenya dan kirim ke customer." + (cleanupFailed ? " Peringatan: pembersihan kunci admin gagal — coba operasi admin apa pun pada token ini dari menu Kelola Token untuk membersihkannya." : ""));
           pendingCode = generateCode(); $("newCodeDisplay").textContent = pendingCode;
@@ -2636,6 +2580,14 @@
           $("mUnlimited").checked = mMax === null;
           $("mMaxRevisions").disabled = mMax === null;
           $("mMaxRevisions").value = mMax === null ? 3 : mMax;
+          /* Token yang dibuka lewat Kelola ikut dicatat di riwayat perangkat
+             ini — jadi token dari perangkat lain bisa mulai disinkronkan
+             dari sini juga. */
+          var knownList = historyLoad();
+          if (!knownList.some(function(it){ return it.code === code; })) {
+            var freshItem = docToHistoryItem(code, doc);
+            if (freshItem) { knownList.push(freshItem); historySave(knownList); }
+          }
           historyPatch(code, { maxRevisions: mMax, revisionsUsed: mUsed, status: doc.status || "active" });
           renderHistory();
           var d = doc.data || {};
