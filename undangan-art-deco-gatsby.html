@@ -126,6 +126,42 @@
   .veil-title{font-family:var(--sans);letter-spacing:.4em;text-indent:.4em;font-size:.85rem;color:var(--champagne)}
   .veil-msg{color:var(--muted);margin:14px auto 22px;max-width:26em}
 
+  /* ---------- loading screen (infinity emas) ---------- */
+  #appLoader{
+    position:fixed;inset:0;z-index:400;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+    background:radial-gradient(60% 50% at 50% 44%,rgba(201,162,39,.09),transparent 70%),#060503;
+    transition:opacity .6s ease;
+  }
+  #appLoader.done{opacity:0;pointer-events:none}
+  #appLoader .ld-inf{
+    width:clamp(72px,19vw,112px);
+    animation:ldPulse 2s ease-in-out infinite;
+    filter:drop-shadow(0 0 14px rgba(212,175,55,.35));
+  }
+  #appLoader svg{display:block;width:100%;height:auto;overflow:visible}
+  #appLoader .ld-base{fill:none;stroke:url(#ldGold);stroke-width:4.6;stroke-linecap:round}
+  #appLoader .ld-sheen{
+    fill:none;stroke:#fff8e1;stroke-width:4.6;stroke-linecap:round;
+    stroke-dasharray:16 84;opacity:.85;
+    animation:ldSweep 1.8s linear infinite;
+  }
+  @keyframes ldSweep{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+  @keyframes ldPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  #appLoader .ld-text{
+    font-family:var(--sans);font-size:.8rem;letter-spacing:.34em;text-indent:.34em;
+    text-transform:uppercase;color:var(--muted);text-align:center;padding:0 20px;
+  }
+  #appLoader .ld-dot{animation:ldBlink 1.4s ease-in-out infinite}
+  #appLoader .ld-dot:nth-child(2){animation-delay:.18s}
+  #appLoader .ld-dot:nth-child(3){animation-delay:.36s}
+  @keyframes ldBlink{0%,60%,100%{opacity:.15}30%{opacity:1}}
+  @media (prefers-reduced-motion:reduce){
+    #appLoader .ld-inf,#appLoader .ld-sheen,#appLoader .ld-dot{animation:none !important}
+    #appLoader .ld-sheen{opacity:0}
+    #appLoader .ld-dot{opacity:1}
+  }
+
   /* ---------- sampul / gerbang ---------- */
   #cover{
     position:fixed;inset:0;z-index:120;overflow:hidden;background:var(--bg);
@@ -399,6 +435,25 @@
 </style>
 </head>
 <body class="locked">
+
+<!-- ================= LOADING SCREEN (infinity emas) ================= -->
+<div id="appLoader" role="status" aria-label="Memuat undangan">
+  <div class="ld-inf" aria-hidden="true">
+    <svg viewBox="0 0 100 50" focusable="false">
+      <defs>
+        <linearGradient id="ldGold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#D4AF37" />
+          <stop offset="50%" stop-color="#F5E6C4" />
+          <stop offset="100%" stop-color="#B98A2F" />
+        </linearGradient>
+      </defs>
+      <path class="ld-base" pathLength="100" d="M50 25 C40 6 14 6 14 25 C14 44 40 44 50 25 C60 6 86 6 86 25 C86 44 60 44 50 25 Z" />
+      <path class="ld-sheen" pathLength="100" d="M50 25 C40 6 14 6 14 25 C14 44 40 44 50 25 C60 6 86 6 86 25 C86 44 60 44 50 25 Z" />
+    </svg>
+  </div>
+  <p class="ld-text">Memuat undangan<span class="ld-dot">.</span><span class="ld-dot">.</span><span class="ld-dot">.</span></p>
+</div>
+
 <div class="page">
 
 <!-- ================= VEIL MEMUAT DATA TAMU (hanya bila ada ?t=) ================= -->
@@ -765,6 +820,28 @@
 <script>
 (function(){
   "use strict";
+
+  /* ---------- LOADING SCREEN (infinity emas) ----------
+     Loader hilang HANYA bila dua syarat terpenuhi bersamaan:
+     (1) event 'load' window — semua asset/gambar selesai dimuat, dan
+     (2) markLoaderReady() — hidrasi token (bila ada ?t=) + init selesai.
+     Setelah itu fade-out 600ms lalu overlay di-remove dari DOM. */
+  var appLoader = document.getElementById('appLoader');
+  var loaderWinLoaded = (document.readyState === 'complete');
+  var loaderInitDone = false;
+  function maybeHideLoader(){
+    if (!appLoader || !loaderWinLoaded || !loaderInitDone) return;
+    if (appLoader.classList.contains('done')) return;
+    appLoader.classList.add('done');
+    setTimeout(function(){
+      if (appLoader && appLoader.parentNode) appLoader.parentNode.removeChild(appLoader);
+      appLoader = null;
+    }, 700);
+  }
+  function markLoaderReady(){ loaderInitDone = true; maybeHideLoader(); }
+  window.addEventListener('load', function(){ loaderWinLoaded = true; maybeHideLoader(); });
+  /* Jaring pengaman: halaman tidak pernah terkunci selamanya oleh loader */
+  setTimeout(function(){ loaderInitDone = true; loaderWinLoaded = true; maybeHideLoader(); }, 30000);
 
   /* ---------- SAMPUL / GERBANG ---------- */
   var cover = document.getElementById('cover');
@@ -1735,7 +1812,7 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     var params;
-    try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
+    try { params = new URLSearchParams(window.location.search); } catch (e) { markLoaderReady(); return; }
     var rawCode = params.get('t');
     var guestNameEarly = '';
     try { guestNameEarly = (params.get('to') || params.get('nama') || '').trim(); } catch (e) { guestNameEarly = ''; }
@@ -1752,9 +1829,9 @@
       if (emb && typeof emb === 'object') applyWaNumber(emb.waNumber || emb.wa || emb.whatsapp || '');
       if (typeof window.__WA_NUMBER__ === 'string') applyWaNumber(window.__WA_NUMBER__);
     } catch (e) {}
-    if (!rawCode) return; /* tanpa ?t= → demo persis seperti semula (kecuali ?wa=/?to= di atas) */
+    if (!rawCode) { markLoaderReady(); return; } /* tanpa ?t= → demo persis seperti semula (kecuali ?wa=/?to= di atas) */
     var code = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (!code) return;
+    if (!code) { markLoaderReady(); return; }
     var guestName = guestNameEarly;
 
     if (veil) veil.classList.add('show');
@@ -1765,6 +1842,9 @@
         var vm = document.getElementById('veilMsg');
         if (vm) vm.textContent = 'Koneksi lambat. Anda dapat melihat versi contoh terlebih dahulu.';
         if (veilDemoBtn) veilDemoBtn.style.display = '';
+        /* Loader dilepas agar tombol versi contoh pada veil bisa dijangkau;
+           hidrasi tetap berjalan dan veil tetap tampil di belakangnya. */
+        markLoaderReady();
       }
     }, 15000);
     function veilDone(){
@@ -1785,13 +1865,14 @@
       /* SDK gagal → biarkan tampilan demo apa adanya */
       showDemoWishes();
       veilDone();
+      markLoaderReady();
       return;
     }
 
     db.collection('tokens').doc(code).get().then(function(snap){
-      if (!snap.exists) { clearTimeout(veilTimer); hShowInvalid(); return; }
+      if (!snap.exists) { clearTimeout(veilTimer); markLoaderReady(); hShowInvalid(); return; }
       var doc = snap.data() || {};
-      if (doc.status !== 'active') { clearTimeout(veilTimer); hShowInvalid(); return; }
+      if (doc.status !== 'active') { clearTimeout(veilTimer); markLoaderReady(); hShowInvalid(); return; }
       try {
         hApply(doc.data || {}, guestName);
       } catch (e) {
@@ -1806,10 +1887,12 @@
       fsDb = db; fsCode = code; fsActive = true;
       loadSharedWishes();
       veilDone();
+      markLoaderReady();
     }).catch(function(){
       /* Gagal jaringan → biarkan tampilan demo apa adanya */
       showDemoWishes();
       veilDone();
+      markLoaderReady();
     });
   });
 })();
