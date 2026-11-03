@@ -416,9 +416,83 @@
         .cover-names { font-size: 46px; }
         #quoteText { font-size: 23px; }
       }
+
+      /* ---------- loading screen: infinity emas ---------- */
+      #loader {
+        position: fixed; inset: 0; z-index: 2000;
+        background: var(--paper);
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+        opacity: 1; transition: opacity 0.6s ease;
+      }
+      #loader.hide { opacity: 0; pointer-events: none; }
+      .loader-inf { animation: loaderPulse 2s ease-in-out infinite; will-change: transform; }
+      .loader-inf svg {
+        display: block; width: clamp(96px, 26vw, 144px); height: auto;
+        filter: drop-shadow(0 0 7px rgba(212, 175, 55, 0.45));
+      }
+      .loader-sheen { animation: loaderSheen 1.8s linear infinite; }
+      @keyframes loaderPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+      @keyframes loaderSheen {
+        from { stroke-dashoffset: 100; }
+        to { stroke-dashoffset: -100; }
+      }
+      .loader-text {
+        font-family: "Nunito Sans", sans-serif; font-size: 13px; font-weight: 600;
+        letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin: 0;
+      }
+      .loader-text .dot { animation: loaderDot 1.4s ease-in-out infinite; }
+      .loader-text .dot:nth-of-type(2) { animation-delay: 0.2s; }
+      .loader-text .dot:nth-of-type(3) { animation-delay: 0.4s; }
+      @keyframes loaderDot {
+        0%, 60%, 100% { opacity: 0.15; }
+        30% { opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .loader-inf, .loader-sheen, .loader-text .dot { animation: none; }
+      }
     </style>
   </head>
   <body>
+    <!-- ================= LOADING SCREEN ================= -->
+    <div id="loader" role="status" aria-label="Memuat undangan">
+      <div class="loader-inf" aria-hidden="true">
+        <svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <defs>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#D4AF37" />
+              <stop offset="50%" stop-color="#F5E6C4" />
+              <stop offset="100%" stop-color="#B98A2F" />
+            </linearGradient>
+          </defs>
+          <path d="M 50 25 C 50 15 38 8 28 8 C 14 8 6 16 6 25 C 6 34 14 42 28 42 C 38 42 50 35 50 25 C 50 15 62 8 72 8 C 86 8 94 16 94 25 C 94 34 86 42 72 42 C 62 42 50 35 50 25 Z" fill="none" stroke="url(#goldGrad)" stroke-width="6" stroke-linecap="round" />
+          <path class="loader-sheen" d="M 50 25 C 50 15 38 8 28 8 C 14 8 6 16 6 25 C 6 34 14 42 28 42 C 38 42 50 35 50 25 C 50 15 62 8 72 8 C 86 8 94 16 94 25 C 94 34 86 42 72 42 C 62 42 50 35 50 25 Z" fill="none" stroke="#FFF8E1" stroke-width="2.4" stroke-linecap="round" pathLength="100" stroke-dasharray="20 80" />
+        </svg>
+      </div>
+      <p class="loader-text">Memuat undangan<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></p>
+    </div>
+    <script>
+      /* Gerbang loader: fade-out HANYA setelah window load DAN hidrasi token selesai. */
+      window.__invLoader = (function () {
+        var pageLoaded = false, hydrated = false, hidden = false;
+        function tryHide() {
+          if (hidden || !pageLoaded || !hydrated) return;
+          hidden = true;
+          var el = document.getElementById("loader");
+          if (!el) return;
+          el.classList.add("hide");
+          setTimeout(function () { el.style.display = "none"; }, 650);
+        }
+        if (document.readyState === "complete") { pageLoaded = true; }
+        else { window.addEventListener("load", function () { pageLoaded = true; tryHide(); }); }
+        /* jaring pengaman: loader tidak pernah menahan halaman lebih dari 20 detik */
+        setTimeout(function () { pageLoaded = true; hydrated = true; tryHide(); }, 20000);
+        return { markHydrated: function () { hydrated = true; tryHide(); } };
+      })();
+    </script>
+
     <div id="petals" aria-hidden="true"></div>
 
     <!-- ================= COVER ================= -->
@@ -969,6 +1043,8 @@
         var wishDb = null;
         var tokenIsActive = false;
         var tokenCode = params.get("t");
+        /* tanpa token tidak ada hidrasi — loader cukup menunggu window load */
+        if (!tokenCode && window.__invLoader) window.__invLoader.markHydrated();
 
         function nonEmpty(v) { return typeof v === "string" ? v.trim().length > 0 : (v != null && v !== ""); }
         function str(v) { return (v === null || v === undefined) ? "" : String(v).trim(); }
@@ -1464,8 +1540,9 @@
         if (tokenCode) {
           tokenCode = String(tokenCode).toUpperCase().trim();
           document.addEventListener("DOMContentLoaded", function () {
+            function loaderDone() { if (window.__invLoader) window.__invLoader.markHydrated(); }
             try {
-              if (typeof firebase === "undefined") return;
+              if (typeof firebase === "undefined") { loaderDone(); return; }
               if (!firebase.apps.length) {
                 firebase.initializeApp({
                   apiKey: "AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
@@ -1477,20 +1554,22 @@
               wishDb = db;
               loadSharedWishes(db, tokenCode);
               var settled = false;
-              var loadTimer = setTimeout(function () { settled = true; }, 15000);
+              var loadTimer = setTimeout(function () { settled = true; loaderDone(); }, 15000);
               db.collection("tokens").doc(tokenCode).get().then(function (snap) {
                 if (settled) return;
                 settled = true;
                 clearTimeout(loadTimer);
-                if (!snap.exists) return;
+                if (!snap.exists) { loaderDone(); return; }
                 var docData = snap.data() || {};
-                if (docData.status !== "active") return;
+                if (docData.status !== "active") { loaderDone(); return; }
                 tokenIsActive = true;
                 try { applyCustomerData(docData.data || {}); } catch (e) {}
+                loaderDone();
               }).catch(function () {
                 if (!settled) { settled = true; clearTimeout(loadTimer); }
+                loaderDone();
               });
-            } catch (e) {}
+            } catch (e) { loaderDone(); }
           });
         }
       })();

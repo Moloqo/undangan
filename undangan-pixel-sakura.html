@@ -110,6 +110,23 @@ h2{font-size:clamp(18px,5.2vw,25px);text-align:center}
 #guestLoader .vt{font-size:26px;color:var(--accent-deep);letter-spacing:.14em}
 #guestLoader svg{width:54px;height:54px;animation:spinPetal 2.4s steps(8) infinite}
 @keyframes spinPetal{to{transform:rotate(360deg)}}
+/* ---------- page loader : infinity emas ---------- */
+#pageLoader{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;flex-direction:column;gap:22px;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:1;transition:opacity .6s ease}
+#pageLoader.done{opacity:0;pointer-events:none}
+#pageLoader .pl-inf{width:clamp(72px,22vw,120px);height:auto;overflow:visible;animation:plPulse 2s ease-in-out infinite}
+#pageLoader .pl-sheen{stroke-dasharray:15 85;animation:plSheen 1.5s linear infinite}
+@keyframes plSheen{to{stroke-dashoffset:-100}}
+@keyframes plPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+#pageLoader .pl-text{margin:0;font-size:14px;font-weight:600;letter-spacing:.1em;color:var(--ink-soft)}
+#pageLoader .pl-dot{display:inline-block;animation:plBlink 1.2s ease-in-out infinite}
+#pageLoader .pl-dot:nth-child(2){animation-delay:.2s}
+#pageLoader .pl-dot:nth-child(3){animation-delay:.4s}
+@keyframes plBlink{0%,55%,100%{opacity:.12}30%{opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  #pageLoader .pl-inf{animation:none}
+  #pageLoader .pl-sheen{animation:none;stroke-dasharray:none;opacity:0}
+  #pageLoader .pl-dot{animation:none;opacity:1}
+}
 .invalid-invite{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:18px}
 /* ---------- cover ---------- */
 #cover{
@@ -299,6 +316,45 @@ footer .fnote{font-size:14px;color:var(--ink-soft);max-width:480px;margin:12px a
 </style>
 </head>
 <body class="locked">
+
+<!-- LOADING SCREEN : infinity emas — hilang setelah window load + hidrasi/init selesai -->
+<div id="pageLoader" role="status" aria-label="Memuat undangan">
+  <svg class="pl-inf" viewBox="0 0 120 60" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="plGold" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#D4AF37"/>
+        <stop offset="50%" stop-color="#F5E6C4"/>
+        <stop offset="100%" stop-color="#B98A2F"/>
+      </linearGradient>
+    </defs>
+    <path d="M60 30 C60 21 51 14 42 14 C30 14 21 21 21 30 C21 39 30 46 42 46 C51 46 60 39 60 30 C60 21 69 14 78 14 C90 14 99 21 99 30 C99 39 90 46 78 46 C69 46 60 39 60 30 Z" fill="none" stroke="url(#plGold)" stroke-width="5" stroke-linecap="round"/>
+    <path class="pl-sheen" d="M60 30 C60 21 51 14 42 14 C30 14 21 21 21 30 C21 39 30 46 42 46 C51 46 60 39 60 30 C60 21 69 14 78 14 C90 14 99 21 99 30 C99 39 90 46 78 46 C69 46 60 39 60 30 Z" pathLength="100" fill="none" stroke="#FFFBEB" stroke-opacity=".95" stroke-width="5" stroke-linecap="round"/>
+  </svg>
+  <p class="pl-text">Memuat undangan<span class="pl-dot">.</span><span class="pl-dot">.</span><span class="pl-dot">.</span></p>
+</div>
+<script>
+/* Page loader: fade-out HANYA setelah (1) window 'load' (semua asset termuat) DAN
+   (2) inisialisasi JS + hidrasi token selesai — ditandai lewat window.__pageInitReady()
+   yang dipanggil IIFE hidrasi di semua jalur selesai (tanpa ?t=, sukses, gagal, fallback).
+   Pengaman 15 detik agar loader tidak pernah mengunci tamu. */
+(function(){
+  var loaded = false, ready = false, hidden = false, t0 = Date.now();
+  function tryHide(){
+    if (hidden || !loaded || !ready) return;
+    var wait = 500 - (Date.now() - t0);
+    if (wait > 0) { setTimeout(tryHide, wait); return; }
+    hidden = true;
+    var el = document.getElementById('pageLoader');
+    if (!el) return;
+    el.classList.add('done');
+    setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 700);
+  }
+  window.__pageInitReady = function(){ ready = true; tryHide(); };
+  if (document.readyState === 'complete') { loaded = true; }
+  else { window.addEventListener('load', function(){ loaded = true; tryHide(); }); }
+  setTimeout(function(){ loaded = true; ready = true; tryHide(); }, 15000);
+})();
+</script>
 
 <svg class="sprite-defs" aria-hidden="true" focusable="false"><defs>
 <pattern id="dithPink" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#ffb3d1"/><rect width="4" height="4" fill="#ffd6e7"/><rect x="4" y="4" width="4" height="4" fill="#ffd6e7"/></pattern>
@@ -990,7 +1046,7 @@ footer .fnote{font-size:14px;color:var(--ink-soft);max-width:480px;margin:12px a
   function boot(){
     var code = "";
     try { code = (new URLSearchParams(location.search).get("t") || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, ""); } catch(e){ code = ""; }
-    if (!code) return;
+    if (!code) { if (window.__pageInitReady) window.__pageInitReady(); return; }
 
     var loader = document.getElementById("guestLoader");
     if (loader) loader.hidden = false;
@@ -999,6 +1055,7 @@ footer .fnote{font-size:14px;color:var(--ink-soft);max-width:480px;margin:12px a
     function hideLoader(){
       if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
       if (loader) loader.hidden = true;
+      if (window.__pageInitReady) window.__pageInitReady();
     }
     loadTimer = setTimeout(hideLoader, 15000);
 
