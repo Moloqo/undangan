@@ -668,6 +668,7 @@
         var windowLoaded = new Promise(function (res) {
           if (document.readyState === "complete") res();
           else window.addEventListener("load", function () { res(); });
+        });
 
         /* Hydration promise for loader */
         var resolveHydration = null;
@@ -806,7 +807,7 @@
           if (empty) { empty.remove(); empty = null; }
           var card = document.createElement("div");
           card.className = "wish";
-          card.innerHTML = "<b>" + esc(name) + "</b><span data-txt="penutup.label2" class=\"att\">" + esc(att) + "</span><p data-txt="penutup.text2">" + esc(wish) + "</p>";
+          card.innerHTML = "<b>" + esc(name) + "</b><span data-txt=\"penutup.label2\" class=\"att\">" + esc(att) + "</span><p data-txt=\"penutup.text2\">" + esc(wish) + "</p>";
           wall.insertBefore(card, wall.firstChild);
           document.getElementById("f-wish").value = "";
           /* Simpan juga ke dinding ucapan bersama (Firestore tokens/{kode}/wishes).

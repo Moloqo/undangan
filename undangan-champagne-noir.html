@@ -831,6 +831,7 @@
         var windowLoaded = new Promise(function (res) {
           if (document.readyState === "complete") res();
           else window.addEventListener("load", function () { res(); });
+        });
 
         /* Hydration promise for loader */
         var resolveHydration = null;
