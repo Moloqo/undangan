@@ -159,8 +159,8 @@
       .chip[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
       .chip .cnt{ opacity:.6; font-weight:600; }
       @media (max-width:760px){
-        .chips{ flex-wrap:nowrap; width:100%; }
-        .chip{ flex:1 1 0; min-width:0; padding:9px 3px; font-size:12.5px; letter-spacing:-.01em; text-align:center; white-space:nowrap; }
+        .chips{ flex-wrap:wrap; width:100%; }
+        .chip{ flex:0 1 auto; min-width:0; padding:9px 13px; font-size:12.5px; letter-spacing:-.01em; text-align:center; white-space:nowrap; }
       }
 
       /* ---------- Cards ---------- */
@@ -495,8 +495,8 @@
             <a class="btn ghost" href="#cara-pesan">Cara Pesan</a>
           </div>
           <ul class="stats rv">
-            <li><b>16</b> template</li>
-            <li><b>7</b> Pixel · <b>9</b> Klasik</li>
+            <li><b>43</b> template</li>
+            <li><b>7</b> Pixel · <b>9</b> Klasik · <b>6</b> Budaya · <b>10</b> Tema Bebas · <b>6</b> Elegant · <b>5</b> Premium</li>
             <li><b>1 token</b> = 1 undangan</li>
           </ul>
         </section>
@@ -507,9 +507,13 @@
             <input id="searchInput" type="search" placeholder="Cari template…" aria-label="Cari template" />
           </div>
           <div class="chips" role="group" aria-label="Filter kategori">
-            <button class="chip" data-filter="all" aria-pressed="true">Semua <span class="cnt">· 16</span></button>
+            <button class="chip" data-filter="all" aria-pressed="true">Semua <span class="cnt">· 43</span></button>
             <button class="chip" data-filter="pixel" aria-pressed="false">Pixel <span class="cnt">· 7</span></button>
             <button class="chip" data-filter="klasik" aria-pressed="false">Klasik <span class="cnt">· 9</span></button>
+            <button class="chip" data-filter="budaya" aria-pressed="false">Budaya <span class="cnt">· 6</span></button>
+            <button class="chip" data-filter="bebas" aria-pressed="false">Tema Bebas <span class="cnt">· 10</span></button>
+            <button class="chip" data-filter="elegant" aria-pressed="false">Elegant <span class="cnt">· 6</span></button>
+            <button class="chip" data-filter="premium" aria-pressed="false">Premium <span class="cnt">· 5</span></button>
           </div>
         </div>
 
@@ -1177,7 +1181,142 @@
           desc:"Surat cinta & Menara Eiffel.",
           url:"https://invito.std.ai.id/undangan-parisian-love-letter.html",
           bg:"linear-gradient(160deg,#31456b,#1b2a47)", fg:"#f2c4ce",
-          art: motif('<path d="M50 10 C54 30 60 52 68 84 L58 84 C55 68 53 60 50 60 C47 60 45 68 42 84 L32 84 C40 52 46 30 50 10Z" fill="MOTIF"/><path d="M38 56 L62 56 M42 38 L58 38" stroke="#1b2a47" stroke-width="3.4"/><path d="M26 88 L74 88" stroke="MOTIF" stroke-width="3.6" stroke-linecap="round"/><circle cx="50" cy="8" r="2.6" fill="MOTIF"/>') }
+          art: motif('<path d="M50 10 C54 30 60 52 68 84 L58 84 C55 68 53 60 50 60 C47 60 45 68 42 84 L32 84 C40 52 46 30 50 10Z" fill="MOTIF"/><path d="M38 56 L62 56 M42 38 L58 38" stroke="#1b2a47" stroke-width="3.4"/><path d="M26 88 L74 88" stroke="MOTIF" stroke-width="3.6" stroke-linecap="round"/><circle cx="50" cy="8" r="2.6" fill="MOTIF"/>') },
+        { slug:"undangan-pernikahan-minangkabau-minimalis-2", name:"Minangkabau Minimalis", tag:"Budaya · Adat Minang", group:"budaya",
+          desc:"Songket marun-emas & gonjong rumah gadang.",
+          url:"https://invito.std.ai.id/undangan-pernikahan-minangkabau-minimalis-2.html",
+          bg:"linear-gradient(150deg,#7c2128,#4a1218)", fg:"#eec25e",
+          art: motif('<path d="M8 46 L24 28 L36 42 L50 24 L64 42 L76 28 L92 46 L86 46 L86 80 L14 80 L14 46 Z" fill="MOTIF"/><rect x="44" y="60" width="12" height="20" fill="#4a1218"/>') },
+        { slug:"undangan-jawa-minimalis", name:"Jawa Sogan Klasik", tag:"Budaya · Adat Jawa", group:"budaya",
+          desc:"Kawung sogan & bingkai keraton.",
+          url:"https://invito.std.ai.id/undangan-jawa-minimalis.html",
+          bg:"linear-gradient(150deg,#3a2410,#1d1005)", fg:"#e0c078",
+          art: motif('<g ' + G + '><ellipse cx="50" cy="34" rx="9" ry="15"/><ellipse cx="50" cy="66" rx="9" ry="15"/><ellipse cx="34" cy="50" rx="15" ry="9"/><ellipse cx="66" cy="50" rx="15" ry="9"/></g><circle cx="50" cy="50" r="4.5" fill="MOTIF"/>') },
+        { slug:"undangan-sunda-minimalis", name:"Sunda Priangan Garden", tag:"Budaya · Adat Sunda", group:"budaya",
+          desc:"Bambu & daun organik Priangan.",
+          url:"https://invito.std.ai.id/undangan-sunda-minimalis.html",
+          bg:"linear-gradient(150deg,#2e5a34,#16281a)", fg:"#cfe3a8",
+          art: motif('<g fill="MOTIF"><rect x="30" y="28" width="9" height="54" rx="4"/><rect x="48" y="20" width="9" height="62" rx="4"/><rect x="66" y="32" width="9" height="50" rx="4"/></g><path d="M24 24 Q50 12 78 26" ' + G + '/>') },
+        { slug:"undangan-bali-minimalis", name:"Bali Sekala Niskala", tag:"Budaya · Adat Bali", group:"budaya",
+          desc:"Poleng hitam-putih & malam sakral.",
+          url:"https://invito.std.ai.id/undangan-bali-minimalis.html",
+          bg:"linear-gradient(160deg,#232323,#0c0c0c)", fg:"#f5f0e6",
+          art: motif('<rect x="20" y="60" width="60" height="10" fill="MOTIF"/><rect x="20" y="70" width="60" height="10" fill="#0c0c0c" stroke="MOTIF" stroke-width="2"/><path d="M50 12 C56 26 60 40 62 56" ' + G + '/><circle cx="62" cy="60" r="5" fill="MOTIF"/>') },
+        { slug:"undangan-batak-minimalis", name:"Batak Gorga Geometric", tag:"Budaya · Adat Batak", group:"budaya",
+          desc:"Fret gorga geometris yang tegas.",
+          url:"https://invito.std.ai.id/undangan-batak-minimalis.html",
+          bg:"linear-gradient(150deg,#5a2a14,#2e130a)", fg:"#f0b45a",
+          art: motif('<path d="M14 70 L14 30 L30 30 L30 54 L46 54 L46 30 L62 30 L62 54 L78 54 L78 30 L86 30 L86 70 Z" fill="MOTIF"/><circle cx="50" cy="20" r="5" fill="MOTIF"/>') },
+        { slug:"undangan-betawi-minimalis", name:"Betawi Kebaya Ceria", tag:"Budaya · Adat Betawi", group:"budaya",
+          desc:"Gigi balang & warna ceria.",
+          url:"https://invito.std.ai.id/undangan-betawi-minimalis.html",
+          bg:"linear-gradient(150deg,#c05a1e,#7e3410)", fg:"#ffe3ae",
+          art: motif('<path d="M14 40 L26 40 L32 52 L44 52 L50 40 L62 40 L68 52 L80 52 L86 40 L86 70 L14 70 Z" fill="MOTIF"/><circle cx="50" cy="24" r="6" fill="MOTIF"/>') },
+        { slug:"undangan-botanical-garden", name:"Botanical Garden", tag:"Bebas · Botanikal", group:"bebas",
+          desc:"Dedaunan hijau taman botani.",
+          url:"https://invito.std.ai.id/undangan-botanical-garden.html",
+          bg:"linear-gradient(150deg,#2e5a34,#142a18)", fg:"#bfe3a0",
+          art: motif('<path d="M50 12 C72 30 76 56 50 88 C24 56 28 30 50 12Z" fill="MOTIF"/><path d="M50 20 L50 80" stroke="#142a18" stroke-width="3"/>') },
+        { slug:"undangan-tropical-beach", name:"Tropical Beach", tag:"Bebas · Pantai Tropis", group:"bebas",
+          desc:"Palem & debur ombak tropis.",
+          url:"https://invito.std.ai.id/undangan-tropical-beach.html",
+          bg:"linear-gradient(150deg,#1e7a8c,#0d3a44)", fg:"#ffe3a8",
+          art: motif('<circle cx="50" cy="30" r="12" fill="MOTIF"/><path d="M50 46 L50 86 M50 56 Q34 52 26 40 M50 56 Q66 52 74 40 M50 66 Q38 64 32 56 M50 66 Q62 64 68 56" ' + G + '/>') },
+        { slug:"undangan-sakura-spring", name:"Sakura Spring", tag:"Bebas · Musim Semi", group:"bebas",
+          desc:"Kelopak sakura bermekaran.",
+          url:"https://invito.std.ai.id/undangan-sakura-spring.html",
+          bg:"linear-gradient(150deg,#f3cfd9,#e2a7bb)", fg:"#a03a5a",
+          art: motif('<g fill="MOTIF"><ellipse cx="50" cy="30" rx="9" ry="14"/><ellipse cx="50" cy="70" rx="9" ry="14"/><ellipse cx="30" cy="50" rx="14" ry="9"/><ellipse cx="70" cy="50" rx="14" ry="9"/></g><circle cx="50" cy="50" r="6" fill="#f3cfd9"/>') },
+        { slug:"undangan-midnight-starry", name:"Midnight Starry", tag:"Bebas · Langit Malam", group:"bebas",
+          desc:"Bintang & bulan di malam hari.",
+          url:"https://invito.std.ai.id/undangan-midnight-starry.html",
+          bg:"linear-gradient(160deg,#131a3e,#080d24)", fg:"#cfe8ff",
+          art: motif('<path d="M62 14 A34 34 0 1 0 62 78 A26 26 0 1 1 62 14Z" fill="MOTIF"/><path d="M76 30 l2 4.6 4.6 2 -4.6 2 -2 4.6 -2 -4.6 -4.6 -2 4.6 -2Z" fill="MOTIF"/>') },
+        { slug:"undangan-vintage-paper", name:"Vintage Paper", tag:"Bebas · Kertas Vintage", group:"bebas",
+          desc:"Tekstur kertas tua yang hangat.",
+          url:"https://invito.std.ai.id/undangan-vintage-paper.html",
+          bg:"linear-gradient(150deg,#a8895a,#6b4f2c)", fg:"#f7ecd4",
+          art: motif('<rect x="24" y="18" width="52" height="64" rx="4" ' + G + '/><path d="M32 32 L68 32 M32 44 L68 44 M32 56 L60 56" stroke="MOTIF" stroke-width="3" stroke-linecap="round"/>') },
+        { slug:"undangan-watercolor-floral", name:"Watercolor Floral", tag:"Bebas · Cat Air", group:"bebas",
+          desc:"Bunga cat air yang lembut.",
+          url:"https://invito.std.ai.id/undangan-watercolor-floral.html",
+          bg:"linear-gradient(150deg,#d9c8e8,#a88bc4)", fg:"#fff4f8",
+          art: motif('<g fill="MOTIF" opacity=".9"><circle cx="50" cy="32" r="11"/><circle cx="50" cy="68" r="11"/><circle cx="32" cy="50" r="11"/><circle cx="68" cy="50" r="11"/></g><circle cx="50" cy="50" r="7" fill="#a88bc4"/>') },
+        { slug:"undangan-islamic-elegant", name:"Islamic Elegant", tag:"Bebas · Islami", group:"bebas",
+          desc:"Kubah & ornamen Islami elegan.",
+          url:"https://invito.std.ai.id/undangan-islamic-elegant.html",
+          bg:"linear-gradient(160deg,#14402e,#0a2118)", fg:"#d9b45e",
+          art: motif('<path d="M50 14 C62 28 70 38 70 52 L30 52 C30 38 38 28 50 14Z" fill="MOTIF"/><rect x="26" y="52" width="48" height="30" fill="MOTIF"/><path d="M50 6 L50 14" stroke="MOTIF" stroke-width="3"/><circle cx="50" cy="4" r="2.4" fill="MOTIF"/>') },
+        { slug:"undangan-christian-blessing", name:"Christian Blessing", tag:"Bebas · Kristiani", group:"bebas",
+          desc:"Salib & merpati penuh berkat.",
+          url:"https://invito.std.ai.id/undangan-christian-blessing.html",
+          bg:"linear-gradient(150deg,#e8eef7,#b9c8de)", fg:"#4a6a9a",
+          art: motif('<path d="M44 20 L56 20 L56 38 L72 38 L72 50 L56 50 L56 82 L44 82 L44 50 L28 50 L28 38 L44 38 Z" fill="MOTIF"/>') },
+        { slug:"undangan-oriental-peony", name:"Oriental Peony", tag:"Bebas · Oriental", group:"bebas",
+          desc:"Peony merah & aksen oriental.",
+          url:"https://invito.std.ai.id/undangan-oriental-peony.html",
+          bg:"linear-gradient(160deg,#8c1f2e,#4a0e18)", fg:"#f2c14e",
+          art: motif('<g fill="MOTIF"><circle cx="50" cy="38" r="12"/><circle cx="38" cy="56" r="12"/><circle cx="62" cy="56" r="12"/></g><circle cx="50" cy="54" r="8" fill="#4a0e18"/><path d="M50 74 L50 88 M40 80 L50 74 L60 80" ' + G + '/>') },
+        { slug:"undangan-mountain-adventure", name:"Mountain Adventure", tag:"Bebas · Petualangan", group:"bebas",
+          desc:"Puncak gunung & langit biru.",
+          url:"https://invito.std.ai.id/undangan-mountain-adventure.html",
+          bg:"linear-gradient(160deg,#3d6a8a,#1e3a52)", fg:"#eaf4fb",
+          art: motif('<path d="M8 78 L34 30 L46 52 L58 24 L78 60 L92 78 Z" fill="MOTIF"/><path d="M34 30 L40 40 L34 48 L28 40 Z M58 24 L64 34 L58 42 L52 34 Z" fill="#1e3a52"/>') },
+        { slug:"undangan-emerald-botanical", name:"Emerald Botanical", tag:"Elegant · Zamrud Botani", group:"elegant",
+          desc:"Daun monstera hijau zamrud.",
+          url:"https://invito.std.ai.id/undangan-emerald-botanical.html",
+          bg:"linear-gradient(150deg,#1e5a44,#0e2e22)", fg:"#d4e8b0",
+          art: motif('<path d="M50 10 C70 24 74 52 50 90 C26 52 30 24 50 10Z" fill="MOTIF"/><path d="M50 18 L50 82 M38 34 L50 30 M62 34 L50 30 M34 52 L50 48 M66 52 L50 48" stroke="#0e2e22" stroke-width="2.6"/>') },
+        { slug:"undangan-royal-ivory-gold", name:"Royal Ivory Gold", tag:"Elegant · Ivory Emas", group:"elegant",
+          desc:"Mawar emas di atas ivory.",
+          url:"https://invito.std.ai.id/undangan-royal-ivory-gold.html",
+          bg:"linear-gradient(150deg,#f2ead8,#d8c9a8)", fg:"#a8842e",
+          art: motif('<circle cx="50" cy="46" r="16" ' + G + '/><circle cx="50" cy="46" r="8" ' + G + '/><path d="M50 62 L50 88 M42 74 Q50 70 58 74" ' + G + '/>') },
+        { slug:"undangan-sage-minimalist", name:"Sage Minimalist", tag:"Elegant · Sage", group:"elegant",
+          desc:"Ranting sage yang minimalis.",
+          url:"https://invito.std.ai.id/undangan-sage-minimalist.html",
+          bg:"linear-gradient(150deg,#9aa88a,#5f6f52)", fg:"#f4f6ee",
+          art: motif('<path d="M50 12 L50 88" ' + G + '/><g fill="MOTIF"><ellipse cx="38" cy="32" rx="9" ry="4.4" transform="rotate(-30 38 32)"/><ellipse cx="62" cy="32" rx="9" ry="4.4" transform="rotate(30 62 32)"/><ellipse cx="38" cy="54" rx="9" ry="4.4" transform="rotate(-30 38 54)"/><ellipse cx="62" cy="54" rx="9" ry="4.4" transform="rotate(30 62 54)"/></g>') },
+        { slug:"undangan-navy-gold", name:"Navy Gold", tag:"Elegant · Navy Emas", group:"elegant",
+          desc:"Kipas art-deco emas di navy.",
+          url:"https://invito.std.ai.id/undangan-navy-gold.html",
+          bg:"linear-gradient(160deg,#1c2a4a,#0c1428)", fg:"#d9ae54",
+          art: motif('<path d="M20 74 A32 32 0 0 1 80 74" ' + G + '/><path d="M30 74 A22 22 0 0 1 70 74" ' + G + '/><path d="M50 74 L50 44 M50 74 L34 52 M50 74 L66 52" stroke="MOTIF" stroke-width="3" stroke-linecap="round"/>') },
+        { slug:"undangan-blush-rose", name:"Blush Rose", tag:"Elegant · Blush", group:"elegant",
+          desc:"Bunga blush yang romantis.",
+          url:"https://invito.std.ai.id/undangan-blush-rose.html",
+          bg:"linear-gradient(150deg,#e8b4b8,#c48488)", fg:"#fff2f2",
+          art: motif('<g fill="MOTIF"><ellipse cx="50" cy="34" rx="10" ry="15"/><ellipse cx="50" cy="66" rx="10" ry="15"/><ellipse cx="34" cy="50" rx="15" ry="10"/><ellipse cx="66" cy="50" rx="15" ry="10"/></g><circle cx="50" cy="50" r="6" fill="#c48488"/>') },
+        { slug:"undangan-champagne-noir", name:"Champagne Noir", tag:"Elegant · Noir", group:"elegant",
+          desc:"Bunga emas di atas hitam.",
+          url:"https://invito.std.ai.id/undangan-champagne-noir.html",
+          bg:"linear-gradient(160deg,#2a2420,#100d0a)", fg:"#d9b46a",
+          art: motif('<path d="M50 16 L56 40 L80 40 L60 54 L68 78 L50 62 L32 78 L40 54 L20 40 L44 40 Z" fill="MOTIF"/><circle cx="50" cy="50" r="5" fill="#100d0a"/>') },
+        { slug:"undangan-champagne-garden", name:"Champagne Garden", tag:"Premium · Taman Champagne", group:"premium",
+          desc:"Gerbang emas taman champagne.",
+          url:"https://invito.std.ai.id/undangan-champagne-garden.html",
+          bg:"linear-gradient(150deg,#d4af6a,#8a6a34)", fg:"#fff8e8",
+          art: motif('<path d="M26 86 L26 48 A24 24 0 0 1 74 48 L74 86" ' + G + '/><path d="M38 86 L38 54 A12 12 0 0 1 62 54 L62 86" ' + G + '/><circle cx="50" cy="20" r="4" fill="MOTIF"/>') },
+        { slug:"undangan-royal-emerald", name:"Royal Emerald", tag:"Premium · Zamrud Royal", group:"premium",
+          desc:"Mahkota zamrud yang megah.",
+          url:"https://invito.std.ai.id/undangan-royal-emerald.html",
+          bg:"linear-gradient(160deg,#0f4c3a,#072a20)", fg:"#e8c85e",
+          art: motif('<path d="M22 68 L26 36 L40 50 L50 28 L60 50 L74 36 L78 68 Z" fill="MOTIF"/><rect x="22" y="68" width="56" height="10" rx="3" fill="MOTIF"/><circle cx="50" cy="24" r="3.4" fill="#072a20"/>') },
+        { slug:"undangan-midnight-sapphire", name:"Midnight Sapphire", tag:"Premium · Safir Tengah Malam", group:"premium",
+          desc:"Permata safir berkilau.",
+          url:"https://invito.std.ai.id/undangan-midnight-sapphire.html",
+          bg:"linear-gradient(160deg,#1a2a6a,#0a1234)", fg:"#8fc4e8",
+          art: motif('<path d="M30 34 L50 20 L70 34 L62 72 L38 72 Z" fill="MOTIF"/><path d="M30 34 L70 34 M38 72 L44 34 M62 72 L56 34" stroke="#0a1234" stroke-width="2.4"/>') },
+        { slug:"undangan-terracotta-rustic", name:"Terracotta Rustic", tag:"Premium · Terakota Rustic", group:"premium",
+          desc:"Matahari terakota yang hangat.",
+          url:"https://invito.std.ai.id/undangan-terracotta-rustic.html",
+          bg:"linear-gradient(150deg,#b45a34,#6e3018)", fg:"#ffe0b8",
+          art: motif('<circle cx="50" cy="50" r="14" fill="MOTIF"/><g stroke="MOTIF" stroke-width="3.4" stroke-linecap="round"><path d="M50 18 L50 28 M50 72 L50 82 M18 50 L28 50 M72 50 L82 50 M27 27 L34 34 M66 66 L73 73 M73 27 L66 34 M34 66 L27 73"/></g>') },
+        { slug:"undangan-lavender-dream", name:"Lavender Dream", tag:"Premium · Mimpi Lavender", group:"premium",
+          desc:"Tangkai lavender yang menenangkan.",
+          url:"https://invito.std.ai.id/undangan-lavender-dream.html",
+          bg:"linear-gradient(150deg,#9a8ac4,#5a4a8a)", fg:"#f2ecff",
+          art: motif('<path d="M50 88 L50 30" ' + G + '/><g fill="MOTIF"><ellipse cx="50" cy="24" rx="5" ry="8"/><ellipse cx="42" cy="36" rx="5" ry="8" transform="rotate(-24 42 36)"/><ellipse cx="58" cy="36" rx="5" ry="8" transform="rotate(24 58 36)"/><ellipse cx="44" cy="50" rx="5" ry="8" transform="rotate(-18 44 50)"/><ellipse cx="56" cy="50" rx="5" ry="8" transform="rotate(18 56 50)"/></g>') }
       ];
       function templateBySlug(slug){ for (var i=0;i<TEMPLATES.length;i++) if (TEMPLATES[i].slug===slug) return TEMPLATES[i]; return null; }
 
@@ -1241,7 +1380,8 @@
 
       /* ================= KATALOG ================= */
       var activeFilter = "all";
-      var GROUP_LABEL = { pixel: "Template Pixel", klasik: "Template Klasik" };
+      var GROUP_LABEL = { pixel: "Template Pixel", klasik: "Template Klasik", budaya: "Template Budaya", bebas: "Tema Bebas", elegant: "Template Elegant", premium: "Template Premium" };
+      var GROUP_SHORT = { pixel: "Pixel", klasik: "Klasik", budaya: "Budaya", bebas: "Tema Bebas", elegant: "Elegant", premium: "Premium" };
       function groupCount(g){ var n = 0; TEMPLATES.forEach(function(t){ if (t.group === g) n++; }); return n; }
       function pickTemplate(slug){
         $("tokenTemplate").value = slug;
@@ -1316,7 +1456,7 @@
           var card = document.createElement("article"); card.className = "tcard";
           var scene = document.createElement("div"); scene.className = "scene" + (t.group === "pixel" ? " pixel" : "");
           scene.style.background = t.bg;
-          scene.innerHTML = '<div class="grain"></div>' + t.art.replace(/MOTIF/g, t.fg) + '<div class="frame"></div>' + '<img class="thumb" src="assets/thumb-' + t.slug + '.jpg" alt="Tampilan awal ' + t.name + ' — ketuk untuk melihat landing page fullscreen" onerror="this.style.display=\'none\'">' + '<span class="cat-badge">' + (t.group === "pixel" ? "Pixel" : "Klasik") + '</span>' + '<span class="fs-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>Fullscreen</span>' + '<button type="button" class="fs-open" aria-label="Lihat landing page ' + t.name + ' fullscreen"></button>';
+          scene.innerHTML = '<div class="grain"></div>' + t.art.replace(/MOTIF/g, t.fg) + '<div class="frame"></div>' + '<img class="thumb" src="assets/thumb-' + t.slug + '.jpg" alt="Tampilan awal ' + t.name + ' — ketuk untuk melihat landing page fullscreen" onerror="this.style.display=\'none\'">' + '<span class="cat-badge">' + (GROUP_SHORT[t.group] || t.group) + '</span>' + '<span class="fs-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>Fullscreen</span>' + '<button type="button" class="fs-open" aria-label="Lihat landing page ' + t.name + ' fullscreen"></button>';
           scene.querySelector(".fs-open").addEventListener("click", function(){ openFullscreen(t); });
           var body = document.createElement("div"); body.className = "body";
           var tag = document.createElement("p"); tag.className = "tag"; tag.textContent = t.tag;
@@ -1337,7 +1477,7 @@
       function fillTemplateSelect(sel){
         sel.innerHTML = "";
         TEMPLATES.forEach(function(t){
-          var o = document.createElement("option"); o.value = t.slug; o.textContent = (t.group === "pixel" ? "Pixel · " : "Klasik · ") + t.name; sel.appendChild(o);
+          var o = document.createElement("option"); o.value = t.slug; o.textContent = ((GROUP_SHORT[t.group] || t.group) + " · ") + t.name; sel.appendChild(o);
         });
       }
       fillTemplateSelect($("tokenTemplate"));
