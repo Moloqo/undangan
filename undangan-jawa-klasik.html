@@ -372,9 +372,76 @@
         h2 { font-size: 30px; }
         .cd-cell b { font-size: 28px; }
       }
+
+      /* ---------- page loader ---------- */
+      #pageLoader {
+        position: fixed; inset: 0; z-index: 200;
+        background: var(--ivory);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 24px; padding: 24px;
+        transition: opacity 0.6s ease;
+      }
+      #pageLoader.done { opacity: 0; pointer-events: none; }
+      .loader-inf {
+        width: 76px; height: auto; display: block;
+        animation: infPulse 2s ease-in-out infinite;
+      }
+      @media (min-width: 640px) { .loader-inf { width: 108px; } }
+      @keyframes infPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+      .loader-sheen {
+        stroke-dasharray: 16 84;
+        animation: infSheen 2.2s linear infinite;
+      }
+      @keyframes infSheen {
+        from { stroke-dashoffset: 100; }
+        to { stroke-dashoffset: 0; }
+      }
+      .loader-text {
+        font-size: 13px; letter-spacing: 0.28em; text-transform: uppercase;
+        color: var(--ink-soft); margin: 0; text-align: center;
+      }
+      .loader-dots span { animation: infDot 1.2s ease-in-out infinite; }
+      .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+      .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes infDot {
+        0%, 60%, 100% { opacity: 0.15; }
+        30% { opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .loader-inf, .loader-sheen, .loader-dots span { animation: none; }
+        #pageLoader { transition: none; }
+      }
     </style>
   </head>
   <body>
+    <!-- ================= LOADER ================= -->
+    <div id="pageLoader" role="status" aria-label="Memuat undangan">
+      <svg class="loader-inf" viewBox="0 0 128 64" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="infGold" x1="0" y1="0" x2="128" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#D4AF37" />
+            <stop offset="0.5" stop-color="#F5E6C4" />
+            <stop offset="1" stop-color="#B98A2F" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M64 32 C64 20 54 10 41 10 C24 10 12 19 12 32 C12 45 24 54 41 54 C54 54 64 44 64 32 C64 20 74 10 87 10 C104 10 116 19 116 32 C116 45 104 54 87 54 C74 54 64 44 64 32 Z"
+          stroke="url(#infGold)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"
+        />
+        <path
+          class="loader-sheen"
+          d="M64 32 C64 20 54 10 41 10 C24 10 12 19 12 32 C12 45 24 54 41 54 C54 54 64 44 64 32 C64 20 74 10 87 10 C104 10 116 19 116 32 C116 45 104 54 87 54 C74 54 64 44 64 32 Z"
+          pathLength="100"
+          stroke="#fff6da" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"
+          opacity="0.9" style="filter: drop-shadow(0 0 5px rgba(255,240,200,0.95))"
+        />
+      </svg>
+      <p class="loader-text">Memuat undangan<span class="loader-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></p>
+    </div>
+
     <!-- ================= COVER ================= -->
     <div id="cover" role="dialog" aria-label="Sampul undangan">
       <div class="cover-inner">
@@ -1262,7 +1329,7 @@
           tokenCode = String(tokenCode).toUpperCase().trim();
           document.addEventListener("DOMContentLoaded", function () {
             try {
-              if (typeof firebase === "undefined") return;
+              if (typeof firebase === "undefined") { if (window.__tokenDone) window.__tokenDone(); return; }
               if (!firebase.apps.length) {
                 firebase.initializeApp({
                   apiKey: "AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
@@ -1274,20 +1341,21 @@
               wishDb = db;
               loadSharedWishes(db, tokenCode);
               var settled = false;
-              var loadTimer = setTimeout(function () { settled = true; }, 15000);
+              var loadTimer = setTimeout(function () { settled = true; if (window.__tokenDone) window.__tokenDone(); }, 15000);
               db.collection("tokens").doc(tokenCode).get().then(function (snap) {
                 if (settled) return;
                 settled = true;
                 clearTimeout(loadTimer);
+                if (window.__tokenDone) window.__tokenDone();
                 if (!snap.exists) return;
                 var docData = snap.data() || {};
                 if (docData.status !== "active") return;
                 tokenIsActive = true;
                 try { applyCustomerData(docData.data || {}); } catch (e) {}
               }).catch(function () {
-                if (!settled) { settled = true; clearTimeout(loadTimer); }
+                if (!settled) { settled = true; clearTimeout(loadTimer); if (window.__tokenDone) window.__tokenDone(); }
               });
-            } catch (e) {}
+            } catch (e) { if (window.__tokenDone) window.__tokenDone(); }
           });
         }
 
@@ -1354,6 +1422,31 @@
         musicBtn.addEventListener("click", function () {
           if (musicOn) stopMusic(); else startMusic();
         });
+      })();
+    </script>
+    <script>
+      /* ---------- page loader: hide only when page fully loaded AND token hydration settled ---------- */
+      (function () {
+        var loader = document.getElementById("pageLoader");
+        if (!loader) return;
+        var pageLoaded = document.readyState === "complete";
+        var hydrated = !(new URLSearchParams(location.search).get("t") || "").trim();
+        var hidden = false;
+        function tryHide() {
+          if (hidden || !pageLoaded || !hydrated) return;
+          hidden = true;
+          loader.classList.add("done");
+          setTimeout(function () {
+            if (loader.parentNode) loader.parentNode.removeChild(loader);
+          }, 700);
+        }
+        window.__tokenDone = function () { hydrated = true; tryHide(); };
+        if (!pageLoaded) {
+          window.addEventListener("load", function () { pageLoaded = true; tryHide(); });
+        }
+        tryHide();
+        /* failsafe: never trap the guest behind the loader */
+        setTimeout(function () { pageLoaded = true; hydrated = true; tryHide(); }, 25000);
       })();
     </script>
   </body>

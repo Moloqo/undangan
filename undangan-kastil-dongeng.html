@@ -354,6 +354,40 @@
         background: transparent; color: #fff; font-size: 22px; cursor: pointer;
       }
 
+      /* ---------- loading screen ---------- */
+      #pageLoader {
+        position: fixed; inset: 0; z-index: 999;
+        background: linear-gradient(180deg, #f6ecf2 0%, var(--paper-bg) 55%, #fdf6ec 100%);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 24px; padding: 24px; text-align: center;
+        transition: opacity 0.6s ease;
+      }
+      #pageLoader.done { opacity: 0; pointer-events: none; }
+      .loader-inf {
+        animation: loaderPulse 2s ease-in-out infinite;
+        filter: drop-shadow(0 8px 20px rgba(185, 138, 47, 0.35));
+      }
+      .loader-inf svg { display: block; width: clamp(76px, 22vw, 120px); height: auto; }
+      .loader-inf .sheen {
+        stroke-dasharray: 20 80;
+        animation: loaderSheen 2.2s linear infinite;
+      }
+      @keyframes loaderSheen { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+      @keyframes loaderPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+      .loader-text {
+        font-size: 13px; letter-spacing: 0.28em; text-transform: uppercase;
+        color: var(--ink-soft); margin: 0;
+      }
+      .loader-text .dot { animation: loaderDot 1.4s ease-in-out infinite; }
+      .loader-text .dot:nth-child(2) { animation-delay: 0.2s; }
+      .loader-text .dot:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes loaderDot { 0%, 60%, 100% { opacity: 0.15; } 30% { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .loader-inf { animation: none; }
+        .loader-inf .sheen { animation-duration: 4.5s; }
+        .loader-text .dot { animation: none; opacity: 0.6; }
+      }
+
       /* ---------- reveal ---------- */
       .rv { opacity: 0; transform: translateY(18px); transition: opacity 0.8s ease, transform 0.8s ease; }
       .rv.in { opacity: 1; transform: none; }
@@ -372,6 +406,26 @@
     </style>
   </head>
   <body>
+    <!-- ================= LOADING SCREEN ================= -->
+    <div id="pageLoader" role="status" aria-label="Memuat undangan">
+      <div class="loader-inf" aria-hidden="true">
+        <svg viewBox="0 0 120 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="120" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#D4AF37" />
+              <stop offset="0.5" stop-color="#F5E6C4" />
+              <stop offset="1" stop-color="#B98A2F" />
+            </linearGradient>
+          </defs>
+          <path d="M60 32 C60 18 72 8 86 8 C102 8 112 18 112 32 C112 46 102 56 86 56 C72 56 60 46 60 32 C60 18 48 8 34 8 C18 8 8 18 8 32 C8 46 18 56 34 56 C48 56 60 46 60 32 Z"
+            stroke="url(#goldGrad)" stroke-width="6.5" stroke-linecap="round" pathLength="100" />
+          <path class="sheen" d="M60 32 C60 18 72 8 86 8 C102 8 112 18 112 32 C112 46 102 56 86 56 C72 56 60 46 60 32 C60 18 48 8 34 8 C18 8 8 18 8 32 C8 46 18 56 34 56 C48 56 60 46 60 32 Z"
+            stroke="#FFF6DC" stroke-width="2.6" stroke-linecap="round" pathLength="100" opacity="0.95" />
+        </svg>
+      </div>
+      <p class="loader-text">Memuat undangan<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></p>
+    </div>
+
     <!-- ================= COVER ================= -->
     <div id="cover" role="dialog" aria-label="Sampul undangan">
       <div class="cover-inner">
@@ -663,6 +717,31 @@
           var nameInput = document.getElementById("f-name");
           if (nameInput && !nameInput.value) nameInput.value = guest;
         }
+
+        /* ---------- loading screen ----------
+           Loader hilang HANYA setelah: (1) window 'load' selesai
+           (semua asset termuat) DAN (2) hidrasi token ?t= selesai
+           (atau tidak ada token). Fade-out 600ms lalu remove dari DOM. */
+        var loaderStart = Date.now();
+        var loaderGone = false;
+        var winLoaded = document.readyState === "complete";
+        var tokenSettled = !params.get("t");
+        function signalTokenSettled() { tokenSettled = true; maybeHideLoader(); }
+        function maybeHideLoader() {
+          if (loaderGone || !winLoaded || !tokenSettled) return;
+          var wait = 900 - (Date.now() - loaderStart);
+          if (wait > 0) { setTimeout(maybeHideLoader, wait); return; }
+          loaderGone = true;
+          var loader = document.getElementById("pageLoader");
+          if (!loader) return;
+          loader.classList.add("done");
+          setTimeout(function () {
+            if (loader.parentNode) loader.parentNode.removeChild(loader);
+          }, 700);
+        }
+        window.addEventListener("load", function () { winLoaded = true; maybeHideLoader(); });
+        /* Jaring pengaman: jangan pernah menjebak tamu di loader. */
+        setTimeout(function () { winLoaded = true; tokenSettled = true; maybeHideLoader(); }, 20000);
 
         /* ---------- cover ---------- */
         var cover = document.getElementById("cover");
@@ -1270,7 +1349,7 @@
           tokenCode = String(tokenCode).toUpperCase().trim();
           document.addEventListener("DOMContentLoaded", function () {
             try {
-              if (typeof firebase === "undefined") return;
+              if (typeof firebase === "undefined") { signalTokenSettled(); return; }
               if (!firebase.apps.length) {
                 firebase.initializeApp({
                   apiKey: "AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
@@ -1282,11 +1361,12 @@
               wishDb = db;
               loadSharedWishes(db, tokenCode);
               var settled = false;
-              var loadTimer = setTimeout(function () { settled = true; }, 15000);
+              var loadTimer = setTimeout(function () { settled = true; signalTokenSettled(); }, 15000);
               db.collection("tokens").doc(tokenCode).get().then(function (snap) {
                 if (settled) return;
                 settled = true;
                 clearTimeout(loadTimer);
+                signalTokenSettled();
                 if (!snap.exists) return;
                 var docData = snap.data() || {};
                 if (docData.status !== "active") return;
@@ -1297,8 +1377,9 @@
                 try { applyTextOverrides(docData.texts); } catch (e) {}
               }).catch(function () {
                 if (!settled) { settled = true; clearTimeout(loadTimer); }
+                signalTokenSettled();
               });
-            } catch (e) {}
+            } catch (e) { signalTokenSettled(); }
           });
         }
 
