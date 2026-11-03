@@ -665,35 +665,18 @@
             if (loaderEl && loaderEl.parentNode) loaderEl.parentNode.removeChild(loaderEl);
           }, 700);
         }
-        var windowLoaded = new Promise(function (res) {
-          if (document.readyState === "complete") res();
-          else window.addEventListener("load", function () { res(); });
-        });
-
-        /* Hydration promise for loader */
-        var resolveHydration = null;
-        var hydrationSettled = new Promise(function (res) { resolveHydration = res; });
-        function finishHydration() {
-          if (resolveHydration) { var r = resolveHydration; resolveHydration = null; r(); }
+        /* Loader: sembunyikan setelah window load, failsafe 15 detik */
+        var _loaderHidden = false;
+        function _doHideLoader(){
+          if(_loaderHidden) return; _loaderHidden = true;
+          hideLoader();
         }
-        /* Failsafe: hide loader after 25s no matter what */
-        setTimeout(function() { try { hideLoader();
-
-        /* Hide loader after window load AND hydration complete */
-        Promise.all([windowLoaded, hydrationSettled]).then(function () {
-          if (window.requestAnimationFrame) {
-            requestAnimationFrame(function () { requestAnimationFrame(hideLoader); });
-        /* If no token, resolve hydration immediately (demo mode) */
-        try {
-          var _tc = (new URLSearchParams(window.location.search).get("t")||"").trim();
-          if (!_tc) { finishHydration(); }
-        } catch(e) { finishHydration(); }
-
-          } else {
-            hideLoader();
-          }
-        });
- } catch(e) {} finishHydration(); }, 25000);
+        if(document.readyState === "complete"){
+          _doHideLoader();
+        } else {
+          window.addEventListener("load", _doHideLoader);
+        }
+        setTimeout(_doHideLoader, 15000);
 
 
       (function () {
