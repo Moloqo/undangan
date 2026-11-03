@@ -350,18 +350,18 @@
         </div>
 
         <span class="demo-chip">Contoh &middot; Data Demo</span>
-        <p class="cover-kicker" style="margin-top:22px;">Kaset Pernikahan &middot; The Wedding Of</p>
+        <p class="cover-kicker" style="margin-top:22px;" data-txt="cover.subtitle">Kaset Pernikahan &middot; The Wedding Of</p>
         <h1 id="coverNames">GILANG <span class="amp">&amp;</span> PUTRI</h1>
         <p id="coverDate">SABTU &middot; 13 . 11 . 2027</p>
 
         <div class="guest-box">
-          <p>Kepada Yth.<br />Bapak / Ibu / Saudara/i</p>
+          <p data-txt="cover.guestlabel">Kepada Yth.<br />Bapak / Ibu / Saudara/i</p>
           <p class="guest-name" id="guestName">Tamu Undangan</p>
-          <p class="fine">Mohon maaf bila ada kesalahan penulisan nama &amp; gelar.</p>
+          <p class="fine" data-txt="cover.fine">Mohon maaf bila ada kesalahan penulisan nama &amp; gelar.</p>
         </div>
 
-        <button class="btn pink" id="openBtn" type="button"><span class="tri" aria-hidden="true"></span> TEKAN PLAY</button>
-        <p class="cover-note">Satu kaset. Satu cerita. Diputar selamanya.</p>
+        <button class="btn pink" id="openBtn" type="button"><span class="tri" aria-hidden="true"></span> <span data-txt="cover.button">TEKAN PLAY</span></button>
+        <p class="cover-note" data-txt="cover.note">Satu kaset. Satu cerita. Diputar selamanya.</p>
         <p id="liveStatus" role="status" hidden></p>
       </div>
     </div>
@@ -375,10 +375,10 @@
         <div class="hero-osd"><span>PLAY &#9654; SP 0:00:01</span><span class="r">&#9679; REC</span></div>
         <div class="hero-body">
           <span class="demo-chip">Contoh &middot; Data Demo</span>
-          <p class="hero-kicker">The Wedding Of</p>
+          <p class="hero-kicker" data-txt="hero.kicker">The Wedding Of</p>
           <h2 id="heroNames">GILANG <span class="amp">&amp;</span> PUTRI</h2>
           <p id="heroDate">Sabtu, 13 November 2027 &middot; Balai Kartini, Jakarta</p>
-          <p class="hero-sub">Dengan memohon rahmat dan ridha Tuhan Yang Maha Esa, kami mengundang Bapak/Ibu/Saudara/i untuk memutar kaset bahagia kami dan hadir di hari pernikahan kami.</p>
+          <p class="hero-sub" data-txt="hero.subtitle">Dengan memohon rahmat dan ridha Tuhan Yang Maha Esa, kami mengundang Bapak/Ibu/Saudara/i untuk memutar kaset bahagia kami dan hadir di hari pernikahan kami.</p>
         </div>
       </section>
 
@@ -392,8 +392,8 @@
       <!-- ================= QUOTE ================= -->
       <section id="kutipan">
         <div class="wrap">
-          <p id="quoteText">&ldquo;Cinta kami seperti kaset favorit: diputar ulang berkali-kali, dirawat baik-baik, dan tidak pernah bosan didengar.&rdquo;</p>
-          <p id="quoteAttr">Side A &middot; Track 01</p>
+          <p id="quoteText" data-txt="quote.text">&ldquo;Cinta kami seperti kaset favorit: diputar ulang berkali-kali, dirawat baik-baik, dan tidak pernah bosan didengar.&rdquo;</p>
+          <p id="quoteAttr" data-txt="quote.source">Side A &middot; Track 01</p>
           <div class="squiggle" aria-hidden="true">
             <svg viewBox="0 0 120 16" preserveAspectRatio="none"><path d="M2 8 Q 12 1, 22 8 T 42 8 T 62 8 T 82 8 T 102 8 T 122 8" fill="none" stroke="#ff2e88" stroke-width="3.5" stroke-linecap="round"/></svg>
           </div>
@@ -404,15 +404,15 @@
       <section id="mempelai">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 01 <span class="rec">&#9679;</span> Mempelai</span>
-            <h2 class="sec-title">Dua Pemeran Utama</h2>
-            <p class="sec-sub">Kaset ini tidak akan seru tanpa dua orang yang akhirnya memilih judul yang sama.</p>
+            <span class="track-tag" data-txt="mempelai.tag">Track 01 <span class="rec">&#9679;</span> Mempelai</span>
+            <h2 class="sec-title" data-txt="mempelai.title">Dua Pemeran Utama</h2>
+            <p class="sec-sub" data-txt="mempelai.subtitle">Kaset ini tidak akan seru tanpa dua orang yang akhirnya memilih judul yang sama.</p>
           </div>
 
           <div class="card person">
             <div class="avatar-frame" id="frameGroom"><div id="avatarGroom" role="img" aria-label="Avatar pixel mempelai pria"></div></div>
             <h3 class="person-name" id="groomFull">Gilang Ramadhan, S.Kom.</h3>
-            <p class="person-role">Mempelai Pria</p>
+            <p class="person-role" data-txt="mempelai.groomrole">Mempelai Pria</p>
             <p class="person-parents" id="groomParents">Putra dari<br />Bpk. H. Bambang Sutrisno<br />&amp; Ibu Hj. Ratna Wijaya</p>
           </div>
 
@@ -421,7 +421,7 @@
           <div class="card person">
             <div class="avatar-frame" id="frameBride"><div id="avatarBride" role="img" aria-label="Avatar pixel mempelai wanita"></div></div>
             <h3 class="person-name" id="brideFull">Putri Ayu Lestari, S.E.</h3>
-            <p class="person-role">Mempelai Wanita</p>
+            <p class="person-role" data-txt="mempelai.briderole">Mempelai Wanita</p>
             <p class="person-parents" id="brideParents">Putri dari<br />Bpk. H. Agus Salim Hartono<br />&amp; Ibu Hj. Dewi Anggraini</p>
           </div>
         </div>
@@ -431,24 +431,24 @@
       <section id="hitung">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 02 <span class="rec">&#9679;</span> Hitung Mundur</span>
-            <h2 class="sec-title">Menuju Hari Pemutaran</h2>
-            <p class="sec-sub">Kasetnya sudah dimasukkan. Tinggal menunggu hitungan VCR selesai.</p>
+            <span class="track-tag" data-txt="countdown.tag">Track 02 <span class="rec">&#9679;</span> Hitung Mundur</span>
+            <h2 class="sec-title" data-txt="countdown.title">Menuju Hari Pemutaran</h2>
+            <p class="sec-sub" data-txt="countdown.subtitle">Kasetnya sudah dimasukkan. Tinggal menunggu hitungan VCR selesai.</p>
           </div>
 
           <div class="vcr" role="timer" aria-label="Hitung mundur menuju Sabtu, 13 November 2027">
             <div class="vcr-top"><span>VCR &middot; SP MODE</span><span class="r">&#9679; REC</span></div>
             <div class="vcr-cells">
-              <div class="vcr-cell"><div class="vcr-num" id="cdD">000</div><div class="vcr-lab">Hari</div></div>
-              <div class="vcr-cell"><div class="vcr-num" id="cdH">00</div><div class="vcr-lab">Jam</div></div>
-              <div class="vcr-cell"><div class="vcr-num" id="cdM">00</div><div class="vcr-lab">Menit</div></div>
-              <div class="vcr-cell"><div class="vcr-num" id="cdS">00</div><div class="vcr-lab">Detik</div></div>
+              <div class="vcr-cell"><div class="vcr-num" id="cdD">000</div><div class="vcr-lab" data-txt="countdown.days">Hari</div></div>
+              <div class="vcr-cell"><div class="vcr-num" id="cdH">00</div><div class="vcr-lab" data-txt="countdown.hours">Jam</div></div>
+              <div class="vcr-cell"><div class="vcr-num" id="cdM">00</div><div class="vcr-lab" data-txt="countdown.minutes">Menit</div></div>
+              <div class="vcr-cell"><div class="vcr-num" id="cdS">00</div><div class="vcr-lab" data-txt="countdown.seconds">Detik</div></div>
             </div>
           </div>
-          <p id="cdDone">Kasetnya sudah berputar &mdash; hari bahagia telah tiba!</p>
+          <p id="cdDone" data-txt="countdown.done">Kasetnya sudah berputar &mdash; hari bahagia telah tiba!</p>
 
           <div class="btn-row">
-            <a class="btn yellow" id="calMain" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Pernikahan%20Gilang%20%26%20Putri&amp;dates=20271113T020000Z/20271113T040000Z&amp;details=Pemberkatan%20nikah%20Gilang%20%26%20Putri&amp;location=Balai%20Kartini%2C%20Jl.%20Gatot%20Subroto%20Kav.%2037%2C%20Jakarta%20Selatan" target="_blank" rel="noopener">+ Simpan ke Kalender</a>
+            <a class="btn yellow" id="calMain" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Pernikahan%20Gilang%20%26%20Putri&amp;dates=20271113T020000Z/20271113T040000Z&amp;details=Pemberkatan%20nikah%20Gilang%20%26%20Putri&amp;location=Balai%20Kartini%2C%20Jl.%20Gatot%20Subroto%20Kav.%2037%2C%20Jakarta%20Selatan" target="_blank" rel="noopener" data-txt="countdown.calendar">+ Simpan ke Kalender</a>
           </div>
         </div>
       </section>
@@ -457,35 +457,35 @@
       <section id="acara">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 03 <span class="rec">&#9679;</span> Rangkaian Acara</span>
-            <h2 class="sec-title">Jadwal Pemutaran</h2>
-            <p class="sec-sub" id="eventsSub">Dua sesi, satu hari. Jangan sampai kasetnya diputar orang lain duluan.</p>
+            <span class="track-tag" data-txt="acara.tag">Track 03 <span class="rec">&#9679;</span> Rangkaian Acara</span>
+            <h2 class="sec-title" data-txt="acara.title">Jadwal Pemutaran</h2>
+            <p class="sec-sub" id="eventsSub" data-txt="acara.subtitle">Dua sesi, satu hari. Jangan sampai kasetnya diputar orang lain duluan.</p>
           </div>
 
           <div id="eventsWrap">
             <div class="card event-card">
               <p class="ev-tape">SP &middot; TAPE 01</p>
               <p class="ev-day">Sabtu</p>
-              <h3>Pemberkatan Nikah</h3>
+              <h3 data-txt="acara.event1.title">Pemberkatan Nikah</h3>
               <p class="ev-date">13 November 2027</p>
               <p class="ev-time">Pukul 09.00 &ndash; 11.00 WIB</p>
               <p class="ev-place"><b>Balai Kartini</b><br />Jl. Gatot Subroto Kav. 37, Kuningan,<br />Jakarta Selatan</p>
               <div class="event-actions">
-                <a class="btn pink small maps-link" href="https://www.google.com/maps/search/?api=1&amp;query=Balai+Kartini+Jakarta" target="_blank" rel="noopener">Buka Maps</a>
-                <a class="btn ghost small cal-link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Pernikahan%20Gilang%20%26%20Putri%20%E2%80%94%20Pemberkatan%20Nikah&amp;dates=20271113T020000Z/20271113T040000Z&amp;details=Pemberkatan%20nikah%20Gilang%20%26%20Putri&amp;location=Balai%20Kartini%2C%20Jl.%20Gatot%20Subroto%20Kav.%2037%2C%20Jakarta%20Selatan" target="_blank" rel="noopener">Simpan Tanggal</a>
+                <a class="btn pink small maps-link" href="https://www.google.com/maps/search/?api=1&amp;query=Balai+Kartini+Jakarta" target="_blank" rel="noopener" data-txt="acara.maps">Buka Maps</a>
+                <a class="btn ghost small cal-link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Pernikahan%20Gilang%20%26%20Putri%20%E2%80%94%20Pemberkatan%20Nikah&amp;dates=20271113T020000Z/20271113T040000Z&amp;details=Pemberkatan%20nikah%20Gilang%20%26%20Putri&amp;location=Balai%20Kartini%2C%20Jl.%20Gatot%20Subroto%20Kav.%2037%2C%20Jakarta%20Selatan" target="_blank" rel="noopener" data-txt="acara.calendar">Simpan Tanggal</a>
               </div>
             </div>
 
             <div class="card event-card">
               <p class="ev-tape">SP &middot; TAPE 02</p>
               <p class="ev-day">Sabtu</p>
-              <h3>Resepsi</h3>
+              <h3 data-txt="acara.event2.title">Resepsi</h3>
               <p class="ev-date">13 November 2027</p>
               <p class="ev-time">Pukul 13.00 &ndash; 15.00 WIB</p>
               <p class="ev-place"><b>Balai Kartini</b><br />Jl. Gatot Subroto Kav. 37, Kuningan,<br />Jakarta Selatan</p>
               <div class="event-actions">
-                <a class="btn pink small maps-link" href="https://www.google.com/maps/search/?api=1&amp;query=Balai+Kartini+Jakarta" target="_blank" rel="noopener">Buka Maps</a>
-                <a class="btn ghost small cal-link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Pernikahan%20Gilang%20%26%20Putri%20%E2%80%94%20Resepsi&amp;dates=20271113T060000Z/20271113T080000Z&amp;details=Resepsi%20pernikahan%20Gilang%20%26%20Putri&amp;location=Balai%20Kartini%2C%20Jl.%20Gatot%20Subroto%20Kav.%2037%2C%20Jakarta%20Selatan" target="_blank" rel="noopener">Simpan Tanggal</a>
+                <a class="btn pink small maps-link" href="https://www.google.com/maps/search/?api=1&amp;query=Balai+Kartini+Jakarta" target="_blank" rel="noopener" data-txt="acara.maps">Buka Maps</a>
+                <a class="btn ghost small cal-link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Pernikahan%20Gilang%20%26%20Putri%20%E2%80%94%20Resepsi&amp;dates=20271113T060000Z/20271113T080000Z&amp;details=Resepsi%20pernikahan%20Gilang%20%26%20Putri&amp;location=Balai%20Kartini%2C%20Jl.%20Gatot%20Subroto%20Kav.%2037%2C%20Jakarta%20Selatan" target="_blank" rel="noopener" data-txt="acara.calendar">Simpan Tanggal</a>
               </div>
             </div>
           </div>
@@ -498,9 +498,9 @@
       <section id="gallerySection">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 04 <span class="rec">&#9679;</span> Galeri</span>
-            <h2 class="sec-title">Cuplikan Kaset</h2>
-            <p class="sec-sub">Beberapa frame favorit dari gulungan yang sama. Ketuk untuk memperbesar.</p>
+            <span class="track-tag" data-txt="galeri.tag">Track 04 <span class="rec">&#9679;</span> Galeri</span>
+            <h2 class="sec-title" data-txt="galeri.title">Cuplikan Kaset</h2>
+            <p class="sec-sub" data-txt="galeri.subtitle">Beberapa frame favorit dari gulungan yang sama. Ketuk untuk memperbesar.</p>
           </div>
 
           <div class="gallery" id="galleryGrid">
@@ -528,22 +528,22 @@
       <section id="infoSection">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 05 <span class="rec">&#9679;</span> Info Tamu</span>
-            <h2 class="sec-title">Catatan Pemutaran</h2>
-            <p class="sec-sub">Hal-hal kecil biar nobarnya makin nyaman.</p>
+            <span class="track-tag" data-txt="info.tag">Track 05 <span class="rec">&#9679;</span> Info Tamu</span>
+            <h2 class="sec-title" data-txt="info.title">Catatan Pemutaran</h2>
+            <p class="sec-sub" data-txt="info.subtitle">Hal-hal kecil biar nobarnya makin nyaman.</p>
           </div>
 
           <div class="card info-card">
             <div class="info-row" id="infoDressRow">
-              <p class="info-label">Dress Code</p>
+              <p class="info-label" data-txt="info.dresslabel">Dress Code</p>
               <p id="infoDress">Nuansa 90-an: warna cerah &amp; motif Memphis. Mohon hindari putih polos ya.</p>
             </div>
             <div class="info-row" id="infoNotesRow">
-              <p class="info-label">Catatan</p>
+              <p class="info-label" data-txt="info.noteslabel">Catatan</p>
               <p id="infoNotes">Mohon hadir 30 menit sebelum acara dimulai. Area parkir tersedia di basement Balai Kartini.</p>
             </div>
             <div class="info-row" id="infoGift">
-              <p class="info-label">Kirim Kado Fisik</p>
+              <p class="info-label" data-txt="info.giftlabel">Kirim Kado Fisik</p>
               <p id="infoGiftAddr">Balai Kartini, Jl. Gatot Subroto Kav. 37, Kuningan, Jakarta Selatan &mdash; a.n. Gilang &amp; Putri</p>
             </div>
           </div>
@@ -554,9 +554,9 @@
       <section id="amplop">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 06 <span class="rec">&#9679;</span> Amplop Digital</span>
-            <h2 class="sec-title">Tanda Kasih</h2>
-            <p class="sec-sub">Doa adalah hadiah terbaik. Namun bila berkenan memberi tanda kasih, ini kartu anggota kami.</p>
+            <span class="track-tag" data-txt="amplop.tag">Track 06 <span class="rec">&#9679;</span> Amplop Digital</span>
+            <h2 class="sec-title" data-txt="amplop.title">Tanda Kasih</h2>
+            <p class="sec-sub" data-txt="amplop.hint">Doa adalah hadiah terbaik. Namun bila berkenan memberi tanda kasih, ini kartu anggota kami.</p>
           </div>
 
           <div id="banksWrap">
@@ -564,14 +564,14 @@
               <div class="bank-head"><span class="bname">BCA</span><span class="mono" style="font-size:12px; letter-spacing:.14em; color:var(--muted);">MEMBER CARD</span></div>
               <p class="bnum">2840 1311 27</p>
               <p class="ban">a.n. Gilang Ramadhan</p>
-              <button class="btn teal small copy-btn" type="button" data-copy="2840131127">Salin Nomor</button>
+              <button class="btn teal small copy-btn" type="button" data-copy="2840131127" data-txt="amplop.copy">Salin Nomor</button>
             </div>
 
             <div class="card bank">
               <div class="bank-head"><span class="bname">DANA</span><span class="mono" style="font-size:12px; letter-spacing:.14em; color:var(--muted);">MEMBER CARD</span></div>
               <p class="bnum">0812 1311 2027</p>
               <p class="ban">a.n. Putri Ayu Lestari</p>
-              <button class="btn teal small copy-btn" type="button" data-copy="081213112027">Salin Nomor</button>
+              <button class="btn teal small copy-btn" type="button" data-copy="081213112027" data-txt="amplop.copy">Salin Nomor</button>
             </div>
           </div>
 
@@ -583,31 +583,31 @@
       <section id="rsvp">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 07 <span class="rec">&#9679;</span> RSVP &amp; Ucapan</span>
-            <h2 class="sec-title">Buku Tamu Rental</h2>
-            <p class="sec-sub">Konfirmasi kehadiran dan tinggalkan pesan di kartu anggota kaset kami.</p>
+            <span class="track-tag" data-txt="rsvp.tag">Track 07 <span class="rec">&#9679;</span> RSVP &amp; Ucapan</span>
+            <h2 class="sec-title" data-txt="rsvp.title">Buku Tamu Rental</h2>
+            <p class="sec-sub" data-txt="rsvp.subtitle">Konfirmasi kehadiran dan tinggalkan pesan di kartu anggota kaset kami.</p>
           </div>
 
           <div class="counters">
-            <div class="counter-cell yes"><div class="counter-num" id="countYes">0</div><div class="counter-lab">Siap Hadir</div></div>
-            <div class="counter-cell no"><div class="counter-num" id="countNo">0</div><div class="counter-lab">Berhalangan</div></div>
+            <div class="counter-cell yes"><div class="counter-num" id="countYes">0</div><div class="counter-lab" data-txt="rsvp.yeslabel">Siap Hadir</div></div>
+            <div class="counter-cell no"><div class="counter-num" id="countNo">0</div><div class="counter-lab" data-txt="rsvp.nolabel">Berhalangan</div></div>
           </div>
 
           <div class="card rsvp-card">
             <form class="rsvp" id="rsvpForm" novalidate>
-              <label for="fName">Nama
-                <input type="text" id="fName" maxlength="40" placeholder="Nama kamu" autocomplete="name" required />
+              <label for="fName"><span data-txt="rsvp.namelabel">Nama</span>
+                <input type="text" id="fName" maxlength="40" placeholder="Nama kamu" autocomplete="name" required data-txt="rsvp.nameplaceholder" />
               </label>
-              <label for="fAttend">Konfirmasi Kehadiran
+              <label for="fAttend"><span data-txt="rsvp.attendlabel">Konfirmasi Kehadiran</span>
                 <select id="fAttend" required>
-                  <option value="yes">Hadir, siap nobar!</option>
-                  <option value="no">Berhalangan, titip doa</option>
+                  <option value="yes" data-txt="rsvp.attend.yes">Hadir, siap nobar!</option>
+                  <option value="no" data-txt="rsvp.attend.no">Berhalangan, titip doa</option>
                 </select>
               </label>
-              <label for="fMsg">Ucapan &amp; Doa
-                <textarea id="fMsg" maxlength="300" placeholder="Tulis ucapanmu di sini&hellip;" required></textarea>
+              <label for="fMsg"><span data-txt="rsvp.msglabel">Ucapan &amp; Doa</span>
+                <textarea id="fMsg" maxlength="300" placeholder="Tulis ucapanmu di sini&hellip;" required data-txt="rsvp.msgplaceholder"></textarea>
               </label>
-              <button class="btn pink" type="submit" id="rsvpSubmitBtn">Kirim Ucapan</button>
+              <button class="btn pink" type="submit" id="rsvpSubmitBtn" data-txt="rsvp.submit">Kirim Ucapan</button>
             </form>
           </div>
 
@@ -619,8 +619,8 @@
       <section id="penutup">
         <div class="wrap">
           <div class="sec-head">
-            <span class="track-tag">Track 08 <span class="rec">&#9679;</span> Terima Kasih</span>
-            <h2 class="sec-title">Sampai Jumpa di Hari H</h2>
+            <span class="track-tag" data-txt="penutup.tag">Track 08 <span class="rec">&#9679;</span> Terima Kasih</span>
+            <h2 class="sec-title" data-txt="penutup.title">Sampai Jumpa di Hari H</h2>
           </div>
 
           <figure class="closing-frame">
@@ -629,11 +629,11 @@
           </figure>
 
           <div class="card closing-card">
-            <p>Merupakan suatu kehormatan dan kebahagiaan bagi kami beserta keluarga apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.</p>
-            <p>Atas kehadiran serta doa yang tulus, kami mengucapkan terima kasih. Jangan lupa: <b>be kind, rewind</b> &mdash; dan sampai jumpa di lantai dansa.</p>
-            <p style="margin-bottom:2px;">Kami yang berbahagia,</p>
+            <p data-txt="penutup.text1">Merupakan suatu kehormatan dan kebahagiaan bagi kami beserta keluarga apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.</p>
+            <p data-txt="penutup.text2">Atas kehadiran serta doa yang tulus, kami mengucapkan terima kasih. Jangan lupa: <b>be kind, rewind</b> &mdash; dan sampai jumpa di lantai dansa.</p>
+            <p style="margin-bottom:2px;" data-txt="penutup.greeting">Kami yang berbahagia,</p>
             <p id="closingNames">GILANG &amp; PUTRI</p>
-            <p style="margin:2px 0 0;">beserta keluarga besar kedua mempelai</p>
+            <p style="margin:2px 0 0;" data-txt="penutup.family">beserta keluarga besar kedua mempelai</p>
           </div>
         </div>
       </section>
@@ -650,7 +650,7 @@
           <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.4-.7-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5s.8 1.9.8 2c.1.1.1.3 0 .5-.3.6-.6.8-.4 1.1.7 1.2 1.6 2 2.8 2.6.3.2.5.1.7-.1l.9-1c.2-.3.4-.2.7-.1l2 .9c.3.2.5.3.6.5 0 .1 0 .6-.2 1.1Z" /></svg>
         </a>
       </div>
-      <p class="foot-note">Kaset ini diproduksi dengan cinta, static TV, dan pola Memphis.</p>
+      <p class="foot-note" data-txt="footer.note">Kaset ini diproduksi dengan cinta, static TV, dan pola Memphis.</p>
       <span class="demo-chip">Contoh &middot; Data Demo</span>
     </footer>
 
@@ -1196,6 +1196,26 @@
           frame.appendChild(img);
         }
 
+        /* ----- override teks generik (token.texts) -----
+           Setiap elemen [data-txt="kunci"] yang kuncinya ada di token.texts
+           diganti teksnya via textContent (placeholder untuk input/textarea).
+           token.texts kosong/absen -> tidak ada perubahan, demo tampil utuh. */
+        function applyTextOverrides(texts) {
+          if (!texts || typeof texts !== "object") return false;
+          var changed = false;
+          document.querySelectorAll("[data-txt]").forEach(function (el) {
+            var key = el.getAttribute("data-txt");
+            if (!key || !Object.prototype.hasOwnProperty.call(texts, key)) return;
+            var val = texts[key];
+            if (typeof val !== "string") return;
+            var tag = el.tagName;
+            if (tag === "INPUT" || tag === "TEXTAREA") el.placeholder = val;
+            else el.textContent = val;
+            changed = true;
+          });
+          return changed;
+        }
+
         function applyCustomerData(d) {
           d = d || {};
           var applied = false;
@@ -1416,6 +1436,9 @@
               } else if (giftBlock) { giftBlock.style.display = "none"; }
             }
           }
+
+          /* ----- override teks generik: dijalankan terakhir, setelah semua hidrasi ----- */
+          if (applyTextOverrides(d.texts)) applied = true;
 
           if (applied) {
             document.querySelectorAll(".demo-chip").forEach(function (c) { c.style.display = "none"; });
