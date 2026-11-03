@@ -203,6 +203,12 @@
       .btn-move[disabled]{ opacity:.4; pointer-events:none; }
       @media (max-width:760px){ .dynamic-item-head{ flex-wrap:wrap; } .dynamic-actions{ width:100%; } .dynamic-actions .btn-remove{ flex:1; } .dynamic-actions .btn-move{ flex:1; } }
 
+      /* ---------- Teks Template (Fase 2) ---------- */
+      .txt-group{ margin-top:22px; }
+      .txt-group h4{ font-size:13px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--brand); margin:0; }
+      .txt-group .form-grid{ margin-top:10px; gap:16px 22px; }
+      #textsFormWrap .field textarea{ min-height:72px; }
+
       .preview-card{ background:var(--bg-soft); border:1px dashed var(--gold); border-radius:14px; padding:24px; margin-top:32px; }
       .preview-card h3{ font-family:"Playfair Display",serif; font-size:20px; margin-bottom:10px; }
       .preview-card dl{ display:grid; grid-template-columns:150px 1fr; gap:5px 14px; font-size:14.5px; margin:0; }
@@ -408,7 +414,7 @@
         </section>
 
         <section class="steps" aria-label="Cara menggunakan">
-          <div class="step"><div class="num">1</div><h3>Pilih Template</h3><p>Ketuk gambar tema untuk pratinjau fullscreen.</p></div>
+          <div class="step"><div class="num">1</div><h3>Pilih Template</h3><p>Ketuk gambar tema untuk melihat landing page-nya fullscreen, lalu pesan lewat tombol Beli via WhatsApp.</p></div>
           <div class="step"><div class="num">2</div><h3>Masukkan Token</h3><p>Kode token dari admin, satu untuk satu undangan.</p></div>
           <div class="step"><div class="num">3</div><h3>Edit &amp; Bagikan</h3><p>Isi data, simpan, bagikan linknya.</p></div>
         </section>
@@ -476,13 +482,13 @@
               <div class="field full">
                 <label for="fWa">Nomor WhatsApp — Tujuan RSVP Tamu</label>
                 <input id="fWa" type="tel" inputmode="tel" autocomplete="tel" placeholder="cth. 0812 3456 7890" />
-                <span class="hint">RSVP tamu masuk ke nomor ini via WhatsApp. atau 628xx.</span>
+                <span class="hint">RSVP tamu terkirim ke nomor ini lewat tombol <b>Kirim via WhatsApp</b>. Berlaku di semua template. Format 08xx atau 628xx.</span>
               </div>
             </div>
 
             <fieldset style="margin-top:34px;">
               <legend>Orang Tua &amp; Keluarga Besar</legend>
-              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Nama ayah & ibu masing-masing mempelai — “Bapak/Ibu” ditambahkan otomatis.</p>
+              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Nama ayah &amp; ibu dari masing-masing mempelai — tampil di undangan sebagai “Putra / Putri dari Bapak … &amp; Ibu …”. Tulis nama lengkapnya saja; kata Bapak / Ibu ditambahkan otomatis.</p>
               <div class="form-grid" style="margin-top:6px;">
                 <div class="field">
                   <label for="fGroomFather">Nama Ayah — Mempelai Pria</label>
@@ -503,7 +509,7 @@
                 <div class="field full">
                   <label for="fFamilyName">Nama Keluarga Besar (jika ada)</label>
                   <input id="fFamilyName" type="text" placeholder="cth. Keluarga Besar Hartono &amp; Keluarga Besar Sutrisno" />
-                  <span class="hint">Opsional — tampil di penutup “Kami yang berbahagia”.</span>
+                  <span class="hint">Opsional — diisi kalau undangan mau menampilkan nama keluarga besar, misalnya di penutup “Kami yang berbahagia”. Boleh dikosongkan.</span>
                 </div>
               </div>
             </fieldset>
@@ -533,12 +539,20 @@
                 <div class="field full">
                   <label for="fInfoNotes">Catatan untuk Tamu</label>
                   <textarea id="fInfoNotes" placeholder="cth. Harap tiba 30 menit sebelumnya. Area parkir di sisi timur gedung."></textarea>
-                  <span class="hint">Info parkir, shuttle, aturan anak, dll.</span>
+                  <span class="hint">Aturan bawa anak, info parkir / shuttle, dan hal lain yang perlu tamu tahu.</span>
                 </div>
                 <div class="field full">
                   <label for="fGiftAddress">Alamat Kirim Kado</label>
                   <input id="fGiftAddress" type="text" placeholder="Alamat kirim kado fisik (opsional)" />
                 </div>
+              </div>
+            </fieldset>
+
+            <fieldset style="margin-top:34px;">
+              <legend>Teks Template</legend>
+              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Ubah teks bawaan template — judul, label, sampai tombol. Yang dikosongkan kembali ke teks asli.</p>
+              <div id="textsFormWrap">
+                <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6;">Daftar teks dimuat dari template — tekan <b>Lihat Preview</b> dulu.</p>
               </div>
             </fieldset>
 
@@ -602,7 +616,7 @@
                     <option value="custom">Musik Sendiri — upload file / link MP3</option>
                     <option value="none">Tanpa Musik</option>
                   </select>
-                  <span class="hint">Tersimpan & terpasang di file unduhan.</span>
+                  <span class="hint">Ikut tersimpan &amp; terpasang di file unduhan.</span>
                 </div>
                 <div class="field">
                   <label for="musicPreviewBtn">Dengar Dulu</label>
@@ -615,7 +629,7 @@
                   <div class="field">
                     <label for="upMusic">Upload File Musik Kalian</label>
                     <input id="upMusic" type="file" accept="audio/*,.mp3,.m4a,.ogg,.wav,.aac" />
-                    <span class="hint">Maks. 8MB. File ditanam ke hasil unduhan.</span>
+                    <span class="hint">Maks. 8MB, MP3 disarankan. File <b>ditanam ke file undangan</b> hasil unduhan.</span>
                   </div>
                   <div class="field">
                     <label>File Terpilih</label>
@@ -625,30 +639,15 @@
                   <div class="field full">
                     <label for="fMusicUrl">Atau Tempel Link Musik (MP3)</label>
                     <input id="fMusicUrl" type="url" inputmode="url" placeholder="https://contoh.com/lagu-kami.mp3" />
-                    <span class="hint">Kalau file & link diisi, file yang dipakai.</span>
+                    <span class="hint">Link MP3 publik <b>ikut tersimpan</b>. Kalau file &amp; link sama-sama diisi, file yang dipakai.</span>
                   </div>
-                </div>
-              </div>
-            </fieldset>
-
-            <fieldset style="margin-top:34px;">
-              <legend>Tampilan</legend>
-              <div class="form-grid" style="margin-top:6px;">
-                <div class="field">
-                  <label for="fAccent">Warna Aksen</label>
-                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                    <input id="fAccentColor" type="color" value="#c9a227" style="width:52px;height:40px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;" />
-                    <input id="fAccent" type="text" inputmode="text" placeholder="Otomatis (warna bawaan template)" style="max-width:230px;" />
-                    <button type="button" class="btn ghost small" id="resetAccentBtn">Reset</button>
-                  </div>
-                  <span class="hint">Kosongkan untuk memakai warna bawaan template.</span>
                 </div>
               </div>
             </fieldset>
 
             <fieldset style="margin-top:34px;">
               <legend>Daftar Tamu &amp; Link Personal</legend>
-              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Satu nama per baris.</p>
+              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Satu nama per baris. Tiap nama jadi link undangan personal — salin atau kirim via WhatsApp.</p>
               <div class="field full">
                 <label for="fGuests">Nama-nama Tamu</label>
                 <textarea id="fGuests" rows="6" placeholder="Satu nama per baris, contoh:&#10;Keluarga Besar Hartono&#10;Bapak Andi Wijaya beserta Ibu&#10;Sinta Maharani"></textarea>
@@ -675,7 +674,7 @@
             </div>
 
             <div class="msg err" id="editorError" role="alert"></div>
-            <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:24px;">Preview tampil persis seperti yang dilihat tamu.</p>
+            <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:24px;">Tekan <b>Lihat Preview</b> untuk melihat undangan seperti yang dilihat tamu — berubah langsung, tanpa mengurangi jatah revisi.</p>
             <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
               <button type="button" class="btn gold flex" id="previewBtn">Lihat Preview</button>
               <button type="submit" class="btn primary flex" id="saveBtn">Simpan Undangan</button>
@@ -693,7 +692,7 @@
 
             <div class="export-box" id="exportBox">
               <h3>File Undangan Mandiri — Untuk Domain Sendiri</h3>
-              <p>Satu file HTML berisi semua data. Buka di browser atau hosting sendiri.</p>
+              <p>Satu file HTML berisi <b>semua data kalian</b> — nama, acara, foto, rekening, dan musik. Buka langsung di browser, atau hosting di domain sendiri.</p>
               <div class="row">
                 <button type="button" class="btn primary small" id="downloadHtmlBtn">Unduh File Undangan (.html)</button>
                 <button type="button" class="btn ghost small" id="toggleGuideBtn" aria-expanded="false">Cara Hosting Gratis</button>
@@ -744,7 +743,7 @@
               <div class="field" style="margin-bottom:6px;">
                 <label for="aMaxRevisions">Maksimal Revisi</label>
                 <input id="aMaxRevisions" type="number" value="3" min="1" step="1" inputmode="numeric" />
-                <span class="hint">Batas tekan Simpan per customer.</span>
+                <span class="hint">Jumlah maksimal customer menekan Simpan.</span>
               </div>
               <label class="checkrow" for="aUnlimited"><input id="aUnlimited" type="checkbox" /> Tanpa batas revisi</label>
               <button class="btn ghost" id="genCodeBtn" style="width:100%;">Acak Kode Baru</button>
@@ -780,16 +779,16 @@
                 <button class="btn primary" id="guestBookBtn" style="margin-top:14px; width:100%;">Cetak Buku Tamu</button>
                 <p style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:8px;">Semua ucapan tamu token ini, disusun jadi buku siap cetak / simpan PDF.</p>
                 <button class="btn ghost" id="manageQrBtn" style="margin-top:14px; width:100%;">Cetak Kartu QR</button>
-                <p style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:8px;">Kartu QR per tamu — siap cetak.</p>
+                <p style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-top:8px;">Kartu QR per tamu dari daftar tamu token ini — siap dicetak &amp; ditempel di undangan fisik.</p>
                 <button class="btn danger" id="revokeBtn" style="margin-top:14px; width:100%;">Cabut Token Ini (Revoke)</button>
               </div>
             </div>
           </div>
 
           <h3 style="font-size:18px; margin:30px 0 6px;">Riwayat Token</h3>
-          <p class="sub" style="margin-bottom:6px;">Daftar kode tersimpan di perangkat ini.</p>
+          <p class="sub" style="margin-bottom:6px;">Token tersimpan aman di database. Daftar kodenya tercatat di perangkat ini, dan tombol Sinkronkan membaca ulang tiap token langsung dari database — status &amp; revisinya selalu yang terbaru.</p>
           <div class="history-toolbar">
-            <p class="history-sync" id="historySyncStatus" role="status">Riwayat di perangkat ini. Sinkronkan untuk memuat ulang.</p>
+            <p class="history-sync" id="historySyncStatus" role="status">Menampilkan riwayat tersimpan di perangkat ini. Sinkronkan untuk membaca ulang status tiap token dari database.</p>
             <button type="button" class="btn ghost small" id="historyRefreshBtn">Sinkronkan dari Database</button>
           </div>
           <div class="msg err" id="historySyncError" role="alert"></div>
@@ -805,7 +804,7 @@
         <button class="backlink no-print" id="gbBackBtn">← Kembali ke Panel Admin</button>
         <section class="panel" style="margin-top:6px;">
           <h2 class="no-print">Buku Tamu &amp; Ucapan</h2>
-          <p class="sub no-print">Ucapan tamu disusun jadi buku. Hapus centang untuk menyembunyikan.</p>
+          <p class="sub no-print">Semua ucapan tamu untuk token ini, disusun jadi buku kenang-kenangan. Hilangkan centang “Sertakan” pada ucapan yang tidak ingin ikut tercetak, lalu cetak atau simpan sebagai PDF.</p>
           <div class="no-print" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
             <button type="button" class="btn primary" id="gbPrintBtn">Cetak / Simpan PDF</button>
           </div>
@@ -828,7 +827,7 @@
         <button class="backlink no-print" id="qrBackBtn">← Kembali</button>
         <section class="panel" style="margin-top:6px;">
           <h2 class="no-print">Kartu QR Undangan Fisik</h2>
-          <p class="sub no-print">Satu kartu per tamu + satu kartu umum. Cetak A4, potong mengikuti garis.</p>
+          <p class="sub no-print">Satu kartu per tamu, plus satu kartu umum tanpa nama. Cetak di kertas A4 (2 kolom), potong mengikuti garis putus-putus, lalu tempel di undangan fisik — tamu tinggal scan untuk membuka undangan digitalnya.</p>
           <div class="no-print" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
             <button type="button" class="btn primary" id="qrPrintBtn">Cetak / Simpan PDF</button>
           </div>
@@ -1750,10 +1749,6 @@
         setVal("fDressCode", info0.dressCode); setVal("fInfoNotes", info0.notes); setVal("fGiftAddress", info0.giftAddress);
         setVal("fQuote", d.quote);
         setVal("fWa", d.waNumber);
-        /* Warna aksen: tampilkan hex tersimpan, atau kosongkan (= bawaan template). */
-        var acc0 = /^#[0-9a-fA-F]{6}$/.test(d.accent || "") ? d.accent.toLowerCase() : "";
-        setVal("fAccent", acc0);
-        var accPicker = $("fAccentColor"); if (accPicker && acc0) accPicker.value = acc0;
         $("fMusic").value = MUSIC_LABELS[d.music] ? d.music : "default";
         setVal("fMusicUrl", d.musicUrl);
         /* File musik lokal sesi sebelumnya tidak dibawa antar-sesi editor:
@@ -1783,23 +1778,12 @@
         var addBtns = [$("addEventBtn"), $("addBankBtn"), $("addRundownBtn"), $("addLoveStoryBtn")];
         addBtns.forEach(function(b){ if (b) b.disabled = false; });
         var sb0 = $("saveBtn"); sb0.disabled = false; sb0.textContent = "Simpan Undangan";
+        resetTextsForm();
         updateRevisionUI();
         updatePreview();
         showView("editor");
       }
       $("editorBackBtn").addEventListener("click", function(){ stopMusicPreview(); showView("catalog"); });
-      /* Sinkronisasi pemilih warna aksen <-> kolom hex + tombol reset. */
-      (function(){
-        var picker = $("fAccentColor"), hex = $("fAccent"), reset = $("resetAccentBtn");
-        if (!picker || !hex) return;
-        picker.addEventListener("input", function(){ hex.value = picker.value; schedulePreviewRender(); });
-        hex.addEventListener("input", function(){
-          var v = hex.value.trim();
-          if (/^#[0-9a-fA-F]{6}$/.test(v)) picker.value = v.toLowerCase();
-          schedulePreviewRender();
-        });
-        if (reset) reset.addEventListener("click", function(){ hex.value = ""; schedulePreviewRender(); });
-      })();
 
       function collectData(){
         var d = current.data;
@@ -1818,14 +1802,19 @@
         d.music = $("fMusic") ? $("fMusic").value : "default";
         d.musicUrl = $("fMusicUrl") ? getVal("fMusicUrl") : (d.musicUrl || "");
         d.musicFileName = customMusicLocal.name || d.musicFileName || "";
-        /* Warna aksen custom: hex valid atau string kosong (= warna bawaan template). */
-        var accRaw = getVal("fAccent");
-        d.accent = /^#[0-9a-fA-F]{6}$/.test(accRaw) ? accRaw.toLowerCase() : "";
         d.guests = collectGuests();
         d.events = collectEvents();
         d.rundown = collectRundown();
         d.loveStory = collectLoveStory();
         d.banks = collectBanks();
+        /* Teks Template (Fase 2): hanya override yang berbeda dari teks
+           bawaan yang disimpan ke data.texts. Formulir belum termuat
+           (null) = texts lama dari token dibiarkan apa adanya. */
+        var txtOv = collectTextsOverrides();
+        if (txtOv !== null) {
+          if (Object.keys(txtOv).length) d.texts = txtOv;
+          else delete d.texts;
+        }
         /* Cermin ke field lama dari acara & rekening pertama agar template yang masih membaca field tunggal tetap menampilkan data terbaru */
         var firstEv = d.events[0] || {};
         d.date = firstEv.date || ""; d.time = firstEv.time || "";
@@ -2328,6 +2317,248 @@
       $("previewBody").addEventListener("click", function(e){ if (e.target === this && !previewState.docked) closePreview(); });
       document.addEventListener("keydown", function(e){
         if (e.key === "Escape" && previewState.open) closePreview();
+      });
+
+      /* ================= TEKS TEMPLATE (FASE 2) =================
+         Formulir edit SELURUH teks statis template, dikelompokkan per
+         section dari kunci data-txt="section.kunci":
+         - Kunci & urutan diambil dari DOM preview iframe yang sudah
+           ter-render (elemen dinamis hasil JS template ikut tertangkap).
+         - Teks bawaan (default) diambil dari HTML template mentah via
+           DOMParser — teks di iframe preview bisa sudah tertimpa
+           token.texts tersimpan, jadi tidak murni bawaan.
+         - Ketikan langsung menimpa elemen preview yang cocok (semua
+           elemen berkunci sama), meniru runtime template: textContent,
+           atau atribut placeholder untuk input/textarea ber-placeholder.
+           Tanpa reload iframe.
+         - Simpan: collectData hanya memasukkan field yang berbeda dari
+           bawaan ke data.texts; yang dikosongkan / dikembalikan ke
+           bawaan terhapus — token tetap bersih.
+         - Semua nilai dirender lewat textContent / value (tanpa
+           innerHTML berisi nilai customer). */
+      var TXT_SECTION_LABELS = {
+        cover: "Cover", hero: "Hero", quote: "Quote / Doa", mempelai: "Mempelai",
+        countdown: "Hitung Mundur", acara: "Acara", galeri: "Galeri", info: "Info Tamu",
+        amplop: "Amplop", rsvp: "RSVP", penutup: "Penutup", rundown: "Rangkaian Acara",
+        footer: "Penutup", nav: "Navigasi", prosesi: "Prosesi Adat"
+      };
+      var TXT_FULL_LABELS = {
+        namelabel: "Label Nama", submit: "Tombol Kirim", days: "Hari", hours: "Jam",
+        minutes: "Menit", seconds: "Detik", guestlabel: "Label Tamu",
+        guestplace: "Placeholder Nama Tamu", briderole: "Peran Mempelai Wanita",
+        groomrole: "Peran Mempelai Pria", dresslabel: "Label Dress Code",
+        giftlabel: "Label Kado", acclabel: "Label Rekening", rowdate: "Label Tanggal",
+        rowtime: "Label Waktu", rowvenue: "Label Tempat"
+      };
+      var TXT_WORD_LABELS = {
+        kicker: "Label Kecil", title: "Judul", subtitle: "Subjudul", intro: "Pengantar",
+        lead: "Pengantar", heading: "Judul", button: "Tombol", greeting: "Sapaan",
+        hint: "Petunjuk", note: "Catatan", closing: "Penutup", opening: "Pembuka",
+        maps: "Tombol Maps", save: "Tombol Simpan", calendar: "Tombol Kalender",
+        gcal: "Tombol Google Calendar", copy: "Tombol Salin", name: "Nama",
+        guest: "Tamu", label: "Label", place: "Tempat", venue: "Tempat",
+        date: "Tanggal", time: "Waktu", when: "Waktu", dress: "Dress Code",
+        gift: "Kado", bride: "Wanita", groom: "Pria", role: "Peran", photo: "Foto",
+        event: "Acara", tag: "Label", caption: "Keterangan", banner: "Spanduk",
+        inviting: "Mengundang", pantun: "Pantun", thanks: "Terima Kasih",
+        verse: "Ayat", source: "Sumber", text: "Teks", message: "Pesan",
+        send: "Kirim", wish: "Ucapan", wishes: "Ucapan", attendance: "Kehadiran",
+        confirm: "Konfirmasi", step: "Langkah", steps: "Langkah", aksara: "Aksara",
+        to: "Kepada", dear: "Kepada", beranda: "Beranda", story: "Kisah",
+        music: "Musik", open: "Buka", account: "Rekening", number: "Nomor",
+        holder: "Pemilik", bank: "Bank", address: "Alamat", scroll: "Gulir",
+        couple: "Mempelai", names: "Nama", day: "Hari", placeholder: "Placeholder"
+      };
+      var textsState = { slug: "", built: false, building: false, fields: [] };
+
+      function txtIsPlaceholderEl(elm){
+        return !!elm && (elm.tagName === "INPUT" || elm.tagName === "TEXTAREA") && elm.hasAttribute("placeholder");
+      }
+      function txtRawValue(elm){
+        if (!elm) return "";
+        if (txtIsPlaceholderEl(elm)) return elm.getAttribute("placeholder") || "";
+        return elm.textContent || "";
+      }
+      function txtNorm(v){ return String(v == null ? "" : v).replace(/\s+/g, " ").trim(); }
+      function txtHumanize(sub){
+        var raw = String(sub || "");
+        if (TXT_FULL_LABELS[raw.toLowerCase()]) return TXT_FULL_LABELS[raw.toLowerCase()];
+        var words = [];
+        raw.split(/[._]+/).forEach(function(part){
+          if (!part) return;
+          part.replace(/([a-z])([A-Z])/g, "$1 $2")
+            .replace(/([A-Za-z])(\d)/g, "$1 $2")
+            .replace(/(\d)([A-Za-z])/g, "$1 $2")
+            .split(/[\s_-]+/)
+            .forEach(function(w){ if (w) words.push(w); });
+        });
+        if (!words.length) return raw || "Teks";
+        return words.map(function(w){
+          var lw = w.toLowerCase();
+          if (TXT_WORD_LABELS[lw]) return TXT_WORD_LABELS[lw];
+          if (/^\d+$/.test(w)) return w;
+          return lw.charAt(0).toUpperCase() + lw.slice(1);
+        }).join(" ");
+      }
+      function txtSectionLabel(sec){
+        if (TXT_SECTION_LABELS[sec]) return TXT_SECTION_LABELS[sec];
+        if (!sec) return "Lainnya";
+        return sec.charAt(0).toUpperCase() + sec.slice(1);
+      }
+      function txtApplyToFrame(key, value){
+        var fr = $("previewFrame");
+        var idoc = null;
+        try { idoc = fr && fr.contentDocument; } catch (e) { idoc = null; }
+        if (!idoc) return;
+        Array.prototype.forEach.call(idoc.querySelectorAll("[data-txt]"), function(elm){
+          if (elm.getAttribute("data-txt") !== key) return;
+          if (txtIsPlaceholderEl(elm)) elm.setAttribute("placeholder", value);
+          else elm.textContent = value;
+        });
+      }
+      function txtFieldEffective(f){
+        var v = f.el ? f.el.value : "";
+        return String(v).trim() ? v : f.def;
+      }
+      function txtApplyAllToFrame(){
+        textsState.fields.forEach(function(f){ txtApplyToFrame(f.key, txtFieldEffective(f)); });
+      }
+      /* null = formulir belum termuat untuk token ini (texts lama jangan
+         diubah); objek (boleh kosong) = hasil kumpul dari formulir. */
+      function collectTextsOverrides(){
+        if (!textsState.built || !current || textsState.slug !== current.slug) return null;
+        var out = {};
+        textsState.fields.forEach(function(f){
+          var v = f.el ? f.el.value : "";
+          if (!String(v).trim()) return;
+          if (f.sticky || v !== f.def) out[f.key] = v;
+        });
+        return out;
+      }
+      function resetTextsForm(){
+        textsState = { slug: "", built: false, building: false, fields: [] };
+        var wrap = $("textsFormWrap");
+        if (!wrap) return;
+        wrap.innerHTML = "";
+        var p = document.createElement("p");
+        p.className = "hint";
+        p.style.cssText = "color:var(--ink-soft); font-size:13.5px; line-height:1.6;";
+        p.textContent = "Daftar teks dimuat dari template — tekan Lihat Preview dulu.";
+        wrap.appendChild(p);
+      }
+      function buildTextsForm(){
+        if (!current || !current.slug) return;
+        if (textsState.built && textsState.slug === current.slug) { txtApplyAllToFrame(); return; }
+        if (textsState.building) return;
+        var fr = $("previewFrame");
+        var idoc = null;
+        try { idoc = fr && fr.contentDocument; } catch (e) { idoc = null; }
+        if (!idoc) return;
+        var slug = current.slug;
+        textsState.building = true;
+        loadTemplateHtml(slug).then(function(html){
+          textsState.building = false;
+          if (!current || current.slug !== slug || !previewState.open) return;
+          var rawMap = {};
+          try {
+            var rawDoc = new DOMParser().parseFromString(String(html || ""), "text/html");
+            Array.prototype.forEach.call(rawDoc.querySelectorAll("[data-txt]"), function(elm){
+              var k = elm.getAttribute("data-txt");
+              if (k && !Object.prototype.hasOwnProperty.call(rawMap, k)) {
+                rawMap[k] = { def: txtNorm(txtRawValue(elm)), isPh: txtIsPlaceholderEl(elm), tag: elm.tagName };
+              }
+            });
+          } catch (e) { rawMap = {}; }
+          var order = [], seen = {}, frameMap = {};
+          Array.prototype.forEach.call(idoc.querySelectorAll("[data-txt]"), function(elm){
+            var k = elm.getAttribute("data-txt");
+            if (!k) return;
+            if (!Object.prototype.hasOwnProperty.call(frameMap, k)) frameMap[k] = elm;
+            if (!seen[k]) { seen[k] = true; order.push(k); }
+          });
+          Object.keys(rawMap).forEach(function(k){
+            if (!seen[k]) { seen[k] = true; order.push(k); }
+          });
+          var wrap = $("textsFormWrap");
+          if (!wrap) return;
+          if (!order.length) {
+            wrap.innerHTML = "";
+            var p0 = document.createElement("p");
+            p0.className = "hint";
+            p0.style.cssText = "color:var(--ink-soft); font-size:13.5px; line-height:1.6;";
+            p0.textContent = "Template ini belum mendukung edit teks.";
+            wrap.appendChild(p0);
+            textsState = { slug: slug, built: true, building: false, fields: [] };
+            return;
+          }
+          var saved = (current.data && current.data.texts && typeof current.data.texts === "object") ? current.data.texts : {};
+          var groups = [], gmap = {}, fields = [];
+          order.forEach(function(key){
+            var dot = key.indexOf(".");
+            var sec = dot === -1 ? "" : key.slice(0, dot);
+            var sub = dot === -1 ? key : key.slice(dot + 1);
+            var raw = rawMap[key] || null;
+            var fEl = frameMap[key] || null;
+            var defKnown = !!raw;
+            var def = raw ? raw.def : txtNorm(txtRawValue(fEl));
+            var tag = raw ? raw.tag : (fEl ? fEl.tagName : "");
+            var hasSaved = Object.prototype.hasOwnProperty.call(saved, key) && saved[key] != null && String(saved[key]).trim() !== "";
+            var f = {
+              key: key, sec: sec, sub: sub, def: def,
+              /* Kunci dinamis tanpa teks bawaan yang bisa dipastikan &
+                 sudah punya override tersimpan: pertahankan override-nya
+                 selama field tidak dikosongkan. */
+              sticky: !defKnown && hasSaved,
+              long: def.length > 60 || tag === "P" || tag === "BLOCKQUOTE",
+              initVal: hasSaved ? String(saved[key]) : def,
+              el: null
+            };
+            fields.push(f);
+            if (!gmap[sec]) { gmap[sec] = { sec: sec, items: [] }; groups.push(gmap[sec]); }
+            gmap[sec].items.push(f);
+          });
+          wrap.innerHTML = "";
+          var n = 0;
+          groups.forEach(function(g){
+            var box = document.createElement("div"); box.className = "txt-group";
+            var h = document.createElement("h4"); h.textContent = txtSectionLabel(g.sec);
+            box.appendChild(h);
+            var grid = document.createElement("div"); grid.className = "form-grid";
+            g.items.forEach(function(f){
+              n++;
+              var fdiv = document.createElement("div");
+              fdiv.className = "field" + (f.long ? " full" : "");
+              var lab = document.createElement("label");
+              lab.textContent = txtHumanize(f.sub);
+              lab.setAttribute("for", "txtField" + n);
+              var inp;
+              if (f.long) { inp = document.createElement("textarea"); inp.rows = 3; }
+              else { inp = document.createElement("input"); inp.type = "text"; }
+              inp.id = "txtField" + n;
+              inp.value = f.initVal;
+              inp.addEventListener("input", function(){ txtApplyToFrame(f.key, txtFieldEffective(f)); });
+              f.el = inp;
+              fdiv.appendChild(lab); fdiv.appendChild(inp);
+              grid.appendChild(fdiv);
+            });
+            box.appendChild(grid);
+            wrap.appendChild(box);
+          });
+          textsState = { slug: slug, built: true, building: false, fields: fields };
+          txtApplyAllToFrame();
+        }).catch(function(){ textsState.building = false; });
+      }
+      /* Scan dimulai tiap preview iframe selesai termuat; jeda singkat
+         memberi waktu hidrasi template (elemen dinamis) terbentuk. */
+      $("previewFrame").addEventListener("load", function(){
+        if (!previewState.open) return;
+        var srcNow = this.src || "";
+        if (!srcNow || srcNow === "about:blank") return;
+        var code0 = current ? current.code : "", slug0 = current ? current.slug : "";
+        setTimeout(function(){
+          if (!previewState.open || !current || current.code !== code0 || current.slug !== slug0) return;
+          buildTextsForm();
+        }, 450);
       });
 
       /* Tautan berkode token (?t=KODE&template=slug) langsung mengisi panel
@@ -3142,8 +3373,10 @@
 
       /* ================= CETAK KARTU QR =================
          Satu kartu per tamu dari daftar tamu token + satu kartu umum
-         tanpa ?to=. QR dirender lokal dengan qrcodejs; bila library
-         gagal dimuat, cadangannya gambar dari api.qrserver.com. */
+         tanpa ?to=. QR SELALU dirender lokal dengan qrcodejs — link
+         tamu (kode token + nama) tidak pernah dikirim ke layanan QR
+         pihak ketiga mana pun. Bila library gagal dimuat, kartu
+         menampilkan catatan, bukan QR dari server eksternal. */
       var qrReturnView = "editor";
       function qrUrlFor(slug, code, name){
         var u = "https://invito.std.ai.id/" + slug + ".html?t=" + code;
@@ -3158,11 +3391,10 @@
             return;
           } catch (e) {}
         }
-        var img = document.createElement("img");
-        img.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(url);
-        img.alt = "Kode QR undangan digital";
-        img.width = 168; img.height = 168;
-        el.appendChild(img);
+        var note = document.createElement("p");
+        note.className = "qr-scan";
+        note.textContent = "QR belum bisa dibuat — periksa koneksi internet, lalu buka halaman ini lagi.";
+        el.appendChild(note);
       }
       function buildQrCard(name, url, couple){
         var card = document.createElement("div"); card.className = "qr-card";
