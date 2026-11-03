@@ -8,47 +8,51 @@
     <title>Katalog Template Undangan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
       :root{
-        --bg:#f8f5ee;
-        --bg-soft:#f1ebdf;
-        --card:#fffefa;
-        --ink:#262119;
-        --ink-soft:#6d6350;
-        --line:#e3dac4;
-        --brand:#1e4d3a;
-        --brand-hover:#275f49;
-        --brand-ink:#ffffff;
-        --gold:#a9852f;
-        --gold-soft:#f3ead2;
-        --danger:#a52a21;
-        --danger-bg:#fbeae8;
-        --ok:#1e6b45;
-        --ok-bg:#e7f2ea;
-        --input-bg:#ffffff;
-        --shadow:0 2px 6px rgba(62,49,20,.04), 0 14px 34px rgba(62,49,20,.06);
-        --shadow-lift:0 4px 10px rgba(62,49,20,.05), 0 22px 44px rgba(62,49,20,.10);
+        --bg:#FBF8F3;
+        --bg-soft:#F3EDE1;
+        --card:#FFFFFF;
+        --ink:#1C1A17;
+        --ink-soft:#6E675C;
+        --line:#E6DECF;
+        --brand:#B98A2F;
+        --brand-hover:#A67A28;
+        --brand-ink:#FFFDF7;
+        --gold:#B98A2F;
+        --gold-soft:#F1E7CF;
+        --sage:#7A8B6F;
+        --sage-soft:#E9EEE3;
+        --danger:#A52A21;
+        --danger-bg:#F9EAE7;
+        --ok:#55705C;
+        --ok-bg:#E9EEE3;
+        --input-bg:#FFFFFF;
+        --shadow:0 1px 3px rgba(62,49,20,.04), 0 12px 32px rgba(62,49,20,.05);
+        --shadow-lift:0 4px 10px rgba(62,49,20,.05), 0 24px 48px rgba(62,49,20,.10);
         --radius:16px;
       }
       @media (prefers-color-scheme: dark){
         :root{
-          --bg:#161814;
-          --bg-soft:#1e211c;
-          --card:#21241e;
-          --ink:#f0ead9;
-          --ink-soft:#c0b69f;
-          --line:#3a3e31;
-          --brand:#7fc7a5;
-          --brand-hover:#93d4b6;
-          --brand-ink:#0f2018;
-          --gold:#d3a94f;
-          --gold-soft:#37311e;
-          --danger:#ff9d94;
-          --danger-bg:#3a201d;
-          --ok:#8fd7ae;
-          --ok-bg:#1d3325;
-          --input-bg:#1a1d18;
+          --bg:#171512;
+          --bg-soft:#201D18;
+          --card:#232019;
+          --ink:#F1EBDD;
+          --ink-soft:#B4AB99;
+          --line:#38332A;
+          --brand:#D2A94F;
+          --brand-hover:#DFBA66;
+          --brand-ink:#221A08;
+          --gold:#D2A94F;
+          --gold-soft:#37301C;
+          --sage:#9DB08F;
+          --sage-soft:#2A2F24;
+          --danger:#FF9D94;
+          --danger-bg:#3A201D;
+          --ok:#A9C79B;
+          --ok-bg:#26301F;
+          --input-bg:#1B1915;
           --shadow:0 2px 6px rgba(0,0,0,.25), 0 14px 34px rgba(0,0,0,.35);
           --shadow-lift:0 4px 10px rgba(0,0,0,.3), 0 22px 44px rgba(0,0,0,.5);
         }
@@ -58,7 +62,7 @@
         margin:0;
         background:var(--bg);
         color:var(--ink);
-        font-family:"Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+        font-family:"Inter", system-ui, -apple-system, sans-serif;
         font-size:16.5px;
         line-height:1.75;
         -webkit-font-smoothing:antialiased;
@@ -69,99 +73,151 @@
       button{ font:inherit; cursor:pointer; }
       input,select,textarea{ font:inherit; font-size:16px; color:var(--ink); }
       a{ color:var(--brand); }
-      .wrap{ max-width:1120px; margin:0 auto; padding:0 22px; }
-      .serif{ font-family:"Playfair Display", Georgia, serif; }
+      .wrap{ max-width:1100px; margin:0 auto; padding:0 22px; }
+      .serif{ font-family:"Cormorant Garamond", Georgia, serif; }
+
+      /* ---------- Header ---------- */
+      .site-head{ position:sticky; top:0; z-index:45; background:color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
+      .site-head .wrap{ display:flex; align-items:center; gap:20px; min-height:66px; }
+      .wordmark{ font-family:"Cormorant Garamond", Georgia, serif; font-size:27px; font-weight:700; letter-spacing:.24em; color:var(--ink); text-decoration:none; line-height:1; display:inline-flex; align-items:center; gap:10px; }
+      .wordmark i{ width:8px; height:8px; background:var(--gold); transform:rotate(45deg); flex:none; }
+      .site-nav{ margin-left:auto; display:flex; align-items:center; gap:6px; }
+      .site-nav a{ color:var(--ink-soft); text-decoration:none; font-size:14.5px; font-weight:500; padding:10px 13px; border-radius:999px; white-space:nowrap; transition:color .2s ease, background .2s ease; }
+      @media (hover:hover){ .site-nav a:hover{ color:var(--ink); background:var(--bg-soft); } }
+      .site-nav .nav-admin{ margin-left:8px; min-height:44px; padding:9px 20px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--ink); font-weight:600; font-size:14.5px; transition:border-color .2s ease, background .2s ease; }
+      @media (hover:hover){ .site-nav .nav-admin:hover{ border-color:var(--gold); } }
+      @media (max-width:560px){
+        .site-head .wrap{ min-height:58px; gap:8px; padding:0 16px; }
+        .wordmark{ font-size:19px; letter-spacing:.16em; gap:7px; }
+        .wordmark i{ width:6px; height:6px; }
+        .site-nav{ gap:2px; }
+        .site-nav a{ padding:8px 7px; font-size:13px; }
+        .site-nav a[href="#faq"]{ display:none; }
+        .site-nav .nav-admin{ margin-left:4px; min-height:40px; padding:8px 14px; font-size:13px; }
+      }
 
       /* ---------- Hero ---------- */
-      .hero{ padding:76px 0 44px; text-align:center; }
-      .hero .rule{ display:flex; align-items:center; justify-content:center; gap:16px; color:var(--gold); margin-bottom:24px; }
-      .hero .rule::before,.hero .rule::after{ content:""; height:1px; width:64px; background:linear-gradient(90deg, transparent, var(--gold)); }
+      .hero{ position:relative; padding:92px 0 58px; text-align:center; overflow:hidden; }
+      .hero::before{ content:""; position:absolute; inset:0; pointer-events:none; background:
+        radial-gradient(560px 300px at 50% -60px, var(--gold-soft), transparent 70%),
+        repeating-linear-gradient(90deg, transparent 0 79px, color-mix(in srgb, var(--ink) 4%, transparent) 79px 80px); }
+      .hero > *{ position:relative; }
+      .hero .rule{ display:flex; align-items:center; justify-content:center; gap:16px; color:var(--gold); margin-bottom:26px; }
+      .hero .rule::before,.hero .rule::after{ content:""; height:1px; width:56px; background:linear-gradient(90deg, transparent, var(--gold)); }
       .hero .rule::after{ background:linear-gradient(90deg, var(--gold), transparent); }
       .hero .rule span{ font-size:11.5px; letter-spacing:.38em; text-transform:uppercase; font-weight:600; padding-left:.38em; }
-      .hero h1{ font-family:"Playfair Display", Georgia, serif; font-weight:700; font-size:clamp(33px,6vw,50px); line-height:1.18; letter-spacing:.005em; }
+      .hero h1{ font-family:"Cormorant Garamond", Georgia, serif; font-weight:600; font-size:clamp(40px,6.4vw,62px); line-height:1.14; letter-spacing:.005em; }
       .hero h1 em{ font-style:italic; font-weight:500; color:var(--brand); }
-      .hero .lead{ max-width:520px; margin:20px auto 0; color:var(--ink-soft); font-size:16.5px; line-height:1.75; }
-      .hero .stats{ margin-top:30px; display:flex; flex-wrap:wrap; gap:8px 26px; justify-content:center; }
+      .hero .lead{ max-width:520px; margin:22px auto 0; color:var(--ink-soft); font-size:17px; line-height:1.75; }
+      .hero .cta-row{ margin-top:34px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+      .hero .stats{ margin-top:38px; display:flex; flex-wrap:wrap; gap:8px 26px; justify-content:center; }
       .hero .stats li{ position:relative; font-size:13.5px; font-weight:500; letter-spacing:.04em; color:var(--ink-soft); }
       .hero .stats li + li::before{ content:""; position:absolute; left:-15px; top:50%; width:4px; height:4px; border-radius:1px; background:var(--gold); transform:translateY(-50%) rotate(45deg); }
       .hero .stats b{ color:var(--ink); font-weight:700; }
 
-      /* ---------- Steps ---------- */
-      .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:48px 0 6px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
-      .step{ padding:30px 28px 32px; text-align:center; }
+      /* ---------- Section umum ---------- */
+      .sec{ padding:76px 0 8px; scroll-margin-top:84px; }
+      .sec-head{ text-align:center; max-width:560px; margin:0 auto 40px; }
+      .sec-head .kick{ font-size:11.5px; letter-spacing:.32em; text-transform:uppercase; font-weight:600; color:var(--gold); }
+      .sec-head h2{ font-family:"Cormorant Garamond", Georgia, serif; font-size:clamp(30px,4.6vw,40px); font-weight:600; line-height:1.2; margin-top:10px; }
+      .sec-head p{ color:var(--ink-soft); font-size:15.5px; margin-top:10px; }
+
+      /* ---------- Steps / Cara Pesan ---------- */
+      .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+      .step{ padding:34px 28px 36px; text-align:center; }
       .step + .step{ border-left:1px solid var(--line); }
-      .step .num{ font-family:"Playfair Display",serif; font-size:27px; font-weight:500; font-style:italic; color:var(--gold); line-height:1; }
-      .step h3{ font-size:15.5px; font-weight:700; letter-spacing:.02em; margin:13px 0 5px; }
+      .step .num{ font-family:"Cormorant Garamond",serif; font-size:32px; font-weight:500; font-style:italic; color:var(--gold); line-height:1; }
+      .step h3{ font-size:15.5px; font-weight:600; letter-spacing:.02em; margin:14px 0 5px; }
       .step p{ color:var(--ink-soft); font-size:14.5px; line-height:1.65; }
 
+      /* ---------- Fitur ---------- */
+      .fitur-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:34px 30px; }
+      .fitur{ text-align:left; }
+      .fitur .ic{ width:48px; height:48px; border:1px solid var(--line); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--sage); margin-bottom:16px; background:var(--card); }
+      .fitur h3{ font-size:15.5px; font-weight:600; margin-bottom:5px; }
+      .fitur p{ color:var(--ink-soft); font-size:14.5px; line-height:1.65; }
+      @media (max-width:900px){ .fitur-grid{ grid-template-columns:repeat(2,1fr); } }
+      @media (max-width:520px){ .fitur-grid{ grid-template-columns:1fr; gap:26px; } }
+
+      /* ---------- FAQ ---------- */
+      .faq-list{ max-width:720px; margin:0 auto; }
+      .faq-item{ border-top:1px solid var(--line); }
+      .faq-item:last-child{ border-bottom:1px solid var(--line); }
+      .faq-item summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap:14px; min-height:56px; padding:14px 4px; font-family:"Cormorant Garamond", Georgia, serif; font-size:20px; font-weight:600; line-height:1.35; }
+      .faq-item summary::-webkit-details-marker{ display:none; }
+      .faq-item summary::after{ content:"+"; margin-left:auto; flex:none; font-family:"Inter",sans-serif; font-weight:400; font-size:22px; color:var(--gold); transition:transform .3s ease; }
+      .faq-item[open ] summary::after{ transform:rotate(45deg); }
+      .faq-item .faq-body{ padding:0 4px 20px; color:var(--ink-soft); font-size:15px; line-height:1.7; max-width:620px; }
+
       /* ---------- Filter ---------- */
-      .toolbar{ margin:46px 0 30px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+      .toolbar{ margin:6px 0 34px; display:flex; flex-direction:column; align-items:center; gap:20px; scroll-margin-top:92px; }
       .searchbox{ position:relative; width:100%; max-width:520px; }
-      .searchbox input{ width:100%; box-sizing:border-box; min-height:50px; border:1px solid var(--line); border-radius:999px; background:var(--input-bg); padding:11px 20px 11px 47px; transition:border-color .15s ease, box-shadow .15s ease; }
-      .searchbox input:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+      .searchbox input{ width:100%; box-sizing:border-box; min-height:52px; border:1px solid var(--line); border-radius:999px; background:var(--input-bg); padding:12px 20px 12px 48px; transition:border-color .2s ease, box-shadow .2s ease; }
+      .searchbox input:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 4px var(--gold-soft); }
       .searchbox svg{ position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--ink-soft); pointer-events:none; }
       .chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
-      .chip{ min-height:40px; padding:7px 17px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--ink-soft); font-weight:500; font-size:14px; transition:border-color .15s ease, color .15s ease, background .15s ease; }
+      .chip{ min-height:44px; padding:9px 19px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--ink-soft); font-weight:500; font-size:14px; transition:border-color .25s ease, color .25s ease, background .25s ease; }
       .chip:hover{ border-color:var(--gold); color:var(--ink); }
-      .chip[aria-pressed="true"]{ background:var(--brand); border-color:var(--brand); color:var(--brand-ink); }
+      .chip[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
       .chip .cnt{ opacity:.6; font-weight:600; }
       @media (max-width:760px){
         .chips{ flex-wrap:nowrap; width:100%; }
-        .chip{ flex:1 1 0; min-width:0; padding:8px 3px; font-size:12.5px; letter-spacing:-.01em; text-align:center; white-space:nowrap; }
+        .chip{ flex:1 1 0; min-width:0; padding:9px 3px; font-size:12.5px; letter-spacing:-.01em; text-align:center; white-space:nowrap; }
       }
 
       /* ---------- Cards ---------- */
-      .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,430px),1fr)); gap:32px; padding-bottom:12px; }
-      .grid-head{ grid-column:1 / -1; display:flex; align-items:center; gap:16px; margin-top:40px; }
+      .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,430px),1fr)); gap:36px; padding-bottom:12px; }
+      .grid-head{ grid-column:1 / -1; display:flex; align-items:center; gap:16px; margin-top:44px; }
       .grid-head:first-child{ margin-top:8px; }
       .grid-head::before{ content:""; flex:none; width:7px; height:7px; background:var(--gold); transform:rotate(45deg); }
-      .grid-head h2{ font-family:"Playfair Display",serif; font-size:25px; font-weight:700; line-height:1.3; white-space:nowrap; }
+      .grid-head h2{ font-family:"Cormorant Garamond",serif; font-size:28px; font-weight:600; line-height:1.3; white-space:nowrap; }
       .grid-head .cnt{ color:var(--ink-soft); font-size:13.5px; font-weight:500; letter-spacing:.03em; white-space:nowrap; }
       .grid-head::after{ content:""; flex:1; height:1px; background:var(--line); align-self:center; min-width:24px; }
       .scene .cat-badge{ position:absolute; bottom:12px; left:12px; z-index:3; background:rgba(20,16,8,.55); color:#fff; font-size:10.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; padding:5px 11px; border-radius:999px; pointer-events:none; backdrop-filter:blur(3px); }
-      .tcard{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column; transition:box-shadow .25s ease, border-color .25s ease; }
-      @media (hover:hover){ .tcard:hover{ box-shadow:var(--shadow-lift); border-color:#d5c8a6; } }
-      @media (hover:hover) and (prefers-color-scheme: dark){ .tcard:hover{ border-color:#4c5140; } }
+      .tcard{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column; transition:box-shadow .4s ease, border-color .4s ease, transform .4s ease; }
+      @media (hover:hover){ .tcard:hover{ box-shadow:var(--shadow-lift); transform:translateY(-4px); } }
       .scene{ position:relative; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center; overflow:hidden; }
       .scene .fs-badge{ position:absolute; top:12px; right:12px; z-index:3; display:inline-flex; align-items:center; gap:6px; background:rgba(20,16,8,.62); color:#fff; font-size:11.5px; font-weight:700; letter-spacing:.06em; padding:7px 12px; border-radius:999px; pointer-events:none; backdrop-filter:blur(3px); }
       .scene .fs-badge svg{ flex:none; }
       .scene .fs-open{ position:absolute; inset:0; z-index:4; width:100%; height:100%; border:none; background:transparent; padding:0; cursor:zoom-in; -webkit-tap-highlight-color:transparent; }
       .scene .fs-open:focus-visible{ outline:3px solid var(--gold); outline-offset:-3px; }
       .scene svg.motif{ width:104px; height:104px; position:relative; z-index:1; }
-      .scene img.thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 0%; display:block; z-index:2; transition:transform .6s ease; }
+      .scene img.thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 0%; display:block; z-index:2; transition:transform .4s ease; }
       @media (hover:hover){ .tcard:hover .scene img.thumb{ transform:scale(1.03); } }
       .scene .frame{ position:absolute; inset:10px; border:1px solid rgba(255,255,255,.28); border-radius:8px; pointer-events:none; }
       .scene .grain{ position:absolute; inset:0; opacity:.16; background-image:radial-gradient(rgba(255,255,255,.9) 1px, transparent 1.4px); background-size:14px 14px; }
       .scene.pixel .grain{ background-image:linear-gradient(rgba(255,255,255,.55) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.55) 1px, transparent 1px); background-size:16px 16px; opacity:.12; }
-      .tcard .body{ padding:24px 24px 26px; display:flex; flex-direction:column; gap:9px; flex:1; }
-      .tcard h3{ font-family:"Playfair Display",serif; font-size:22px; font-weight:700; line-height:1.3; }
-      .tcard .tag{ color:var(--gold); font-weight:600; font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; }
+      .tcard .body{ padding:26px 26px 28px; display:flex; flex-direction:column; gap:9px; flex:1; }
+      .tcard h3{ font-family:"Cormorant Garamond",serif; font-size:26px; font-weight:600; line-height:1.25; }
+      .tcard .tag{ align-self:flex-start; color:var(--gold); border:1px solid var(--line); background:var(--bg); border-radius:999px; padding:4px 12px; font-weight:600; font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
       .tcard .desc{ color:var(--ink-soft); font-size:14.5px; line-height:1.7; flex:1; }
       .tcard .actions{ display:flex; align-items:center; gap:10px; margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }
       .empty-note{ text-align:center; color:var(--ink-soft); padding:34px 0; }
 
       /* ---------- Buttons ---------- */
-      .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:10px 22px; border-radius:999px; border:1px solid transparent; font-weight:600; font-size:15px; letter-spacing:.01em; text-decoration:none; transition:background .15s ease, border-color .15s ease, color .15s ease, transform .12s ease; }
+      .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:11px 24px; border-radius:999px; border:1px solid transparent; font-weight:600; font-size:15px; letter-spacing:.01em; text-decoration:none; transition:background .3s ease, border-color .3s ease, color .3s ease, transform .15s ease; }
       .btn:active{ transform:scale(.98); }
       .btn.primary{ background:var(--brand); color:var(--brand-ink); }
       @media (hover:hover){ .btn.primary:hover{ background:var(--brand-hover); } }
       .btn.ghost{ background:transparent; border-color:var(--line); color:var(--ink); font-weight:500; }
       @media (hover:hover){ .btn.ghost:hover{ border-color:var(--gold); } }
-      .btn.gold{ background:var(--gold); color:#fffdf4; }
-      .btn.wa-buy{ background:#1da851; color:#fff; }
-      @media (hover:hover){ .btn.wa-buy:hover{ background:#178a43; } }
+      .btn.gold{ background:var(--gold); color:#FFFDF7; }
+      @media (prefers-color-scheme: dark){ .btn.gold{ color:#221A08; } }
+      .btn.wa-buy{ background:var(--gold); color:#FFFDF7; }
+      @media (hover:hover){ .btn.wa-buy:hover{ background:var(--brand-hover); } }
+      @media (prefers-color-scheme: dark){ .btn.wa-buy{ color:#221A08; } }
       .btn.wa-buy svg{ flex:none; }
       .btn.danger{ background:var(--danger-bg); color:var(--danger); border-color:var(--danger); }
-      .btn.small{ min-height:40px; padding:7px 16px; font-size:13.5px; }
-      .btn.demo{ min-height:40px; padding:7px 4px; border:none; border-radius:0; background:transparent; color:var(--brand); font-weight:600; font-size:14px; letter-spacing:.02em; white-space:nowrap; }
-      .btn.demo::after{ content:"→"; margin-left:2px; transition:transform .15s ease; }
+      .btn.small{ min-height:48px; padding:10px 18px; font-size:14px; }
+      .btn.demo{ min-height:48px; padding:10px 4px; border:none; border-radius:0; background:transparent; color:var(--brand); font-weight:600; font-size:14.5px; letter-spacing:.02em; white-space:nowrap; }
+      .btn.demo::after{ content:"→"; margin-left:2px; transition:transform .25s ease; }
       @media (hover:hover){ .btn.demo:hover::after{ transform:translateX(3px); } }
       .btn[disabled]{ opacity:.55; pointer-events:none; }
       .btn.flex{ flex:1; }
 
       /* ---------- Panels / forms ---------- */
-      .panel{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:38px; margin:40px 0; }
-      .panel h2{ font-family:"Playfair Display",serif; font-size:27px; font-weight:700; line-height:1.3; }
+      .panel{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:42px; margin:44px 0; }
+      .panel h2{ font-family:"Cormorant Garamond",serif; font-size:32px; font-weight:600; line-height:1.25; }
       .panel .sub{ color:var(--ink-soft); margin-top:6px; max-width:640px; font-size:15.5px; }
       .token-row{ display:flex; gap:12px; margin-top:22px; flex-wrap:wrap; }
       .token-row select,.token-row input{ min-height:54px; border:1px solid var(--line); border-radius:13px; background:var(--input-bg); padding:12px 16px; box-sizing:border-box; }
@@ -176,7 +232,7 @@
       .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:28px; }
       .field{ display:flex; flex-direction:column; gap:8px; }
       .field.full{ grid-column:1 / -1; }
-      .field label{ font-weight:700; font-size:14.5px; }
+      .field label{ font-weight:600; font-size:14.5px; }
       .field .hint{ font-weight:400; color:var(--ink-soft); font-size:13px; line-height:1.55; }
       .field input,.field textarea{ min-height:52px; border:1px solid var(--line); border-radius:12px; background:var(--input-bg); padding:11px 14px; box-sizing:border-box; width:100%; }
       .field textarea{ min-height:88px; resize:vertical; line-height:1.6; }
@@ -205,12 +261,12 @@
 
       /* ---------- Teks Template (Fase 2) ---------- */
       .txt-group{ margin-top:22px; }
-      .txt-group h4{ font-size:13px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--brand); margin:0; }
+      .txt-group h4{ font-size:13px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--brand); margin:0; }
       .txt-group .form-grid{ margin-top:10px; gap:16px 22px; }
       #textsFormWrap .field textarea{ min-height:72px; }
 
       .preview-card{ background:var(--bg-soft); border:1px dashed var(--gold); border-radius:14px; padding:24px; margin-top:32px; }
-      .preview-card h3{ font-family:"Playfair Display",serif; font-size:20px; margin-bottom:10px; }
+      .preview-card h3{ font-family:"Cormorant Garamond",serif; font-size:23px; font-weight:600; margin-bottom:10px; }
       .preview-card dl{ display:grid; grid-template-columns:150px 1fr; gap:5px 14px; font-size:14.5px; margin:0; }
       .preview-card dt{ color:var(--ink-soft); font-weight:600; }
       .preview-card dd{ margin:0; font-weight:600; word-break:break-word; }
@@ -221,7 +277,7 @@
       .link-box h3{ color:var(--ok); font-size:17px; }
       .export-box{ margin-top:28px; background:var(--card); border:1px solid var(--gold); border-radius:14px; padding:24px; display:none; }
       .export-box.show{ display:block; }
-      .export-box h3{ font-family:"Playfair Display",serif; font-size:20px; margin-bottom:8px; }
+      .export-box h3{ font-family:"Cormorant Garamond",serif; font-size:23px; font-weight:600; margin-bottom:8px; }
       .export-box p{ color:var(--ink-soft); font-size:14.5px; line-height:1.7; }
       .export-box .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
       .host-guide{ margin-top:18px; border-top:1px solid var(--line); padding-top:16px; display:none; }
@@ -281,8 +337,8 @@
       /* ---------- Buku tamu & kartu QR ---------- */
       .book{ margin-top:26px; }
       .book-cover{ text-align:center; border:1px solid var(--gold); border-radius:14px; padding:52px 26px; background:var(--bg-soft); }
-      .book-cover .book-title{ font-family:"Playfair Display",serif; font-size:30px; font-weight:700; line-height:1.25; }
-      .book-cover .book-couple{ font-family:"Playfair Display",serif; font-size:24px; font-weight:700; margin-top:20px; color:var(--brand); line-height:1.35; }
+      .book-cover .book-title{ font-family:"Cormorant Garamond",serif; font-size:34px; font-weight:600; line-height:1.25; }
+      .book-cover .book-couple{ font-family:"Cormorant Garamond",serif; font-size:27px; font-weight:600; margin-top:20px; color:var(--brand); line-height:1.35; }
       .book-cover .book-date{ color:var(--ink-soft); margin-top:6px; font-size:15.5px; }
       .wish-block{ border-bottom:1px solid var(--line); padding:20px 4px; transition:opacity .15s ease; }
       .wish-block.excluded{ opacity:.42; }
@@ -299,7 +355,7 @@
       .qr-name{ font-weight:700; font-size:17px; line-height:1.4; margin-top:2px; word-break:break-word; }
       .qr-box{ display:flex; align-items:center; justify-content:center; margin:16px auto 6px; min-height:168px; }
       .qr-box img{ display:block; }
-      .qr-couple{ font-family:"Playfair Display",serif; font-weight:700; font-size:18px; line-height:1.35; margin-top:8px; }
+      .qr-couple{ font-family:"Cormorant Garamond",serif; font-weight:600; font-size:21px; line-height:1.35; margin-top:8px; }
       .qr-scan{ font-size:13px; color:var(--ink-soft); margin-top:2px; }
       @media (max-width:560px){ .qr-grid{ grid-template-columns:1fr; } }
 
@@ -307,28 +363,34 @@
       @media print{
         @page{ size:A4; margin:12mm; }
         body{ background:#fff; }
-        .no-print,.wa-float,.toast,.overlay,.pv-overlay,.fs-overlay{ display:none !important; }
-        #viewGuestBook,#viewQrCards{ color:#262119; }
+        .no-print,.wa-float,.toast,.overlay,.pv-overlay,.fs-overlay,.site-head{ display:none !important; }
+        #viewGuestBook,#viewQrCards{ color:#1C1A17; }
         #viewGuestBook .wrap,#viewQrCards .wrap{ max-width:none; padding:0; }
         #viewGuestBook .panel,#viewQrCards .panel{ border:none; box-shadow:none; padding:0; margin:0; background:#fff; }
         .book{ margin-top:0; }
         .book-cover{ background:#fff; break-after:page; page-break-after:always; }
         .wish-block{ break-inside:avoid; page-break-inside:avoid; }
         .wish-block.excluded{ display:none !important; }
-        .wish-badge{ background:#f3ead2; color:#262119; }
+        .wish-badge{ background:#F1E7CF; color:#1C1A17; }
         .qr-grid{ grid-template-columns:repeat(2,1fr); margin-top:0; }
         .qr-card{ background:#fff; break-inside:avoid; page-break-inside:avoid; }
       }
 
       /* ---------- Footer / modal / toast ---------- */
-      footer{ border-top:1px solid var(--line); margin-top:64px; padding:36px 0 52px; text-align:center; color:var(--ink-soft); font-size:14.5px; }
+      footer{ border-top:1px solid var(--line); margin-top:76px; padding:44px 0 56px; text-align:center; color:var(--ink-soft); font-size:14.5px; }
+      footer .f-mark{ font-family:"Cormorant Garamond", Georgia, serif; font-size:24px; font-weight:700; letter-spacing:.24em; color:var(--ink); display:inline-flex; align-items:center; gap:10px; }
+      footer .f-mark i{ width:7px; height:7px; background:var(--gold); transform:rotate(45deg); }
+      footer .f-links{ margin-top:16px; display:flex; flex-wrap:wrap; gap:8px 22px; justify-content:center; align-items:center; }
+      footer .f-links a{ color:var(--ink-soft); text-decoration:none; font-weight:500; }
+      @media (hover:hover){ footer .f-links a:hover{ color:var(--brand); } }
+      footer .f-copy{ margin-top:18px; font-size:13.5px; }
       .admin-link{ background:none; border:none; color:var(--ink-soft); text-decoration:underline; min-height:48px; padding:10px 14px; font-size:14px; }
       .overlay{ position:fixed; inset:0; background:rgba(18,14,8,.55); display:none; align-items:flex-end; justify-content:center; z-index:50; padding:0; overflow-y:auto; overscroll-behavior:contain; }
       .overlay.show{ display:flex; }
       .sheet{ background:var(--card); color:var(--ink); width:100%; max-width:480px; border-radius:22px 22px 0 0; padding:28px 26px calc(28px + env(safe-area-inset-bottom)); box-shadow:var(--shadow); max-height:calc(100dvh - 12px); overflow-y:auto; }
       .sheet form{ margin:0; }
       .sheet .msg{ margin:0 0 14px; text-align:left; }
-      .sheet h3{ font-family:"Playfair Display",serif; font-size:24px; margin-bottom:6px; }
+      .sheet h3{ font-family:"Cormorant Garamond",serif; font-size:28px; font-weight:600; margin-bottom:6px; }
       .sheet p{ color:var(--ink-soft); font-size:15px; }
       .sheet input{ width:100%; box-sizing:border-box; min-height:54px; border:1px solid var(--line); border-radius:12px; background:var(--input-bg); padding:12px 16px; margin:18px 0 14px; text-align:center; letter-spacing:.3em; font-weight:800; font-size:20px; }
       .sheet .row{ display:flex; gap:10px; }
@@ -339,7 +401,7 @@
       .pv-overlay{ position:fixed; inset:0; z-index:55; background:rgba(18,14,8,.78); display:none; flex-direction:column; }
       .pv-overlay.show{ display:flex; }
       .pv-bar{ display:flex; align-items:center; gap:12px; background:var(--card); color:var(--ink); border-bottom:1px solid var(--line); padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top)); }
-      .pv-title{ font-family:"Playfair Display",serif; font-weight:700; font-size:18px; line-height:1.3; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .pv-title{ font-family:"Cormorant Garamond",serif; font-weight:600; font-size:21px; line-height:1.3; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       .pv-status{ font-size:12.5px; font-weight:700; color:var(--ok); background:var(--ok-bg); border-radius:999px; padding:5px 12px; white-space:nowrap; }
       .pv-close{ width:48px; height:48px; flex:none; border-radius:12px; border:1px solid var(--line); background:var(--bg-soft); color:var(--ink); font-size:19px; font-weight:700; line-height:1; }
       .pv-dock{ height:48px; flex:none; border-radius:12px; border:1px solid var(--line); background:var(--bg-soft); color:var(--ink); font-size:14px; font-weight:700; padding:0 14px; white-space:nowrap; }
@@ -354,7 +416,7 @@
       .fs-overlay.show{ display:flex; }
       .fs-bar{ flex:none; display:flex; align-items:center; gap:12px; background:var(--card); color:var(--ink); border-bottom:1px solid var(--line); padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top)); }
       .fs-head{ flex:1; min-width:0; }
-      .fs-title{ display:block; font-family:"Playfair Display",serif; font-weight:700; font-size:18px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .fs-title{ display:block; font-family:"Cormorant Garamond",serif; font-weight:600; font-size:21px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       .fs-sub{ display:block; font-size:12px; line-height:1.4; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       .fs-close{ width:48px; height:48px; flex:none; border-radius:12px; border:1px solid var(--line); background:var(--bg-soft); color:var(--ink); font-size:19px; font-weight:700; line-height:1; }
       .fs-body{ flex:1; min-height:0; position:relative; background:#100d08; }
@@ -367,29 +429,42 @@
       .fs-foot .btn{ min-height:48px; }
       @media (max-width:480px){ .fs-foot .btn.demo-open{ display:none; } }
       .pv-loading{ align-self:center; text-align:center; color:#f3ecdc; font-size:15.5px; line-height:1.7; padding:24px; max-width:340px; }
-      input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+      input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 4px var(--gold-soft); }
       [hidden]{ display:none !important; }
+
+      /* ---------- Animasi masuk (halus) ----------
+         Elemen selalu terlihat penuh secara default; saat masuk viewport,
+         kelas .in memicu animasi naik sekali jalan. Tidak ada state
+         tersembunyi yang menetap, jadi konten tidak pernah tertahan. */
+      @keyframes rvRise{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:none; } }
+      .rv-on .rv.in{ animation:rvRise .7s ease both; }
+      @media (prefers-reduced-motion: reduce){
+        html{ scroll-behavior:auto; }
+        .rv-on .rv.in{ animation:none; }
+        *,*::before,*::after{ transition-duration:.01ms !important; }
+      }
 
       @media (max-width:760px){
         .steps{ grid-template-columns:1fr; }
-        .step{ padding:24px 20px 26px; }
+        .step{ padding:26px 20px 28px; }
         .step + .step{ border-left:none; border-top:1px solid var(--line); }
         .form-grid{ grid-template-columns:1fr; }
         .admin-grid{ grid-template-columns:1fr; }
-        .panel{ padding:28px 20px; margin:28px 0; }
+        .panel{ padding:30px 20px; margin:30px 0; }
         .preview-card dl{ grid-template-columns:1fr; gap:1px; }
         .preview-card dd{ margin-bottom:8px; }
-        .hero{ padding:52px 0 34px; }
-        .hero h1{ font-size:33px; }
-        .grid{ gap:26px; }
-        .grid-head{ margin-top:32px; }
+        .hero{ padding:58px 0 42px; }
+        .sec{ padding:52px 0 4px; }
+        .grid{ gap:28px; }
+        .grid-head{ margin-top:34px; }
         .tcard .actions{ gap:8px; }
-        .tcard .actions .btn.primary,.tcard .actions .btn.wa-buy{ min-height:44px; padding:9px 16px; font-size:14.5px; }
-        .tcard .actions .btn.demo{ min-height:44px; font-size:13.5px; }
+        .tcard .actions .btn.primary,.tcard .actions .btn.wa-buy{ padding:10px 16px; font-size:14.5px; }
+        .tcard .actions .btn.demo{ font-size:13.5px; }
         .token-row{ flex-direction:column; }
         .token-row select,.token-row input{ flex:none; width:100%; }
         .token-row .btn{ width:100%; min-height:50px; }
         fieldset{ padding:18px 16px; }
+        footer{ margin-top:56px; }
       }
       @media (min-width:761px){
         .overlay{ align-items:center; padding:20px; }
@@ -401,25 +476,35 @@
 
     <!-- ================= VIEW: KATALOG ================= -->
     <main id="viewCatalog">
+      <header class="site-head">
+        <div class="wrap">
+          <span class="wordmark"><i aria-hidden="true"></i>INVITO</span>
+          <nav class="site-nav" aria-label="Navigasi utama">
+            <a href="#katalog">Katalog</a>
+            <a href="#cara-pesan">Cara Pesan</a>
+            <a href="#faq">FAQ</a>
+            <button type="button" class="nav-admin" id="adminOpenBtnTop">Admin</button>
+          </nav>
+        </div>
+      </header>
+
       <div class="wrap">
         <section class="hero">
-          <div class="rule"><span>Katalog Template</span></div>
-          <h1>Undangan Digital,<br /><em>Sesuai Gaya Kalian</em></h1>
-          <p class="lead">Pilih template, masukkan token, isi data kalian — link undangan langsung siap dibagikan.</p>
-          <ul class="stats">
+          <div class="rule rv"><span>Katalog Template</span></div>
+          <h1 class="rv">Undangan Digital yang<br />Bikin <em>Tamu Terkesan</em></h1>
+          <p class="lead rv">Pilih template, isi data kalian, lalu bagikan link personal ke setiap tamu — semua dari HP.</p>
+          <div class="cta-row rv">
+            <a class="btn primary" href="#katalog">Lihat Katalog</a>
+            <a class="btn ghost" href="#cara-pesan">Cara Pesan</a>
+          </div>
+          <ul class="stats rv">
             <li><b>16</b> template</li>
             <li><b>7</b> Pixel · <b>9</b> Klasik</li>
             <li><b>1 token</b> = 1 undangan</li>
           </ul>
         </section>
 
-        <section class="steps" aria-label="Cara menggunakan">
-          <div class="step"><div class="num">1</div><h3>Pilih Template</h3><p>Ketuk gambar tema untuk melihat landing page-nya fullscreen, lalu pesan lewat tombol Beli via WhatsApp.</p></div>
-          <div class="step"><div class="num">2</div><h3>Masukkan Token</h3><p>Kode token dari admin, satu untuk satu undangan.</p></div>
-          <div class="step"><div class="num">3</div><h3>Edit &amp; Bagikan</h3><p>Isi data, simpan, bagikan linknya.</p></div>
-        </section>
-
-        <div class="toolbar">
+        <div class="toolbar" id="katalog">
           <div class="searchbox">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
             <input id="searchInput" type="search" placeholder="Cari template…" aria-label="Cari template" />
@@ -434,7 +519,7 @@
         <section class="grid" id="templateGrid" aria-label="Daftar template"></section>
         <p class="empty-note" id="emptyNote" hidden>Tidak ada template yang cocok dengan pencarian ini.</p>
 
-        <section class="panel" id="tokenPanel">
+        <section class="panel rv" id="tokenPanel">
           <h2>Sudah Punya Token?</h2>
           <p class="sub">Pilih template, masukkan kode token, lalu klik Buka Editor.</p>
           <div class="token-row">
@@ -444,13 +529,86 @@
           </div>
           <div class="msg err" id="tokenError" role="alert"></div>
         </section>
+
+        <section class="sec" id="cara-pesan" aria-label="Cara pesan">
+          <div class="sec-head rv">
+            <p class="kick">Cara Pesan</p>
+            <h2>Tiga Langkah, Langsung Jadi</h2>
+          </div>
+          <div class="steps rv">
+            <div class="step"><div class="num">1</div><h3>Pilih Template</h3><p>Ketuk gambar tema untuk melihat landing page-nya fullscreen, lalu pesan lewat tombol Beli via WhatsApp.</p></div>
+            <div class="step"><div class="num">2</div><h3>Masukkan Token</h3><p>Kode token dari admin, satu untuk satu undangan.</p></div>
+            <div class="step"><div class="num">3</div><h3>Edit &amp; Bagikan</h3><p>Isi data, simpan, bagikan linknya.</p></div>
+          </div>
+        </section>
+
+        <section class="sec" aria-label="Fitur undangan">
+          <div class="sec-head rv">
+            <p class="kick">Fitur</p>
+            <h2>Lengkap untuk Hari Bahagia</h2>
+          </div>
+          <div class="fitur-grid">
+            <div class="fitur rv">
+              <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
+              <h3>Edit Sendiri, Kapan Saja</h3>
+              <p>Nama, acara, foto, galeri, sampai teks template — diubah langsung dari HP dengan preview realtime.</p>
+            </div>
+            <div class="fitur rv">
+              <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></div>
+              <h3>Link Personal per Tamu</h3>
+              <p>Tiap tamu dapat link dengan namanya sendiri — salin satu-satu atau kirim langsung via WhatsApp.</p>
+            </div>
+            <div class="fitur rv">
+              <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></div>
+              <h3>RSVP via WhatsApp</h3>
+              <p>Konfirmasi kehadiran &amp; ucapan tamu terkirim langsung ke nomor WhatsApp kalian.</p>
+            </div>
+            <div class="fitur rv">
+              <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></div>
+              <h3>Amplop Digital &amp; Musik</h3>
+              <p>Rekening &amp; e-wallet untuk amplop online, plus musik latar pilihan kalian sendiri.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="sec" id="faq" aria-label="Pertanyaan umum">
+          <div class="sec-head rv">
+            <p class="kick">FAQ</p>
+            <h2>Sering Ditanyakan</h2>
+          </div>
+          <div class="faq-list rv">
+            <details class="faq-item">
+              <summary>Bagaimana cara memesan template?</summary>
+              <p class="faq-body">Pilih template yang disuka, klik Beli via WhatsApp, dan admin akan mengirimkan kode token untuk template itu. Masukkan tokennya di panel “Sudah Punya Token?” di atas, lalu isi data undangan kalian di editor.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Apa itu token?</summary>
+              <p class="faq-body">Token adalah kode unik untuk satu undangan. Satu token terikat ke satu template dan menyimpan semua data undangan kalian — jadi link undangannya tetap sama setiap kali data diperbarui.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Berapa kali saya bisa mengubah data?</summary>
+              <p class="faq-body">Sesuai jatah revisi token kalian — sisanya selalu tampil di editor. Melihat preview tidak mengurangi jatah; jatah hanya berkurang saat menekan Simpan.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Bisakah tamu menerima link dengan namanya sendiri?</summary>
+              <p class="faq-body">Bisa. Tulis daftar nama tamu di editor, dan tiap nama otomatis menjadi link personal yang menampilkan nama tamu itu di sampul undangan — siap disalin atau dikirim via WhatsApp.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Bisakah undangan dipasang di domain sendiri?</summary>
+              <p class="faq-body">Bisa. Dari editor, unduh file undangan mandiri (satu file HTML berisi semua data) lalu hosting gratis di Netlify Drop atau Cloudflare Pages — panduan langkahnya ada di editor.</p>
+            </details>
+          </div>
+        </section>
       </div>
 
       <footer>
         <div class="wrap">
-          <p>Katalog Template Undangan Digital</p>
-          <div class="admin-cta"><button type="button" class="btn ghost" id="adminOpenBtn">Panel Admin</button></div>
-          <p style="margin-top:12px; font-size:13.5px;">Panel khusus pemilik usaha.</p>
+          <span class="f-mark"><i aria-hidden="true"></i>INVITO</span>
+          <div class="f-links">
+            <a href="https://wa.me/6288210882762?text=Halo%2C%20saya%20mau%20konsultasi%20dulu%20tentang%20undangan%20digitalnya." target="_blank" rel="noopener">WhatsApp</a>
+            <button type="button" class="admin-link" id="adminOpenBtn" style="min-height:0; padding:0; text-decoration:none; font-weight:500;">Panel Admin</button>
+          </div>
+          <p class="f-copy">© 2026 Invito — Katalog Template Undangan Digital</p>
         </div>
       </footer>
     </main>
@@ -897,6 +1055,53 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script>
+      /* Animasi masuk halus: fade + naik perlahan saat elemen masuk viewport.
+         Kelas rv-on hanya ditambahkan dari sini — tanpa JS, konten tetap tampil. */
+      (function(){
+        var root = document.documentElement;
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var io = null;
+        if (!reduce && "IntersectionObserver" in window) {
+          root.classList.add("rv-on");
+          io = new IntersectionObserver(function(entries){
+            entries.forEach(function(en){
+              if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+            });
+          }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+        }
+        function tag(el, delay){
+          if (!el || el.classList.contains("rv-done")) return;
+          el.classList.add("rv-done");
+          if (!io) return;
+          el.classList.add("rv");
+          if (delay) el.style.animationDelay = delay + "ms";
+          io.observe(el);
+        }
+        var gridSeen = false;
+        window.__rvScan = function(container){
+          if (!container) return;
+          var items = container.querySelectorAll(".tcard, .grid-head");
+          if (gridSeen) {
+            /* Render ulang (ketik pencarian / ganti filter): tampil langsung, tanpa animasi. */
+            Array.prototype.forEach.call(items, function(el){ el.classList.add("rv-done"); });
+            return;
+          }
+          gridSeen = true;
+          Array.prototype.forEach.call(items, function(el, i){ tag(el, Math.min(i * 80, 560)); });
+        };
+        Array.prototype.forEach.call(document.querySelectorAll(".rv"), function(el){ tag(el, 0); });
+        /* Jaring pengaman: apa pun yang belum terlihat (lompatan jangkar,
+           observer lambat) tetap tampil setelah 1,8 detik — konten tidak
+           pernah tertahan tak terlihat. */
+        setTimeout(function(){
+          Array.prototype.forEach.call(document.querySelectorAll(".rv"), function(el){
+            el.classList.add("in");
+            if (io) io.unobserve(el);
+          });
+        }, 1800);
+      })();
+    </script>
+    <script>
       "use strict";
 
       /* ================= DATA TEMPLATE ================= */
@@ -1137,6 +1342,7 @@
           grid.appendChild(card);
         });
         $("emptyNote").hidden = shown !== 0;
+        if (window.__rvScan) window.__rvScan(grid);
       }
       function fillTemplateSelect(sel){
         sel.innerHTML = "";
@@ -3026,6 +3232,7 @@
       }
       function closePinModal(){ $("pinOverlay").classList.remove("show"); }
       $("adminOpenBtn").addEventListener("click", openPinModal);
+      $("adminOpenBtnTop").addEventListener("click", openPinModal);
       $("pinCancelBtn").addEventListener("click", closePinModal);
       $("pinOverlay").addEventListener("click", function(e){
         /* Ketukan di latar hanya menutup modal selagi kolom PIN masih kosong.
