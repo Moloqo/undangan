@@ -328,6 +328,38 @@
     position:absolute; top:16px; right:16px; width:52px; height:52px; border-radius:50%;
     border:1px solid var(--gold); background:transparent; color:var(--gold-pale); font-size:22px; cursor:pointer;
   }
+  /* ============ LOADING SCREEN (infinity emas) ============ */
+  #invLoader{
+    position:fixed; inset:0; z-index:200;
+    background:radial-gradient(120% 70% at 50% 0%, #2b1c0d 0%, var(--night) 58%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:24px; padding:24px; text-align:center;
+    transition:opacity .6s ease;
+  }
+  #invLoader.done{ opacity:0; pointer-events:none; }
+  .inv-loader-mark{
+    width:72px; height:auto; display:block;
+    animation:invPulse 2s ease-in-out infinite;
+  }
+  @media (min-width:640px){ .inv-loader-mark{ width:96px; } }
+  .inv-loader-sheen{
+    stroke-dasharray:36 204;
+    animation:invSheen 2.2s linear infinite;
+  }
+  @keyframes invSheen{ to{ stroke-dashoffset:-240; } }
+  @keyframes invPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+  .inv-loader-text{
+    font-family:"Special Elite", monospace; font-size:12.5px; letter-spacing:.28em;
+    text-transform:uppercase; color:var(--gold-pale); margin:0;
+  }
+  .inv-loader-dots span{ display:inline-block; animation:invDot 1.4s ease-in-out infinite; }
+  .inv-loader-dots span:nth-child(2){ animation-delay:.2s; }
+  .inv-loader-dots span:nth-child(3){ animation-delay:.4s; }
+  @keyframes invDot{ 0%,60%,100%{ opacity:.15; } 30%{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){
+    .inv-loader-mark, .inv-loader-sheen, .inv-loader-dots span{ animation:none; }
+  }
+
   /* Konten selalu terlihat; .in hanya memicu animasi masuk sekali. */
   .reveal{ opacity:1; }
   .reveal.in{ animation:fadeUp .7s ease both; }
@@ -339,6 +371,22 @@
 </style>
 </head>
 <body class="locked">
+
+<!-- ================= LOADING SCREEN ================= -->
+<div id="invLoader" role="status" aria-label="Memuat undangan">
+  <svg class="inv-loader-mark" viewBox="0 0 120 60" fill="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="invGoldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#D4AF37" />
+        <stop offset="50%" stop-color="#F5E6C4" />
+        <stop offset="100%" stop-color="#B98A2F" />
+      </linearGradient>
+    </defs>
+    <path d="M60 30 C60 18 48 12 38 12 C22 12 12 20 12 30 C12 40 22 48 38 48 C48 48 60 42 60 30 C60 18 72 12 82 12 C98 12 108 20 108 30 C108 40 98 48 82 48 C72 48 60 42 60 30 Z" stroke="url(#invGoldGrad)" stroke-width="5" stroke-linecap="round" />
+    <path class="inv-loader-sheen" d="M60 30 C60 18 48 12 38 12 C22 12 12 20 12 30 C12 40 22 48 38 48 C48 48 60 42 60 30 C60 18 72 12 82 12 C98 12 108 20 108 30 C108 40 98 48 82 48 C72 48 60 42 60 30 Z" stroke="#FFF6D8" stroke-width="5" stroke-linecap="round" opacity=".85" />
+  </svg>
+  <p class="inv-loader-text">Memuat undangan<span class="inv-loader-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></p>
+</div>
 
 <!-- ================= COVER ================= -->
 <div id="cover" role="dialog" aria-label="Sampul undangan">
@@ -624,6 +672,35 @@
   function nonEmpty(v){ return v!==null && v!==undefined && String(v).trim()!==""; }
   function isHttp(u){ return typeof u==="string" && /^https?:\/\//i.test(u.trim()); }
   function shortName(full){ var p=String(full||"").trim().split(/\s+/); return p[0]||""; }
+
+  /* ---------- LOADING SCREEN: hilang hanya setelah window load DAN
+     hidrasi token selesai (keduanya ditunggu via Promise.all) ---------- */
+  var loaderEl=$("invLoader");
+  var loaderHidden=false;
+  var resolveHydration=null;
+  var hydrationPromise=new Promise(function(res){ resolveHydration=res; });
+  var loadPromise=new Promise(function(res){
+    if(document.readyState==="complete") res();
+    else window.addEventListener("load",function(){ res(); },{once:true});
+  });
+  function signalHydrationDone(){
+    if(resolveHydration){ var r=resolveHydration; resolveHydration=null; r(); }
+  }
+  function hideLoader(){
+    if(loaderHidden) return; loaderHidden=true;
+    if(!loaderEl) return;
+    loaderEl.classList.add("done");
+    setTimeout(function(){
+      loaderEl.style.display="none";
+      if(loaderEl.parentNode) loaderEl.parentNode.removeChild(loaderEl);
+    },650);
+  }
+  Promise.all([loadPromise,hydrationPromise]).then(function(){
+    /* dua rAF: pastikan cover sudah ter-render sempurna sebelum fade-out */
+    requestAnimationFrame(function(){ requestAnimationFrame(hideLoader); });
+  });
+  /* failsafe: loader tidak boleh mengunci halaman selamanya */
+  setTimeout(function(){ signalHydrationDone(); hideLoader(); },20000);
 
   var toastTimer=null;
   function showToast(msg){
@@ -1228,13 +1305,13 @@
 
   /* ---------- hydrate ---------- */
   (function hydrateGuest(){
-    if(!tokenCode) return;
+    if(!tokenCode){ signalHydrationDone(); return; }
     var statusEl=$("tokenStatus");
     function showStatus(msg){ if(statusEl){ statusEl.textContent=msg; statusEl.classList.add("show"); } }
     function hideStatus(){ if(statusEl){ statusEl.classList.remove("show"); statusEl.textContent=""; } }
     document.addEventListener("DOMContentLoaded",function(){
       try{
-        if(typeof firebase==="undefined"){ showStatus("Koneksi ke server undangan gagal dimuat. Menampilkan contoh undangan."); return; }
+        if(typeof firebase==="undefined"){ showStatus("Koneksi ke server undangan gagal dimuat. Menampilkan contoh undangan."); signalHydrationDone(); return; }
         showStatus("Memuat data undangan…");
         if(!firebase.apps||!firebase.apps.length){
           firebase.initializeApp({
@@ -1250,10 +1327,14 @@
         var loadTimer=setTimeout(function(){
           settled=true;
           showStatus("Gagal memuat data undangan. Periksa koneksi Anda, atau muat ulang halaman.");
+          signalHydrationDone();
         },15000);
         db.collection("tokens").doc(tokenCode).get().then(function(snap){
           if(settled) return;
           settled=true; clearTimeout(loadTimer);
+          /* hidrasi selesai dalam callback ini (applyGuestData sinkron di bawah);
+             resolusi promise terantre sebagai microtask setelah callback tuntas */
+          signalHydrationDone();
           if(!snap.exists){ showStatus("Undangan ini belum diisi oleh mempelai. Menampilkan contoh undangan."); return; }
           var doc=snap.data()||{};
           if(doc.status!=="active"){ showStatus("Undangan ini belum diisi oleh mempelai. Menampilkan contoh undangan."); return; }
@@ -1270,9 +1351,11 @@
             settled=true; clearTimeout(loadTimer);
             showStatus("Gagal memuat data undangan. Periksa koneksi Anda, atau muat ulang halaman.");
           }
+          signalHydrationDone();
         });
       }catch(e){
         showStatus("Koneksi ke server undangan gagal. Menampilkan contoh undangan.");
+        signalHydrationDone();
       }
     });
   })();

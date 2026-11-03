@@ -310,6 +310,29 @@
       .invalid-wrap{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;text-align:center;}
       .invalid-msg{color:var(--muted);font-size:19px;max-width:400px;}
 
+      /* ---------- loading screen infinity emas ---------- */
+      #pageLoader{
+        position:fixed;inset:0;z-index:200;
+        background:radial-gradient(120% 90% at 50% 0%,var(--night-2) 0%,var(--night) 55%,var(--deep) 100%);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+        padding:24px;text-align:center;
+        transition:opacity .6s ease;
+      }
+      #pageLoader.done{opacity:0;pointer-events:none;}
+      .pl-inf{
+        width:clamp(76px,20vw,120px);height:auto;display:block;
+        animation:plPulse 2s ease-in-out infinite;
+        filter:drop-shadow(0 0 14px rgba(212,175,55,.35));
+      }
+      @keyframes plPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+      .pl-sheen{stroke-dasharray:16 84;animation:plSheen 2.2s linear infinite;}
+      @keyframes plSheen{from{stroke-dashoffset:100;}to{stroke-dashoffset:0;}}
+      .pl-text{font-size:15px;font-weight:700;letter-spacing:.14em;color:var(--muted);}
+      .pl-dots span{color:#F5E6C4;animation:plDot 1.4s ease-in-out infinite;}
+      .pl-dots span:nth-child(2){animation-delay:.2s;}
+      .pl-dots span:nth-child(3){animation-delay:.4s;}
+      @keyframes plDot{0%,60%,100%{opacity:.15;}30%{opacity:1;}}
+
       /* ---------- susunan acara (dari token) ---------- */
       .timeline{max-width:460px;margin:0 auto;display:grid;gap:14px;}
       .tl-item{border:1px solid var(--line);background:var(--panel);padding:20px 22px;text-align:center;}
@@ -319,11 +342,28 @@
 
       @media (prefers-reduced-motion: reduce){
         .star,.comet,.rocket-flame,#musicBtn.playing,#guestLoader .spin{animation:none !important;}
+        .pl-inf,.pl-sheen,.pl-dots span{animation:none !important;}
         html{scroll-behavior:auto;}
       }
     </style>
   </head>
   <body class="locked">
+
+    <!-- ================= LOADING SCREEN INFINITY EMAS ================= -->
+    <div id="pageLoader" role="status" aria-label="Memuat undangan">
+      <svg class="pl-inf" viewBox="0 0 100 50" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="plGold" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#D4AF37" />
+            <stop offset="50%" stop-color="#F5E6C4" />
+            <stop offset="100%" stop-color="#B98A2F" />
+          </linearGradient>
+        </defs>
+        <path pathLength="100" d="M50 25C50 17 40 10 32 10C24 10 18 17 18 25C18 33 24 40 32 40C40 40 50 33 50 25C50 17 60 10 68 10C76 10 82 17 82 25C82 33 76 40 68 40C60 40 50 33 50 25Z" stroke="url(#plGold)" stroke-width="5" stroke-linecap="round" />
+        <path class="pl-sheen" pathLength="100" d="M50 25C50 17 40 10 32 10C24 10 18 17 18 25C18 33 24 40 32 40C40 40 50 33 50 25C50 17 60 10 68 10C76 10 82 17 82 25C82 33 76 40 68 40C60 40 50 33 50 25Z" stroke="#FFF6D8" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 5px rgba(245,230,196,.95));" />
+      </svg>
+      <p class="pl-text">Memuat undangan<span class="pl-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></p>
+    </div>
 
     <!-- ================= SAMPUL TERKUNCI ================= -->
     <div id="cover" role="dialog" aria-label="Sampul undangan">
@@ -1439,10 +1479,37 @@
         document.title="Undangan Tidak Valid";
       }
 
+      /* ---------- gerbang loading screen infinity emas ----------
+         Loader hilang (fade-out 600ms lalu di-remove dari DOM) HANYA
+         setelah DUA syarat terpenuhi: (1) window 'load' — semua asset
+         termuat, dan (2) hidrasi data token selesai (atau tidak ada
+         ?t= sama sekali). Pengaman 16 detik agar tamu tidak pernah
+         terkunci di layar loading bila jaringan/SDK bermasalah. */
+      var pageLoader=document.getElementById("pageLoader");
+      var winLoaded=(document.readyState==="complete");
+      var hydrationDone=false;
+      function tryHidePageLoader(){
+        if(!pageLoader || pageLoader.getAttribute("data-done")==="1") return;
+        if(!winLoaded || !hydrationDone) return;
+        pageLoader.setAttribute("data-done","1");
+        pageLoader.classList.add("done");
+        setTimeout(function(){
+          pageLoader.style.display="none";
+          if(pageLoader.parentNode) pageLoader.parentNode.removeChild(pageLoader);
+        },700);
+      }
+      function markHydrationDone(){
+        if(hydrationDone) return;
+        hydrationDone=true;
+        tryHidePageLoader();
+      }
+      window.addEventListener("load",function(){ winLoaded=true; tryHidePageLoader(); });
+      setTimeout(function(){ winLoaded=true; hydrationDone=true; tryHidePageLoader(); },16000);
+
       function loadGuestData(){
         var code="";
         try{ code=(new URLSearchParams(window.location.search).get("t")||"").trim().toUpperCase().replace(/[^A-Z0-9]/g,""); }catch(e){}
-        if(!code) return;
+        if(!code){ markHydrationDone(); return; }
         var loader=document.getElementById("guestLoader");
         if(loader) loader.hidden=false;
         var loadTimer=null;
@@ -1452,8 +1519,8 @@
         }
         /* Fallback 15 detik: apa pun yang terjadi pada jaringan/SDK,
            loader tidak boleh mengunci tamu — data demo tampil apa adanya. */
-        loadTimer=setTimeout(hideLoader, 15000);
-        if(typeof firebase==="undefined"){ hideLoader(); showToast("Data tamu gagal dimuat — menampilkan contoh."); return; }
+        loadTimer=setTimeout(function(){ hideLoader(); markHydrationDone(); }, 15000);
+        if(typeof firebase==="undefined"){ hideLoader(); markHydrationDone(); showToast("Data tamu gagal dimuat — menampilkan contoh."); return; }
         try{
           if(!firebase.apps || !firebase.apps.length){
             firebase.initializeApp({
@@ -1470,11 +1537,12 @@
             if(doc.status!=="active"){ showInvalidLink(); return; }
             if(doc.template && doc.template!=="undangan-pixel-luar-angkasa"){ showInvalidLink(); return; }
             var d=doc.data||{};
-            if(!d || !Object.keys(d).length) return;
+            if(!d || !Object.keys(d).length){ markHydrationDone(); return; }
             applyCustomerData(d);
             if(doc.texts) applyTextOverrides(doc.texts);
-          }).catch(function(){ hideLoader(); showToast("Data tamu gagal dimuat — menampilkan contoh."); });
-        }catch(e){ hideLoader(); showToast("Data tamu gagal dimuat — menampilkan contoh."); }
+            markHydrationDone();
+          }).catch(function(){ hideLoader(); markHydrationDone(); showToast("Data tamu gagal dimuat — menampilkan contoh."); });
+        }catch(e){ hideLoader(); markHydrationDone(); showToast("Data tamu gagal dimuat — menampilkan contoh."); }
       }
       if(document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded", loadGuestData);
