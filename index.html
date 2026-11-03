@@ -712,13 +712,6 @@
             </fieldset>
 
             <fieldset style="margin-top:34px;">
-              <legend>Kisah Cinta</legend>
-              <p class="hint" style="color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin-bottom:6px;">Perjalanan kalian bab demi bab. Boleh dikosongkan.</p>
-              <div class="dynamic-list" id="loveStoryList"></div>
-              <button type="button" class="btn-add" id="addLoveStoryBtn">+ Tambah kisah</button>
-            </fieldset>
-
-            <fieldset style="margin-top:34px;">
               <legend>Foto</legend>
               <div class="form-grid" style="margin-top:6px;">
                 <div class="field">
@@ -1498,12 +1491,6 @@
         }
         return [{ time: "", activity: "", location: "" }];
       }
-      function normalizeLoveStory(d){
-        if (d && Array.isArray(d.loveStory) && d.loveStory.length) {
-          return d.loveStory.map(function(s){ s = s || {}; return { title: s.title || "", year: s.year || "", text: s.text || "" }; });
-        }
-        return [{ title: "", year: "", text: "" }];
-      }
       /* ---------- Musik latar: pilihan customer ---------- */
       var MUSIC_LABELS = {
         "default": "Bawaan Template",
@@ -1822,10 +1809,6 @@
             var actInp = item.querySelector("[data-rd='activity']");
             titleEl.textContent = "Rangkaian " + (idx + 1) + (actInp && actInp.value.trim() ? " — " + actInp.value.trim() : "");
           }
-          if (titleEl && kind === "loveStory") {
-            var tInp = item.querySelector("[data-ls='title']");
-            titleEl.textContent = "Kisah " + (idx + 1) + (tInp && tInp.value.trim() ? " — " + tInp.value.trim() : "");
-          }
         });
       }
       function makeMoveButtons(item, listEl, kind){
@@ -1868,32 +1851,10 @@
         grid.appendChild(makeField("Lokasi (opsional)", locInp, true));
         item.appendChild(grid); return item;
       }
-      function buildLoveStoryItem(s){
-        s = s || {};
-        var listEl = $("loveStoryList");
-        var item = document.createElement("div"); item.className = "dynamic-item";
-        var head = document.createElement("div"); head.className = "dynamic-item-head";
-        var strong = document.createElement("strong"); strong.textContent = "Kisah";
-        head.appendChild(strong); head.appendChild(makeMoveButtons(item, listEl, "loveStory")); item.appendChild(head);
-        var grid = document.createElement("div"); grid.className = "form-grid"; grid.style.marginTop = "0";
-        var titleInp = makeInput("text", s.title, "cth. Awal Bertemu"); titleInp.setAttribute("data-ls", "title");
-        titleInp.addEventListener("input", function(){ refreshOrderedList(listEl, "loveStory"); });
-        var yearInp = makeInput("text", s.year, "cth. 2019"); yearInp.setAttribute("data-ls", "year");
-        var textInp = makeTextarea(s.text, "Ceritakan bab ini dengan kata-kata kalian sendiri…"); textInp.setAttribute("data-ls", "text");
-        grid.appendChild(makeField("Judul Bab", titleInp, false));
-        grid.appendChild(makeField("Tahun", yearInp, false));
-        grid.appendChild(makeField("Cerita", textInp, true));
-        item.appendChild(grid); return item;
-      }
       function renderRundownList(items){
         var list = $("rundownList"); list.innerHTML = "";
         (items && items.length ? items : [{}]).forEach(function(r){ list.appendChild(buildRundownItem(r)); });
         refreshOrderedList(list, "rundown");
-      }
-      function renderLoveStoryList(items){
-        var list = $("loveStoryList"); list.innerHTML = "";
-        (items && items.length ? items : [{}]).forEach(function(s){ list.appendChild(buildLoveStoryItem(s)); });
-        refreshOrderedList(list, "loveStory");
       }
       function collectEvents(){
         var out = [];
@@ -1920,16 +1881,6 @@
           out.push({ time: v("time"), activity: v("activity"), location: v("location") });
         });
         return out.length ? out : [{ time: "", activity: "", location: "" }];
-      }
-      function collectLoveStory(){
-        var listEl = $("loveStoryList");
-        if (!listEl) return [{ title: "", year: "", text: "" }];
-        var out = [];
-        Array.prototype.forEach.call(listEl.querySelectorAll(".dynamic-item"), function(item){
-          function v(k){ var el = item.querySelector("[data-ls='" + k + "']"); return el ? el.value.trim() : ""; }
-          out.push({ title: v("title"), year: v("year"), text: v("text") });
-        });
-        return out.length ? out : [{ title: "", year: "", text: "" }];
       }
       function openEditor(code, slug, data, doc){
         doc = doc || {};
@@ -1964,7 +1915,6 @@
         setVal("fGuests", normalizeGuests(d).join("\n"));
         renderEventsList(normalizeEvents(d));
         renderRundownList(normalizeRundown(d));
-        renderLoveStoryList(normalizeLoveStory(d));
         renderBanksList(normalizeBanks(d));
         var ph = d.photos || {};
         setThumb($("thumbCover"), ph.cover); setThumb($("thumbGroom"), ph.groom); setThumb($("thumbBride"), ph.bride);
@@ -1978,7 +1928,7 @@
         $("exportBox").classList.add("show");
         var allFields = document.querySelectorAll("#editorForm input, #editorForm textarea, #editorForm select");
         Array.prototype.forEach.call(allFields, function(el){ el.disabled = false; });
-        var addBtns = [$("addEventBtn"), $("addBankBtn"), $("addRundownBtn"), $("addLoveStoryBtn")];
+        var addBtns = [$("addEventBtn"), $("addBankBtn"), $("addRundownBtn")];
         addBtns.forEach(function(b){ if (b) b.disabled = false; });
         var sb0 = $("saveBtn"); sb0.disabled = false; sb0.textContent = "Simpan Undangan";
         resetTextsForm();
@@ -2008,7 +1958,6 @@
         d.guests = collectGuests();
         d.events = collectEvents();
         d.rundown = collectRundown();
-        d.loveStory = collectLoveStory();
         d.banks = collectBanks();
         /* Teks Template (Fase 2): hanya override yang berbeda dari teks
            bawaan yang disimpan ke data.texts. Formulir belum termuat
@@ -2086,11 +2035,6 @@
           var val = b.bank ? (b.bank + (b.number ? " · " + b.number : "") + (b.holder ? " · a.n. " + b.holder : "")) : "";
           setPreviewRow(dl, label, val);
         });
-        (d.loveStory || []).forEach(function(s, i){
-          var label = "Kisah " + (i + 1) + (s.title ? " · " + s.title : "") + (s.year ? " (" + s.year + ")" : "");
-          var val = s.text ? (s.text.length > 180 ? s.text.slice(0, 180) + "…" : s.text) : ((s.title || s.year) ? "judul & tahun terisi, cerita belum" : "belum diisi");
-          setPreviewRow(dl, label, val);
-        });
         var infoNow = d.info || { dressCode: "", notes: "", giftAddress: "" };
         var infoDl = $("infoPreviewList"); infoDl.innerHTML = "";
         var infoAny = false;
@@ -2142,14 +2086,6 @@
         var items = $("rundownList").querySelectorAll(".dynamic-item");
         var last = items[items.length - 1];
         if (last) { var inp = last.querySelector("[data-rd='time']"); if (inp) inp.focus(); last.scrollIntoView({ behavior: "smooth", block: "center" }); }
-      });
-      $("addLoveStoryBtn").addEventListener("click", function(){
-        $("loveStoryList").appendChild(buildLoveStoryItem({ title: "", year: "", text: "" }));
-        refreshOrderedList($("loveStoryList"), "loveStory");
-        updatePreview();
-        var items = $("loveStoryList").querySelectorAll(".dynamic-item");
-        var last = items[items.length - 1];
-        if (last) { var inp = last.querySelector("[data-ls='title']"); if (inp) inp.focus(); last.scrollIntoView({ behavior: "smooth", block: "center" }); }
       });
 
       /* ---------- Upload foto ---------- */
@@ -2866,11 +2802,6 @@
           var main = [r.time, r.activity].filter(Boolean).map(function(x){ return escHtml(x); }).join(" · ");
           return '<p style="text-align:left;margin:10px 0">' + (main ? '<strong style="color:#2a241c">' + main + '</strong>' : '') + (r.location ? '<br><span>' + escHtml(r.location) + '</span>' : '') + '</p>';
         }).join("") + '</section>' : "";
-        var loveItems = normalizeLoveStory(d).filter(function(s){ return s.title || s.year || s.text; });
-        var loveHtml = loveItems.length ? '<section class="card"><h2>Kisah Cinta</h2>' + loveItems.map(function(s){
-          var head = [s.title, s.year].filter(Boolean).map(function(x){ return escHtml(x); }).join(" · ");
-          return (head ? '<p class="when" style="margin-top:16px">' + head + '</p>' : '') + (s.text ? '<p style="text-align:left">' + escHtml(s.text) + '</p>' : '');
-        }).join("") + '</section>' : "";
         var coverImg = ph.cover ? '<img class="cover" src="' + escHtml(ph.cover) + '" alt="Foto ' + escHtml(names) + '">' : "";
         var quoteHtml = d.quote ? '<section class="card quote"><p>“' + escHtml(d.quote) + '”</p></section>' : "";
         var fam = normalizeFamily(d);
@@ -2932,7 +2863,7 @@
           '@media (prefers-color-scheme:dark){body{background:#171a17;color:#f0ead9}.card{background:#22261f;border-color:#3d4234}.card p,.cd span,footer{color:#c4bba6}.card .when,.card .venue,.quote p{color:#f0ead9}.cd div{background:#1f2420}}',
           '</style></head><body><main>',
           '<header><p class="theme">Undangan Pernikahan · ' + escHtml(themeName) + '</p>' + coverImg + '<h1>' + escHtml(groom) + '<br>&amp;<br>' + escHtml(bride) + '</h1>' + (firstDate ? '<p class="date">' + escHtml(fmtDate(firstDate)) + '</p>' : '') + '</header>',
-          quoteHtml, famHtml, cdHtml, evHtml, rundownHtml, loveHtml, infoHtml, galHtml, bankHtml, waHtml, musicHtml,
+          quoteHtml, famHtml, cdHtml, evHtml, rundownHtml, infoHtml, galHtml, bankHtml, waHtml, musicHtml,
           '<footer><p>Merupakan suatu kehormatan &amp; kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p><p style="margin-top:12px"><strong>' + escHtml(names) + '</strong></p></footer>',
           '</main>',
           '<script>',
