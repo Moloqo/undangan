@@ -77,6 +77,30 @@
   .btn.ghost{ background:transparent; color:var(--cream); border-color:var(--accent); box-shadow:5px 5px 0 rgba(0,0,0,.45); }
   .btn svg{ width:17px; height:17px; flex:none; }
 
+  /* ---------- LOADING SCREEN ---------- */
+  #loader{
+    position:fixed; inset:0; z-index:200;
+    background:var(--dark); color:var(--cream);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
+    padding:24px; text-align:center;
+    transition:opacity .6s ease;
+  }
+  #loader.done{ opacity:0; pointer-events:none; }
+  .loader-inf{ width:72px; height:auto; animation:loaderPulse 2s ease-in-out infinite; }
+  @media (min-width:640px){ .loader-inf{ width:104px; } }
+  @keyframes loaderPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+  .loader-inf .sheen{ stroke-dasharray:30 130; animation:loaderSheen 1.5s linear infinite; }
+  @keyframes loaderSheen{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:-160; } }
+  .loader-text{ margin:0; font-size:15px; letter-spacing:.05em; color:#CBB493; }
+  .loader-text .dot{ animation:loaderDot 1.4s ease-in-out infinite; }
+  .loader-text .dot:nth-of-type(2){ animation-delay:.18s; }
+  .loader-text .dot:nth-of-type(3){ animation-delay:.36s; }
+  @keyframes loaderDot{ 0%,55%,100%{ opacity:.15; } 30%{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){
+    .loader-inf, .loader-inf .sheen, .loader-text .dot{ animation:none; }
+    .loader-text .dot{ opacity:1; }
+  }
+
   /* ---------- COVER ---------- */
   #cover{
     position:fixed; inset:0; z-index:60; overflow-y:auto;
@@ -341,6 +365,22 @@
 </style>
 </head>
 <body>
+
+<!-- ================= LOADING SCREEN ================= -->
+<div id="loader" role="status" aria-label="Memuat undangan">
+  <svg class="loader-inf" viewBox="0 0 100 56" fill="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="goldGrad" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#D4AF37" />
+        <stop offset=".5" stop-color="#F5E6C4" />
+        <stop offset="1" stop-color="#B98A2F" />
+      </linearGradient>
+    </defs>
+    <path d="M50 28c-7.5-11-16-17-24.5-17C16 11 9 18.6 9 28s7 17 16.5 17C34 45 42.5 39 50 28Zm0 0c7.5 11 16 17 24.5 17C84 45 91 37.4 91 28s-7-17-16.5-17C66 11 57.5 17 50 28Z" stroke="url(#goldGrad)" stroke-width="6" stroke-linecap="round" />
+    <path class="sheen" pathLength="160" d="M50 28c-7.5-11-16-17-24.5-17C16 11 9 18.6 9 28s7 17 16.5 17C34 45 42.5 39 50 28Zm0 0c7.5 11 16 17 24.5 17C84 45 91 37.4 91 28s-7-17-16.5-17C66 11 57.5 17 50 28Z" stroke="#FFF6D8" stroke-width="6" stroke-linecap="round" opacity=".9" />
+  </svg>
+  <p class="loader-text">Memuat undangan<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></p>
+</div>
 
 <!-- ================= COVER ================= -->
 <div id="cover" role="dialog" aria-label="Sampul undangan">
@@ -654,6 +694,28 @@
   var $ = function(s, c){ return (c||document).querySelector(s); };
   var $$ = function(s, c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- LOADING SCREEN ----------
+     Loader hilang HANYA setelah window 'load' (semua aset/gambar termuat)
+     DAN hidrasi data token selesai — keduanya ditunggu lewat Promise di
+     bagian hidrasi. Fade-out 600ms, lalu overlay dibuang dari DOM. */
+  var loaderEl = document.getElementById("loader");
+  var loaderHidden = false;
+  function hideLoader(){
+    if(loaderHidden) return;
+    loaderHidden = true;
+    if(!loaderEl) return;
+    loaderEl.classList.add("done");
+    setTimeout(function(){
+      if(loaderEl && loaderEl.parentNode) loaderEl.parentNode.removeChild(loaderEl);
+    }, 700);
+  }
+  var windowLoaded = new Promise(function(res){
+    if(document.readyState === "complete") res();
+    else window.addEventListener("load", function(){ res(); });
+  });
+  /* pengaman terakhir: loader tidak boleh menutup halaman selamanya */
+  setTimeout(hideLoader, 25000);
 
   /* ---------- toast ---------- */
   var toastTimer;
@@ -1324,11 +1386,20 @@
       '</main>';
   }
 
+  /* Janji penyelesaian hidrasi — diresolusi di SEMUA jalur keluar
+     startHydration (tanpa token, sukses, token invalid, gagal jaringan,
+     SDK absen, fallback 15 detik), supaya loader tahu hidrasi beres. */
+  var resolveHydration = null;
+  var hydrationSettled = new Promise(function(res){ resolveHydration = res; });
+  function finishHydration(){
+    if(resolveHydration){ var r = resolveHydration; resolveHydration = null; r(); }
+  }
+
   function startHydration(){
     var tokenParam = (params.get("t") || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-    if(!tokenParam) return; /* tanpa ?t= : demo persis seperti sekarang */
+    if(!tokenParam){ finishHydration(); return; } /* tanpa ?t= : demo persis seperti sekarang */
     try {
-      if(typeof firebase === "undefined") return; /* SDK gagal dimuat: biarkan demo */
+      if(typeof firebase === "undefined"){ finishHydration(); return; } /* SDK gagal dimuat: biarkan demo */
       if(!firebase.apps.length){
         firebase.initializeApp({
           apiKey: "AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
@@ -1344,28 +1415,40 @@
       /* fallback 15 detik: bila Firestore tak menjawab, demo dibiarkan utuh
          dan hasil yang datang terlambat diabaikan */
       var settled = false;
-      var timer = setTimeout(function(){ settled = true; }, 15000);
+      var timer = setTimeout(function(){ settled = true; finishHydration(); }, 15000);
       db.collection("tokens").doc(tokenParam).get().then(function(snap){
         if(settled) return;
         settled = true; clearTimeout(timer);
-        if(!snap.exists){ showInvalidPage(); return; }
+        if(!snap.exists){ showInvalidPage(); finishHydration(); return; }
         var doc = snap.data() || {};
-        if(doc.status !== "active"){ showInvalidPage(); return; }
-        if(doc.template && doc.template !== TEMPLATE_SLUG){ showInvalidPage(); return; }
+        if(doc.status !== "active"){ showInvalidPage(); finishHydration(); return; }
+        if(doc.template && doc.template !== TEMPLATE_SLUG){ showInvalidPage(); finishHydration(); return; }
         applyCustomerData(doc.data || {});
         /* texts juga diterima di level dokumen token (di luar field data) */
         applyTextOverrides(doc.texts);
+        finishHydration();
       }).catch(function(){
         /* gagal jaringan: biarkan tampilan demo, jangan kosongkan halaman */
-        settled = true; clearTimeout(timer);
+        settled = true; clearTimeout(timer); finishHydration();
       });
-    } catch(e) { /* SDK bermasalah: biarkan tampilan demo apa adanya */ }
+    } catch(e) { finishHydration(); /* SDK bermasalah: biarkan tampilan demo apa adanya */ }
   }
   if(document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", startHydration);
   } else {
     startHydration();
   }
+
+  /* ---------- LOADER: fade-out setelah aset termuat + hidrasi selesai ----------
+     Dua frame render ditunggu dulu agar cover benar-benar sudah tampil
+     sempurna di balik loader sebelum fade-out dimulai. */
+  Promise.all([windowLoaded, hydrationSettled]).then(function(){
+    if(window.requestAnimationFrame){
+      requestAnimationFrame(function(){ requestAnimationFrame(hideLoader); });
+    } else {
+      hideLoader();
+    }
+  });
 
   /* ---------- reveal on scroll ---------- */
   if("IntersectionObserver" in window){

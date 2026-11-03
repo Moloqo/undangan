@@ -125,6 +125,48 @@ h2{
 }
 #toast.show{ opacity:1; transform:translate(-50%,0); }
 
+/* ---------- LOADING SCREEN (infinity emas) ---------- */
+#pageLoader{
+  position:fixed; inset:0; z-index:1000;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;
+  background:radial-gradient(120% 90% at 50% 38%, #181129 0%, var(--bg) 62%);
+  opacity:1; transition:opacity .6s ease;
+}
+#pageLoader.ld-done{ opacity:0; pointer-events:none; }
+#pageLoader .ld-glow{
+  position:absolute; left:50%; top:44%; transform:translate(-50%,-50%);
+  width:min(78vw,340px); height:min(78vw,340px); border-radius:50%;
+  background:radial-gradient(circle,rgba(240,196,96,.20) 0%,rgba(201,140,50,.07) 45%,transparent 68%);
+  pointer-events:none;
+}
+#pageLoader .ld-svg{
+  width:clamp(144px,42vw,196px); height:auto; position:relative;
+  filter:drop-shadow(0 0 18px rgba(233,180,76,.45));
+  animation:ldPulse 2s ease-in-out infinite;
+}
+@keyframes ldPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+#pageLoader .ld-track{ fill:none; stroke:rgba(201,162,75,.18); stroke-width:5; stroke-linecap:round; }
+#pageLoader .ld-base{ fill:none; stroke:url(#ldGold); stroke-width:5; stroke-linecap:round; }
+#pageLoader .ld-sheen{
+  fill:none; stroke:#fff3cf; stroke-width:5; stroke-linecap:round;
+  stroke-dasharray:16 84; opacity:.95;
+  animation:ldSheen 2.2s linear infinite;
+}
+@keyframes ldSheen{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:-100; } }
+#pageLoader .ld-text{
+  font-family:var(--sans); font-size:14.5px; font-weight:500; letter-spacing:.18em;
+  color:var(--cream-dim); margin:0; position:relative;
+}
+#pageLoader .ld-dots span{ animation:ldBlink 1.2s ease-in-out infinite; }
+#pageLoader .ld-dots span:nth-child(2){ animation-delay:.2s; }
+#pageLoader .ld-dots span:nth-child(3){ animation-delay:.4s; }
+@keyframes ldBlink{ 0%,60%,100%{ opacity:.15; } 30%{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){
+  #pageLoader .ld-svg{ animation:none; }
+  #pageLoader .ld-sheen{ animation:none; opacity:0; }
+  #pageLoader .ld-dots span{ animation:none; opacity:.7; }
+}
+
 /* ---------- tombol musik ---------- */
 #musicBtn{
   position:fixed; right:18px; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:120;
@@ -372,6 +414,54 @@ footer .demo-note{ max-width:36em; margin:14px auto 0; font-size:16.5px; line-he
 </style>
 </head>
 <body class="locked">
+
+<!-- ================= LOADING SCREEN ================= -->
+<div id="pageLoader" role="status" aria-label="Memuat undangan">
+  <div class="ld-glow" aria-hidden="true"></div>
+  <svg class="ld-svg" viewBox="0 0 120 60" aria-hidden="true">
+    <defs>
+      <linearGradient id="ldGold" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#D4AF37"/>
+        <stop offset=".5" stop-color="#F5E6C4"/>
+        <stop offset="1" stop-color="#B98A2F"/>
+      </linearGradient>
+    </defs>
+    <path class="ld-track" pathLength="100" d="M60 30 C60 20 70 12 82 12 C98 12 108 20 108 30 C108 40 98 48 82 48 C70 48 60 40 60 30 C60 20 50 12 38 12 C22 12 12 20 12 30 C12 40 22 48 38 48 C50 48 60 40 60 30 Z"/>
+    <path class="ld-base" pathLength="100" d="M60 30 C60 20 70 12 82 12 C98 12 108 20 108 30 C108 40 98 48 82 48 C70 48 60 40 60 30 C60 20 50 12 38 12 C22 12 12 20 12 30 C12 40 22 48 38 48 C50 48 60 40 60 30 Z"/>
+    <path class="ld-sheen" pathLength="100" d="M60 30 C60 20 70 12 82 12 C98 12 108 20 108 30 C108 40 98 48 82 48 C70 48 60 40 60 30 C60 20 50 12 38 12 C22 12 12 20 12 30 C12 40 22 48 38 48 C50 48 60 40 60 30 Z"/>
+  </svg>
+  <p class="ld-text">Memuat undangan<span class="ld-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></p>
+</div>
+<script>
+/* Kontrol loading screen: hilang (fade-out 600ms lalu remove dari DOM)
+   HANYA setelah window 'load' DAN hidrasi token ?t= selesai.
+   Tanpa ?t=, hidrasi dianggap selesai sejak awal.
+   window.__markHydrated dipanggil skrip hidrasi saat datanya settle. */
+(function(){
+  'use strict';
+  var loader = document.getElementById('pageLoader');
+  var hasToken = false;
+  try { hasToken = !!new URLSearchParams(window.location.search).get('t'); } catch(e){}
+  var state = { loaded: document.readyState === 'complete', hydrated: !hasToken, start: Date.now(), hidden: false };
+  window.__markHydrated = function(){ state.hydrated = true; tryHide(); };
+  function tryHide(){
+    if(state.hidden || !state.loaded || !state.hydrated || !loader) return;
+    state.hidden = true;
+    var wait = Math.max(0, 700 - (Date.now() - state.start));
+    setTimeout(function(){
+      loader.classList.add('ld-done');
+      setTimeout(function(){
+        loader.style.display = 'none';
+        if(loader.parentNode) loader.parentNode.removeChild(loader);
+      }, 650);
+    }, wait);
+  }
+  if(state.loaded) tryHide();
+  else window.addEventListener('load', function(){ state.loaded = true; tryHide(); });
+  /* jaring pengaman: loader tidak boleh mengunci halaman selamanya */
+  setTimeout(function(){ state.loaded = true; state.hydrated = true; tryHide(); }, 20000);
+})();
+</script>
 
 <!-- simbol gunungan kayon (dipakai ulang via <use>) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1043,7 +1133,7 @@ footer .demo-note{ max-width:36em; margin:14px auto 0; font-size:16.5px; line-he
     statusEl.className = isError ? 'error' : '';
     statusEl.hidden = false;
   }
-  function hideStatus(){ if(statusEl) statusEl.hidden = true; }
+  function hideStatus(){ if(statusEl) statusEl.hidden = true; if(window.__markHydrated) window.__markHydrated(); }
 
   function localToast(msg){
     var t = document.getElementById('toast');
@@ -1600,7 +1690,7 @@ footer .demo-note{ max-width:36em; margin:14px auto 0; font-size:16.5px; line-he
   }
 
   /* ---------- ambil data dari Firestore ---------- */
-  function failDemo(){ showStatus('Gagal memuat data undangan. Menampilkan contoh undangan.', true); }
+  function failDemo(){ showStatus('Gagal memuat data undangan. Menampilkan contoh undangan.', true); if(window.__markHydrated) window.__markHydrated(); }
 
   document.addEventListener('DOMContentLoaded', function(){
     try {
