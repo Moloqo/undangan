@@ -395,6 +395,31 @@ footer .demo-badge{color:var(--accent-soft);border-color:rgba(207,227,210,.4);ba
 .gl-spin i:nth-child(2){animation-delay:.15s;background:var(--pink);}
 .gl-spin i:nth-child(3){animation-delay:.3s;background:var(--ink);}
 @keyframes glBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* ---------- page loader: infinity emas ---------- */
+#pageLoader{
+  position:fixed;inset:0;z-index:1000;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  opacity:1;transition:opacity .6s ease;
+}
+#pageLoader.pl-done{opacity:0;pointer-events:none;}
+.pl-box{text-align:center;}
+.pl-inf{
+  width:72px;height:36px;display:block;margin:0 auto;
+  animation:plPulse 2s ease-in-out infinite;
+}
+@media (min-width:640px){.pl-inf{width:104px;height:52px;}}
+.pl-inf .pl-sheen{stroke-dasharray:34 166;animation:plSheen 1.5s linear infinite;}
+@keyframes plSheen{to{stroke-dashoffset:-200;}}
+@keyframes plPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+.pl-text{
+  margin:20px 0 0;font-size:14px;font-weight:600;letter-spacing:.14em;
+  color:var(--ink-soft);
+}
+.pl-dots i{font-style:normal;opacity:.15;animation:plBlink 1.2s ease-in-out infinite;}
+.pl-dots i:nth-child(2){animation-delay:.2s;}
+.pl-dots i:nth-child(3){animation-delay:.4s;}
+@keyframes plBlink{0%,100%{opacity:.15;}50%{opacity:1;}}
 .invalid-invite{
   min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;
   text-align:center;padding:32px 24px;background:var(--bg);color:var(--ink);
@@ -412,6 +437,56 @@ footer .demo-badge{color:var(--accent-soft);border-color:rgba(207,227,210,.4);ba
 </style>
 </head>
 <body class="locked">
+
+<!-- ================= LOADING SCREEN: INFINITY EMAS ================= -->
+<div id="pageLoader" role="alertdialog" aria-modal="true" aria-label="Memuat undangan">
+  <div class="pl-box">
+    <svg class="pl-inf" viewBox="0 0 100 50" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="plGoldGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#D4AF37"/>
+          <stop offset=".5" stop-color="#F5E6C4"/>
+          <stop offset="1" stop-color="#B98A2F"/>
+        </linearGradient>
+      </defs>
+      <path d="M50 25C42 10 26 6 17 13C8 20 8 30 17 37C26 44 42 40 50 25C58 10 74 6 83 13C92 20 92 30 83 37C74 44 58 40 50 25" fill="none" stroke="url(#plGoldGrad)" stroke-width="6.5" stroke-linecap="round" pathLength="200"/>
+      <path class="pl-sheen" d="M50 25C42 10 26 6 17 13C8 20 8 30 17 37C26 44 42 40 50 25C58 10 74 6 83 13C92 20 92 30 83 37C74 44 58 40 50 25" fill="none" stroke="#FFF6D8" stroke-width="3" stroke-linecap="round" pathLength="200"/>
+    </svg>
+    <p class="pl-text">Memuat undangan<span class="pl-dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  /* Gerbang kesiapan loading screen: loader hanya memudar setelah
+     (1) window 'load' — semua asset/gambar termuat,
+     (2) hidrasi data token selesai (bila ada ?t=) — disinyalkan skrip token,
+     (3) inisialisasi JS utama selesai — disinyalkan skrip utama / DOMContentLoaded. */
+  var loader = document.getElementById("pageLoader");
+  if (!loader) return;
+  var winLoaded = false, tokenDone = false, initDone = false, hidden = false;
+  var hasToken = false;
+  try { hasToken = !!((new URLSearchParams(location.search).get("t") || "").trim()); } catch(e){ hasToken = false; }
+  if (!hasToken) tokenDone = true; /* mode demo/template: tidak ada hidrasi */
+  function tryHide(){
+    if (hidden || !winLoaded || !tokenDone || !initDone) return;
+    hidden = true;
+    loader.classList.add("pl-done");
+    setTimeout(function(){
+      loader.style.display = "none";
+      if (loader.parentNode) loader.parentNode.removeChild(loader);
+    }, 650);
+  }
+  window.__plSignalTokenDone = function(){ tokenDone = true; tryHide(); };
+  window.__plSignalInitDone = function(){ initDone = true; tryHide(); };
+  if (document.readyState === "complete") winLoaded = true;
+  else window.addEventListener("load", function(){ winLoaded = true; tryHide(); });
+  document.addEventListener("DOMContentLoaded", function(){ initDone = true; tryHide(); });
+  /* Jaring pengaman: apa pun yang terjadi, loader tidak mengunci halaman. */
+  setTimeout(function(){ winLoaded = true; tokenDone = true; initDone = true; tryHide(); }, 15000);
+  tryHide();
+})();
+</script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -1318,6 +1393,9 @@ footer .demo-badge{color:var(--accent-soft);border-color:rgba(207,227,210,.4);ba
     var first = wall.querySelector('.wish');
     if (first && first.scrollIntoView) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
+
+  /* Beri tahu loading screen: inisialisasi JS utama selesai. */
+  if (typeof window.__plSignalInitDone === "function") window.__plSignalInitDone();
 })();
 </script>
 
@@ -1339,6 +1417,8 @@ footer .demo-badge{color:var(--accent-soft);border-color:rgba(207,227,210,.4);ba
     function hideLoader(){
       if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
       if (loader) loader.hidden = true;
+      /* Beri tahu loading screen infinity: hidrasi token selesai. */
+      if (typeof window.__plSignalTokenDone === "function") window.__plSignalTokenDone();
     }
     /* Fallback 15 detik: apa pun yang terjadi pada jaringan/SDK,
        loader tidak boleh mengunci tamu — data demo tampil apa adanya. */

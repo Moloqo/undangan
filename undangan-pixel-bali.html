@@ -382,20 +382,35 @@ footer .demo-badge{color:var(--accent-soft);border-color:rgba(233,220,192,.4);ba
 }
 .powered-row a svg{width:20px;height:20px;}
 
-/* ---------- guest loader ---------- */
+/* ---------- loading screen — infinity emas ---------- */
 #guestLoader{
-  position:fixed;inset:0;z-index:200;background:var(--bg);
+  position:fixed;inset:0;z-index:1000;background:#171410;
   display:flex;align-items:center;justify-content:center;padding:24px;
+  opacity:1;transition:opacity .6s ease;
 }
-#guestLoader[hidden]{display:none !important;}
-.gl-box{text-align:center;max-width:400px;width:100%;color:var(--ink);}
-.gl-title{font-family:"Press Start 2P",monospace;font-size:17px;line-height:1.8;color:var(--ink);margin:16px 0 6px;}
-.gl-msg{color:var(--ink-soft);font-size:16px;line-height:1.75;margin:10px 0 0;}
-.gl-spin{display:flex;gap:8px;justify-content:center;margin:20px 0 4px;}
-.gl-spin i{width:11px;height:11px;background:var(--accent);animation:glBounce .9s ease-in-out infinite;}
-.gl-spin i:nth-child(2){animation-delay:.15s;background:var(--pink);}
-.gl-spin i:nth-child(3){animation-delay:.3s;background:var(--ink);}
-@keyframes glBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+#guestLoader.fading{opacity:0;pointer-events:none;}
+.gl-box{text-align:center;max-width:400px;width:100%;}
+.inf-wrap{
+  display:inline-block;
+  animation:infPulse 2s ease-in-out infinite;
+  filter:drop-shadow(0 0 14px rgba(212,175,55,.4));
+}
+.inf-svg{display:block;width:clamp(120px,34vw,168px);height:auto;}
+.inf-base{fill:none;stroke:url(#goldGrad);stroke-width:6.5;stroke-linecap:round;stroke-linejoin:round;}
+.inf-sheen{
+  fill:none;stroke:#FFF6D8;stroke-width:6.5;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:16 84;
+  animation:infSheen 2.2s linear infinite;
+}
+@keyframes infSheen{from{stroke-dashoffset:100;}to{stroke-dashoffset:0;}}
+@keyframes infPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+.gl-load-text{
+  margin:26px 0 0;color:#E9DCC0;font-size:15px;font-weight:500;letter-spacing:.14em;
+}
+.gl-load-text .dots i{font-style:normal;opacity:0;animation:glDot 1.4s ease-in-out infinite;}
+.gl-load-text .dots i:nth-child(2){animation-delay:.25s;}
+.gl-load-text .dots i:nth-child(3){animation-delay:.5s;}
+@keyframes glDot{0%,60%,100%{opacity:0;}30%{opacity:1;}}
 .invalid-invite{
   min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;
   text-align:center;padding:32px 24px;background:var(--bg);color:var(--ink);
@@ -539,13 +554,23 @@ footer .demo-badge{color:var(--accent-soft);border-color:rgba(233,220,192,.4);ba
 
 <button id="musicBtn" type="button" aria-label="Musik" aria-pressed="false" style="display:none;">♪</button>
 
-<!-- ================= MEMUAT DATA TAMU ================= -->
-<div id="guestLoader" hidden role="alertdialog" aria-modal="true" aria-label="Memuat undangan">
+<!-- ================= LOADING SCREEN — INFINITY EMAS ================= -->
+<div id="guestLoader" role="alertdialog" aria-modal="true" aria-label="Memuat undangan">
   <div class="gl-box">
-    <svg class="barong-ico" viewBox="0 0 56 48" aria-hidden="true" style="margin:0 auto;"><use href="#orn-barong"/></svg>
-    <p class="gl-title">MEMUAT<br />UNDANGAN…</p>
-    <div class="gl-spin" id="guestSpin" aria-hidden="true"><i></i><i></i><i></i></div>
-    <p class="gl-msg" id="guestLoadMsg">Sebentar ya, kami sedang menyiapkan undangan untuk Anda.</p>
+    <div class="inf-wrap" aria-hidden="true">
+      <svg class="inf-svg" viewBox="0 0 100 60" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="goldGrad" x1="0" y1="0" x2="100" y2="60" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#D4AF37" />
+            <stop offset=".5" stop-color="#F5E6C4" />
+            <stop offset="1" stop-color="#B98A2F" />
+          </linearGradient>
+        </defs>
+        <path class="inf-base" pathLength="100" d="M50 30 C50 18 62 10 74 10 C88 10 94 20 94 30 C94 40 88 50 74 50 C62 50 50 42 50 30 C50 18 38 10 26 10 C12 10 6 20 6 30 C6 40 12 50 26 50 C38 50 50 42 50 30 Z" />
+        <path class="inf-sheen" pathLength="100" d="M50 30 C50 18 62 10 74 10 C88 10 94 20 94 30 C94 40 88 50 74 50 C62 50 50 42 50 30 C50 18 38 10 26 10 C12 10 6 20 6 30 C6 40 12 50 26 50 C38 50 50 42 50 30 Z" />
+      </svg>
+    </div>
+    <p class="gl-load-text">Memuat undangan<span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
   </div>
 </div>
 
@@ -1324,25 +1349,45 @@ footer .demo-badge{color:var(--accent-soft);border-color:rgba(233,220,192,.4);ba
 (function(){
   "use strict";
 
+  /* ---------- gerbang loading screen ----------
+     Loader infinity emas tampil sejak halaman dibuka. Ia baru fade-out
+     (600ms, lalu dihapus dari DOM) SETELAH dua-duanya terpenuhi:
+     (1) window 'load' — semua asset/gambar awal termuat, dan
+     (2) hidrasi data selesai — mode demo langsung siap; mode token
+     menunggu fetch Firestore beres (sukses/gagal/SDK absen). */
+  var loaderEl = document.getElementById("guestLoader");
+  var winLoaded = false, dataReady = false, loaderGone = false;
+  function dismissLoader(){
+    if (loaderGone || !loaderEl) { loaderGone = true; return; }
+    loaderGone = true;
+    loaderEl.classList.add("fading");
+    setTimeout(function(){
+      if (loaderEl && loaderEl.parentNode) loaderEl.parentNode.removeChild(loaderEl);
+    }, 650);
+  }
+  function maybeDismissLoader(){
+    if (winLoaded && dataReady) dismissLoader();
+  }
+  function markDataReady(){
+    dataReady = true;
+    maybeDismissLoader();
+  }
+  if (document.readyState === "complete") { winLoaded = true; }
+  else window.addEventListener("load", function(){ winLoaded = true; maybeDismissLoader(); });
+  /* Fallback 15 detik: apa pun yang terjadi pada jaringan/SDK,
+     loader tidak boleh mengunci tamu — undangan tampil apa adanya. */
+  setTimeout(function(){ winLoaded = true; dataReady = true; maybeDismissLoader(); }, 15000);
+
   function boot(){
     var code = "";
     try { code = (new URLSearchParams(location.search).get("t") || "").trim().toUpperCase(); } catch(e){ code = ""; }
-    if (!code) return; /* tanpa ?t= → demo persis seperti sekarang */
+    if (!code) { markDataReady(); return; } /* tanpa ?t= → demo, hidrasi selesai */
 
-    var loader = document.getElementById("guestLoader");
-    if (loader) loader.hidden = false;
-
-    var loadTimer = null;
-    function hideLoader(){
-      if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
-      if (loader) loader.hidden = true;
-    }
-    /* Fallback 15 detik: apa pun yang terjadi pada jaringan/SDK,
-       loader tidak boleh mengunci tamu — data demo tampil apa adanya. */
-    loadTimer = setTimeout(hideLoader, 15000);
+    function hideLoader(){ markDataReady(); }
 
     function showInvalid(){
-      hideLoader();
+      if (loaderEl && loaderEl.parentNode) loaderEl.parentNode.removeChild(loaderEl);
+      loaderGone = true;
       document.body.innerHTML = "";
       document.body.classList.remove("locked");
       document.documentElement.classList.remove("locked");

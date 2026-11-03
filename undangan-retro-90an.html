@@ -323,15 +323,108 @@
         font-size:26px; line-height:1; cursor:pointer; box-shadow:var(--shadow-sm);
       }
 
+      /* ---------- loading screen: infinity emas ---------- */
+      #appLoader{
+        position:fixed; inset:0; z-index:9999;
+        background:var(--paper);
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+        padding:24px; text-align:center;
+        opacity:1; transition:opacity .6s ease;
+      }
+      #appLoader.done{ opacity:0; pointer-events:none; }
+      #appLoader .inf-wrap{
+        width:clamp(72px,20vw,110px); line-height:0;
+        animation:infPulse 2s ease-in-out infinite;
+      }
+      #appLoader .inf-wrap svg{ width:100%; height:auto; display:block; overflow:visible; }
+      #appLoader .inf-sheen{ animation:infSheen 2.4s linear infinite; }
+      @keyframes infPulse{
+        0%,100%{ transform:scale(1); }
+        50%{ transform:scale(1.06); }
+      }
+      @keyframes infSheen{
+        from{ stroke-dashoffset:0; }
+        to{ stroke-dashoffset:-200; }
+      }
+      #appLoader .loader-text{
+        margin:0; font-family:"Share Tech Mono",monospace; font-size:14px;
+        letter-spacing:.14em; color:var(--ink-soft);
+      }
+      #appLoader .ld-dot{ animation:ldBlink 1.2s ease-in-out infinite; }
+      #appLoader .ld-dot.d2{ animation-delay:.2s; }
+      #appLoader .ld-dot.d3{ animation-delay:.4s; }
+      @keyframes ldBlink{
+        0%,100%{ opacity:.15; }
+        50%{ opacity:1; }
+      }
+
       @media (prefers-reduced-motion: reduce){
         html{ scroll-behavior:auto; }
         .ticker-track{ animation:none; }
         #musicBtn.playing{ animation:none; }
         #cover{ transition:none; }
+        #appLoader{ transition:none; }
+        #appLoader .inf-wrap{ animation:none; }
+        #appLoader .inf-sheen{ animation-duration:7s; }
+        #appLoader .ld-dot{ animation:none; opacity:.7; }
       }
     </style>
   </head>
   <body>
+
+    <!-- ================= LOADING SCREEN ================= -->
+    <div id="appLoader" role="status" aria-label="Memuat undangan">
+      <div class="inf-wrap" aria-hidden="true">
+        <svg viewBox="0 0 120 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGradient" x1="0" y1="0" x2="120" y2="72" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#D4AF37" />
+              <stop offset=".5" stop-color="#F5E6C4" />
+              <stop offset="1" stop-color="#B98A2F" />
+            </linearGradient>
+          </defs>
+          <path d="M60 36 C66 18 84 12 94 20 C106 29 106 43 94 52 C84 60 66 54 60 36 C54 18 36 12 26 20 C14 29 14 43 26 52 C36 60 54 54 60 36 Z"
+            pathLength="200" stroke="#D4AF37" stroke-opacity=".35" stroke-width="11" stroke-linecap="round" />
+          <path d="M60 36 C66 18 84 12 94 20 C106 29 106 43 94 52 C84 60 66 54 60 36 C54 18 36 12 26 20 C14 29 14 43 26 52 C36 60 54 54 60 36 Z"
+            pathLength="200" stroke="url(#goldGradient)" stroke-width="6" stroke-linecap="round" />
+          <path class="inf-sheen" d="M60 36 C66 18 84 12 94 20 C106 29 106 43 94 52 C84 60 66 54 60 36 C54 18 36 12 26 20 C14 29 14 43 26 52 C36 60 54 54 60 36 Z"
+            pathLength="200" stroke="#FFF6D8" stroke-width="6" stroke-linecap="round" stroke-dasharray="26 174" />
+        </svg>
+      </div>
+      <p class="loader-text">Memuat undangan<span class="ld-dot d1">.</span><span class="ld-dot d2">.</span><span class="ld-dot d3">.</span></p>
+    </div>
+    <script>
+      /* Loading screen: hilang HANYA setelah window 'load' DAN hidrasi token
+         (?t=) selesai — keduanya ditunggu. Fungsi window.__invitoReady()
+         dipanggil script utama saat hidrasi Firestore beres/gagal/timeout. */
+      (function () {
+        var loader = document.getElementById("appLoader");
+        if (!loader) return;
+        var loadDone = false, hydDone = false, hidden = false;
+        var needsHyd = false;
+        try {
+          var tParam = new URLSearchParams(window.location.search).get("t");
+          needsHyd = !!(tParam && tParam.trim().toUpperCase().replace(/[^A-Z0-9]/g, ""));
+        } catch (e) {}
+        if (!needsHyd) hydDone = true;
+        function hideLoader() {
+          if (hidden) return;
+          hidden = true;
+          loader.classList.add("done");
+          setTimeout(function () {
+            if (loader.parentNode) loader.parentNode.removeChild(loader);
+          }, 700);
+        }
+        function maybeHide() {
+          if (loadDone && hydDone) hideLoader();
+        }
+        window.__invitoReady = function () { hydDone = true; maybeHide(); };
+        if (document.readyState === "complete") { loadDone = true; maybeHide(); }
+        else window.addEventListener("load", function () { loadDone = true; maybeHide(); });
+        /* Pengaman terakhir: jangan pernah mengunci tamu di layar loading. */
+        setTimeout(function () { loadDone = true; hydDone = true; maybeHide(); }, 20000);
+      })();
+    </script>
 
     <!-- ================= COVER ================= -->
     <div id="cover" role="dialog" aria-label="Sampul undangan">
@@ -1468,6 +1561,13 @@
           } catch (e) {}
         }
 
+        /* ----- beri tahu loading screen bahwa hidrasi sudah selesai ----- */
+        function notifyLoaderReady() {
+          if (typeof window.__invitoReady === "function") {
+            try { window.__invitoReady(); } catch (e) {}
+          }
+        }
+
         /* ----- bootstrap Firestore dengan fallback 15 detik ----- */
         if (TOKEN_CODE) {
           var hydrationStarted = false;
@@ -1492,11 +1592,13 @@
                 settled = true;
                 /* Timeout: biarkan tampilan demo apa adanya. */
                 setLiveStatus("");
+                notifyLoaderReady();
               }, 15000);
               db.collection("tokens").doc(TOKEN_CODE).get().then(function (snap) {
                 if (settled) return;
                 settled = true;
                 clearTimeout(loadTimer);
+                notifyLoaderReady();
                 if (!snap.exists) { setLiveStatus(""); return; }
                 var doc = snap.data() || {};
                 if (doc.status !== "active") { setLiveStatus(""); return; }
@@ -1506,9 +1608,11 @@
                 if (!settled) { settled = true; clearTimeout(loadTimer); }
                 /* Gagal jaringan/SDK: biarkan tampilan demo apa adanya. */
                 setLiveStatus("");
+                notifyLoaderReady();
               });
             } catch (e) {
               setLiveStatus("");
+              notifyLoaderReady();
             }
           }
           if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startHydration);
