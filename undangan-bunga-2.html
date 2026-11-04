@@ -361,6 +361,44 @@
   .seg button{flex:1; padding:12px 6px; border-radius:12px; border:1px solid var(--line); background:var(--bg);
     color:var(--muted); font-size:13.5px; font-weight:400; transition:all .25s}
   .seg button.sel{background:var(--accent); border-color:var(--accent); color:#FFF9F2}
+
+  /* ---------- RSVP2: mobile-first + animasi ringan (tema bunga) ---------- */
+  #rsvp2-seg{flex-direction:column; gap:10px}
+  @media(min-width:640px){#rsvp2-seg{flex-direction:row}}
+  #rsvp2-seg button{min-height:48px; display:flex; align-items:center; justify-content:center; gap:8px;
+    font-size:14px; opacity:0; transform:translateY(14px);
+    transition:opacity .55s ease, transform .55s cubic-bezier(.22,.8,.3,1), background-color .3s ease,
+    border-color .3s ease, color .3s ease, box-shadow .3s ease}
+  #rsvp2-section.in-view #rsvp2-seg button{opacity:1; transform:none}
+  #rsvp2-section.in-view #rsvp2-seg button:nth-child(1){transition-delay:.08s}
+  #rsvp2-section.in-view #rsvp2-seg button:nth-child(2){transition-delay:.16s}
+  #rsvp2-section.in-view #rsvp2-seg button:nth-child(3){transition-delay:.24s}
+  #rsvp2-section.in-view.rsvp2-live #rsvp2-seg button{transition-delay:0s}
+  #rsvp2-seg button::before{content:""; display:inline-flex; align-items:center; justify-content:center;
+    width:22px; height:22px; border-radius:50%; border:1.5px solid currentColor;
+    font-size:11.5px; font-weight:700; line-height:1; flex:0 0 auto}
+  #rsvp2-seg button[data-val="Hadir"]::before{content:"\2713"}
+  #rsvp2-seg button[data-val="Berhalangan"]::before{content:"\2715"}
+  #rsvp2-seg button[data-val="Masih Ragu"]::before{content:"?"}
+  #rsvp2-seg button.sel{transform:scale(1.02); box-shadow:0 10px 24px rgba(119,84,143,.35)}
+  #rsvp2-seg button.sel::before{background:rgba(255,255,255,.22); border-color:#FFF9F2}
+  @media(hover:hover){
+    #rsvp2-seg button:hover{border-color:var(--accent-soft)}
+    #rsvp2-submit:hover{transform:translateY(-2px); box-shadow:0 16px 32px rgba(119,84,143,.45)}
+  }
+  #rsvp2-name{font-size:16px}
+  #rsvp2-name:focus{box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent)}
+  #rsvp2-submit{min-height:48px}
+  #rsvp2-success{animation:rsvp2-ok .6s cubic-bezier(.22,.8,.3,1)}
+  #rsvp2-success::before{content:"\2713"; display:inline-flex; align-items:center; justify-content:center;
+    width:22px; height:22px; border-radius:50%; background:var(--accent); color:#FFF9F2;
+    font-size:12px; font-weight:700; margin-right:8px; vertical-align:-5px;
+    animation:rsvp2-pop .55s .12s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes rsvp2-ok{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+  @keyframes rsvp2-pop{from{transform:scale(0)}60%{transform:scale(1.3)}to{transform:scale(1)}}
+  @media(prefers-reduced-motion:reduce){
+    #rsvp2-seg button, #rsvp2-success, #rsvp2-success::before{animation:none; transition:none; opacity:1; transform:none}
+  }
   .wall{display:flex; flex-direction:column; gap:14px}
   .wish{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:20px 20px 16px; text-align:left}
   .wish.fresh{animation:wishin .8s cubic-bezier(.22,.8,.3,1)}
@@ -743,7 +781,82 @@
   </section>
 
   <!-- ================= RSVP ================= -->
-  <section style="padding-top:6px">
+    <section style="padding-top:6px" id="rsvp2-section">
+    <p class="kicker center rv" data-txt="rsvp2.kicker">RSVP</p>
+    <h2 class="title center rv" data-txt="rsvp2.title">Konfirmasi Kehadiran</h2>
+    <div class="flourish rv"><svg class="beat" width="15" height="14" viewBox="0 0 24 22" fill="currentColor"><path d="M12 21C6 16.5 2 13 2 8.6 2 5.4 4.4 3 7.4 3c1.9 0 3.6 1 4.6 2.5C13 4 14.7 3 16.6 3 19.6 3 22 5.4 22 8.6c0 4.4-4 7.9-10 12.4Z"/></svg></div>
+    <form class="form-card rv zoom" id="rsvp2Form">
+      <label class="flab" for="rsvp2-name" data-txt="rsvp2.label_name">Nama</label>
+      <input type="text" id="rsvp2-name" placeholder="Nama Bapak/Ibu/Saudara/i" autocomplete="name" data-txt="rsvp2.name_placeholder" />
+      <label class="flab" data-txt="rsvp2.label_attendance">Konfirmasi Kehadiran</label>
+      <div class="seg" id="rsvp2-seg">
+        <button type="button" class="sel" data-val="Hadir" data-txt="rsvp2.opt_attend">Hadir</button>
+        <button type="button" data-val="Berhalangan" data-txt="rsvp2.opt_absent">Berhalangan</button>
+        <button type="button" data-val="Masih Ragu" data-txt="rsvp2.opt_maybe">Masih Ragu</button>
+      </div>
+      <p id="rsvp2-success" class="center" data-txt="rsvp2.success_msg" style="display:none;color:var(--accent-deep);font-size:14.5px;margin:0 0 14px;font-weight:500">Terima kasih, konfirmasi kehadiran Anda sudah kami terima.</p>
+      <button class="btn btn-primary" type="submit" id="rsvp2-submit" data-txt="rsvp2.submit" style="width:100%;justify-content:center">Konfirmasi Kehadiran</button>
+    </form>
+  </section>
+  <script>
+  /* ===== RSVP cepat (Konfirmasi Kehadiran) — tulis ke tokens/{kode}/wishes ===== */
+  (function(){
+    var _to = (new URLSearchParams(location.search).get("to")||"").trim();
+    if(_to){ document.getElementById("rsvp2-name").value = _to; }
+    var attend2 = "Hadir";
+    var seg = document.getElementById("rsvp2-seg");
+    seg.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        seg.querySelectorAll("button").forEach(function(x){ x.classList.remove("sel"); });
+        b.classList.add("sel");
+        attend2 = b.getAttribute("data-val");
+      });
+    });
+    document.getElementById("rsvp2Form").addEventListener("submit", function(e){
+      e.preventDefault();
+      var n = document.getElementById("rsvp2-name").value.trim();
+      if(!n){
+        if(typeof toast === "function"){ toast("Isi nama dulu ya"); }
+        document.getElementById("rsvp2-name").focus();
+        return;
+      }
+      try {
+        if(typeof wishDb !== "undefined" && wishDb &&
+           typeof tokenIsActive !== "undefined" && tokenIsActive &&
+           typeof tokenCode !== "undefined" && tokenCode){
+          wishDb.collection("tokens").doc(tokenCode).collection("wishes").add({
+            name: n,
+            attendance: attend2,
+            wish: "",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(function(){});
+        }
+      } catch(e){}
+      var ok = document.getElementById("rsvp2-success");
+      ok.style.display = "";
+      ok.scrollIntoView({behavior:"smooth", block:"center"});
+    });
+  })();
+
+  /* ===== RSVP2 entrance: in-view -> opsi muncul berurutan ===== */
+  (function(){
+    var sec = document.getElementById("rsvp2-section");
+    if(!sec){ return; }
+    if(!("IntersectionObserver" in window)){ sec.classList.add("in-view","rsvp2-live"); return; }
+    var io2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          sec.classList.add("in-view");
+          setTimeout(function(){ sec.classList.add("rsvp2-live"); }, 900);
+          io2.disconnect();
+        }
+      });
+    }, {threshold:.18});
+    io2.observe(sec);
+  })();
+  </script>
+
+<section style="padding-top:6px">
     <p class="kicker center rv" data-txt="rsvp.kicker">RSVP &amp; Doa</p>
     <h2 class="title center rv" data-txt="rsvp.title">Konfirmasi &amp; Ucapan</h2>
     <div class="flourish rv"><svg class="beat" width="15" height="14" viewBox="0 0 24 22" fill="currentColor"><path d="M12 21C6 16.5 2 13 2 8.6 2 5.4 4.4 3 7.4 3c1.9 0 3.6 1 4.6 2.5C13 4 14.7 3 16.6 3 19.6 3 22 5.4 22 8.6c0 4.4-4 7.9-10 12.4Z"/></svg></div>

@@ -261,6 +261,43 @@
       .wish-badge.no{background:var(--pink);}
       .wish-msg{color:var(--muted);margin-top:8px;}
 
+      /* ---------- rsvp2: konfirmasi kehadiran (pixel + mobile-first) ---------- */
+      .rsvp2-head{margin-bottom:26px;}
+      form.rsvp2{max-width:460px;margin:0 auto 44px;}
+      #rsvp2-name{font-family:"VT323",monospace;font-size:22px;letter-spacing:.04em;border:2px solid var(--line);}
+      #rsvp2-name::placeholder{color:var(--muted);opacity:.65;}
+      #rsvp2-name:focus{outline:none;border-color:var(--accent);box-shadow:4px 4px 0 var(--shadow);}
+      .rsvp2-legend{display:block;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+      /* reveal saat section masuk viewport: snap, tanpa kurva halus */
+      #rsvp2.rsvp2-anim .sec-head,#rsvp2.rsvp2-anim form.rsvp2{opacity:0;transform:translateY(16px);}
+      #rsvp2.rsvp2-anim.in-view .sec-head,#rsvp2.rsvp2-anim.in-view form.rsvp2{opacity:1;transform:none;transition:opacity .22s linear,transform .22s linear;}
+      /* pilihan kehadiran: tumpuk vertikal di mobile, 3 kolom >= 640px */
+      .rsvp2-optrow{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;}
+      @media(min-width:640px){.rsvp2-optrow{grid-template-columns:repeat(3,1fr);gap:10px;}}
+      .rsvp2-opt{width:100%;min-height:56px;padding:12px 10px;font-size:11px;border-radius:0;box-shadow:3px 3px 0 var(--shadow);transition:transform .07s linear,box-shadow .07s linear,background-color .07s linear,color .07s linear;}
+      .rsvp2-mark{display:inline-block;margin-right:8px;font-size:12px;line-height:1;}
+      .rsvp2-opt[data-att="hadir"] .rsvp2-mark{color:var(--teal);}
+      .rsvp2-opt[data-att="ragu"] .rsvp2-mark{color:var(--accent);}
+      .rsvp2-opt[data-att="tidak"] .rsvp2-mark{color:var(--pink);}
+      .rsvp2-opt.sel{background:var(--accent);color:#1a1200;border-color:var(--gold-2);box-shadow:6px 6px 0 var(--shadow);transform:translate(-2px,-2px);}
+      .rsvp2-opt.sel .rsvp2-mark{color:#1a1200;}
+      /* opsi masuk satu per satu (delay 80ms), stepped */
+      #rsvp2.rsvp2-anim:not(.in-view) .rsvp2-opt{opacity:0;}
+      #rsvp2.rsvp2-anim.in-view .rsvp2-opt{animation:rsvp2-opt-in .16s linear backwards;}
+      #rsvp2.rsvp2-anim.in-view .rsvp2-opt:nth-child(1){animation-delay:.08s;}
+      #rsvp2.rsvp2-anim.in-view .rsvp2-opt:nth-child(2){animation-delay:.16s;}
+      #rsvp2.rsvp2-anim.in-view .rsvp2-opt:nth-child(3){animation-delay:.24s;}
+      @keyframes rsvp2-opt-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+      @media(hover:hover){.rsvp2-opt:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--shadow);}.rsvp2-opt.sel:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--shadow);}}
+      /* tombol kirim: tekan pixel di :active, angkat saat hover (desktop saja) */
+      #rsvp2-submit{width:100%;min-height:56px;border-radius:0;transition:transform .08s linear,box-shadow .08s linear;}
+      #rsvp2-submit:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--shadow);}
+      @media(hover:hover){#rsvp2-submit:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--shadow);}}
+      /* pesan sukses: pixel pop, tanpa kurva halus */
+      #rsvp2-note{min-height:24px;}
+      #rsvp2-note.pop{animation:rsvp2-pop .18s steps(3,end);}
+      @keyframes rsvp2-pop{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
       /* ---------- penutup & footer ---------- */
       .closing{text-align:center;}
       .closing-img{width:100%;max-width:460px;margin:0 auto 34px;border:1px solid var(--line);image-rendering:pixelated;}
@@ -343,6 +380,7 @@
       @media (prefers-reduced-motion: reduce){
         .star,.comet,.rocket-flame,#musicBtn.playing,#guestLoader .spin{animation:none !important;}
         .pl-inf,.pl-sheen,.pl-dots span{animation:none !important;}
+        #rsvp2 .sec-head,#rsvp2 form.rsvp2,#rsvp2 .rsvp2-opt,#rsvp2-note{opacity:1 !important;transform:none !important;animation:none !important;transition:none !important;}
         html{scroll-behavior:auto;}
       }
     </style>
@@ -691,6 +729,134 @@
             <p class="form-note" id="waHint" hidden data-txt="rsvp.wahint">Konfirmasi &amp; ucapan akan diteruskan ke WhatsApp kedua mempelai.</p>
             <p class="form-note" id="formNote"></p>
           </form>
+
+          <!-- ================= KONFIRMASI KEHADIRAN ================= -->
+          <section id="rsvp2">
+            <div class="wrap">
+              <div class="sec-head rsvp2-head">
+                <span class="vt">— RSVP —</span>
+                <h2 class="sec-title">KONFIRMASI<br />KEHADIRAN</h2>
+                <p class="sec-sub">Kunci status kehadiranmu di misi peluncuran ini — sinyalmu tersimpan untuk kedua mempelai.</p>
+              </div>
+              <form class="rsvp rsvp2" id="rsvp2-form" novalidate>
+                <div class="field">
+                  <label for="rsvp2-name">Nama Kamu</label>
+                  <input id="rsvp2-name" name="name" type="text" placeholder="Tulis namamu di sini" autocomplete="name" maxlength="60" />
+                </div>
+                <div class="field">
+                  <span class="rsvp2-legend" id="rsvp2-legend">Status Kehadiran</span>
+                  <div class="rsvp2-optrow" role="group" aria-labelledby="rsvp2-legend">
+                    <button type="button" class="btn rsvp2-opt sel" data-att="hadir"><span class="rsvp2-mark" aria-hidden="true">&#9654;</span>HADIR</button>
+                    <button type="button" class="btn secondary rsvp2-opt" data-att="ragu"><span class="rsvp2-mark" aria-hidden="true">?</span>MASIH<br />RAGU</button>
+                    <button type="button" class="btn secondary rsvp2-opt" data-att="tidak"><span class="rsvp2-mark" aria-hidden="true">&#10005;</span>BERHA-<br />LANGAN</button>
+                  </div>
+                </div>
+                <button class="btn purple" type="submit" id="rsvp2-submit">KONFIRMASI KEHADIRAN &#10022;</button>
+                <p class="form-note" id="rsvp2-note" aria-live="polite"></p>
+              </form>
+            </div>
+          </section>
+
+    <script>
+    (function(){
+      "use strict";
+      /* ---------- rsvp2: konfirmasi kehadiran -> tokens/{kode}/wishes ---------- */
+      var form=document.getElementById("rsvp2-form");
+      if(!form) return;
+      var nameInput=document.getElementById("rsvp2-name");
+      var note=document.getElementById("rsvp2-note");
+      var opts=form.getElementsByClassName("rsvp2-opt");
+      var attendance="hadir";
+      var labels={hadir:"Hadir",ragu:"Masih Ragu",tidak:"Berhalangan"};
+      function setNote(msg){ note.textContent=msg; }
+      /* pre-fill nama dari ?to= */
+      try{
+        var to=new URLSearchParams(window.location.search).get("to");
+        if(to && to.trim()) nameInput.value=to.trim().slice(0,60);
+      }catch(e){}
+      /* toggle pilihan kehadiran (kotak pixel, default Hadir) */
+      var i;
+      function selectOpt(btn){
+        attendance=btn.getAttribute("data-att");
+        for(var j=0;j<opts.length;j++){
+          var on=opts[j]===btn;
+          opts[j].classList.toggle("sel",on);
+          opts[j].classList.toggle("secondary",!on);
+        }
+      }
+      for(i=0;i<opts.length;i++){
+        opts[i].addEventListener("click",function(){ selectOpt(this); });
+      }
+      function tokenCode(){
+        var code="";
+        try{ code=(new URLSearchParams(window.location.search).get("t")||"").trim().toUpperCase().replace(/[^A-Z0-9]/g,""); }catch(e){}
+        return code;
+      }
+      function dbWrite(name){
+        var code=tokenCode();
+        if(!code || typeof firebase==="undefined" || !firebase.firestore){
+          setNote("Sinyal tercatat! Terima kasih, "+name.split(" ")[0]+". (mode demo \u2014 tanpa kode token) \u2726");
+          form.reset();
+          selectOpt(opts[0]);
+          nameInput.value=name;
+          return;
+        }
+        try{
+          if(!firebase.apps || !firebase.apps.length){
+          firebase.initializeApp({
+          apiKey:"AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
+          authDomain:"undangan-digital-f4310.firebaseapp.com",
+          projectId:"undangan-digital-f4310"
+          });
+          }
+          firebase.firestore().collection("tokens").doc(code).collection("wishes").add({
+            name:name,
+            attendance:labels[attendance]||"Hadir",
+            wish:"",
+            createdAt:firebase.firestore.FieldValue.serverTimestamp()
+          }).then(function(){
+            form.reset();
+            selectOpt(opts[0]);
+            nameInput.value=name;
+            setNote("Sinyal kehadiran terkirim! Terima kasih, "+name.split(" ")[0]+". \u2726");
+          }).catch(function(){
+            setNote("Sinyal gagal dikirim \u2014 coba lagi ya. \u2726");
+          });
+        }catch(e){
+          setNote("Sinyal gagal dikirim \u2014 coba lagi ya. \u2726");
+        }
+      }
+      form.addEventListener("submit",function(ev){
+        ev.preventDefault();
+        var name=nameInput.value.trim();
+        if(!name){ setNote("Isi namamu dulu ya, biar sinyalnya nggak anonim. \u2726"); return; }
+        setNote("Mengirim sinyal\u2026");
+        dbWrite(name);
+      });
+    })();
+
+    /* ---------- rsvp2: animasi reveal pixel (in-view) + pop pesan ---------- */
+    (function(){
+      "use strict";
+      var sec=document.getElementById("rsvp2");
+      if(!sec||!("IntersectionObserver" in window)) return;
+      sec.classList.add("rsvp2-anim");
+      new IntersectionObserver(function(entries,obs){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ sec.classList.add("in-view"); obs.disconnect(); }
+        });
+      },{threshold:.12}).observe(sec);
+      var note=document.getElementById("rsvp2-note");
+      if(note&&"MutationObserver" in window){
+        new MutationObserver(function(){
+          note.classList.remove("pop");
+          void note.offsetWidth;
+          if(note.textContent.trim()) note.classList.add("pop");
+        }).observe(note,{childList:true,characterData:true,subtree:true});
+      }
+    })();
+    </script>
+
           <div class="wall" id="wishWall">
             <div class="wall-empty" id="wallEmpty" data-txt="rsvp.wallempty">Belum ada sinyal masuk. Jadilah yang pertama mengirim ucapan dari Bumi. ✦</div>
           </div>

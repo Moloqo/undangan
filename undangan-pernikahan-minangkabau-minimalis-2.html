@@ -283,6 +283,87 @@
     background:var(--bg); color:var(--muted); border:1.5px solid var(--line); padding:10px 6px;
   }
   .seg button.on{ background:var(--marun); color:#FFEFC4; border-color:var(--dark); }
+  /* ---- rsvp2: konfirmasi kehadiran ---- */
+  .seg2{ display:flex; gap:8px; flex-wrap:wrap; }
+  .seg2 button{
+    flex:1; min-width:100px; min-height:52px; cursor:pointer; font:inherit; font-weight:700; font-size:15px;
+    background:var(--bg); color:var(--muted); border:1.5px solid var(--line); padding:10px 6px;
+  }
+  .seg2 button.on{ background:var(--marun); color:#FFEFC4; border-color:var(--dark); }
+  /* ---- rsvp2: mobile-first layout + micro-animations (2026-11-05) ---- */
+  #rsvp2-panel .seg2{ flex-direction:column; gap:12px; }
+  #rsvp2-panel .seg2 button{
+    width:100%; min-width:0; min-height:52px; padding:14px; font-size:16px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    border-width:2px; border-radius:8px;
+    opacity:0;
+    transition:opacity .4s ease, transform .3s ease, background-color .25s ease,
+      border-color .25s ease, color .25s ease, box-shadow .25s ease;
+  }
+  /* ikon per opsi — badge lingkaran, ikut warna teks tombol */
+  #rsvp2-panel .seg2 button::before{
+    content:""; display:inline-flex; align-items:center; justify-content:center; flex:none;
+    width:28px; height:28px; border:1.5px solid currentColor; border-radius:50%;
+    font-size:14px; font-weight:700; line-height:1;
+    transition:border-color .25s ease, color .25s ease, background-color .25s ease;
+  }
+  #rsvp2-panel .seg2 button[data-rsvp2-st="Hadir"]::before{ content:"\2713"; }
+  #rsvp2-panel .seg2 button[data-rsvp2-st="Berhalangan"]::before{ content:"\2715"; }
+  #rsvp2-panel .seg2 button[data-rsvp2-st="Masih Ragu"]::before{ content:"?"; }
+  /* opsi terpilih: marun penuh + aksen emas */
+  #rsvp2-panel .seg2 button.on{
+    background:var(--marun); color:var(--cream); border-color:var(--accent);
+    transform:scale(1.02);
+    box-shadow:0 8px 20px rgba(110,20,35,.30), inset 0 0 0 1px rgba(233,207,155,.45);
+  }
+  #rsvp2-panel .seg2 button.on::before{ border-color:var(--accent); color:var(--accent-soft); }
+  /* kemunculan stagger saat panel dapat class in-view */
+  #rsvp2-panel.in-view .seg2 button, #rsvp2-panel.in .seg2 button{
+    opacity:1; animation:rsvp2-rise .5s ease backwards;
+  }
+  #rsvp2-panel.in-view .seg2 button:nth-child(1){ animation-delay:80ms; }
+  #rsvp2-panel.in-view .seg2 button:nth-child(2){ animation-delay:160ms; }
+  #rsvp2-panel.in-view .seg2 button:nth-child(3){ animation-delay:240ms; }
+  @keyframes rsvp2-rise{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:translateY(0); } }
+  @media (hover:hover){
+    #rsvp2-panel .seg2 button:not(.on):hover{ border-color:var(--accent); color:var(--marun); }
+  }
+  /* input nama: glow emas saat fokus (base form input sudah 16px & full-width) */
+  #rsvp2-name:focus{
+    outline:none; border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(185,134,47,.28);
+  }
+  /* tombol submit: aktif menyusut, hover terangkat (desktop saja) */
+  #rsvp2-submit{ transition:transform .18s ease, box-shadow .18s ease, background-color .25s ease; }
+  #rsvp2-submit:active{ transform:scale(.97); box-shadow:2px 2px 0 var(--dark); }
+  @media (hover:hover){
+    #rsvp2-submit:hover{ transform:translateY(-2px); box-shadow:7px 7px 0 var(--dark); }
+  }
+  /* pesan sukses: fade+slide, ikon cek pop */
+  #rsvp2-success:not([hidden]){ animation:rsvp2-ok-in .55s cubic-bezier(.2,.9,.3,1.25); }
+  @keyframes rsvp2-ok-in{ from{ opacity:0; transform:translateY(18px) scale(.98); } to{ opacity:1; transform:none; } }
+  #rsvp2-success:not([hidden])::before{
+    content:"\2713"; display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:30px; margin-right:10px; border-radius:50%; flex:none;
+    background:var(--marun); color:var(--cream); border:2px solid var(--accent);
+    font-weight:700; font-size:16px; line-height:1;
+    animation:rsvp2-check-pop .5s cubic-bezier(.2,.9,.3,1.4) .1s backwards;
+  }
+  @keyframes rsvp2-check-pop{ from{ transform:scale(0); } 60%{ transform:scale(1.25); } to{ transform:scale(1); } }
+  /* desktop: 3 kolom horizontal */
+  @media (min-width:640px){
+    #rsvp2-panel .seg2{ flex-direction:row; gap:10px; }
+    #rsvp2-panel .seg2 button{ width:auto; flex:1; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #rsvp2-panel .seg2 button{ opacity:1; animation:none; transition:none; }
+    #rsvp2-submit{ transition:none; }
+    #rsvp2-success:not([hidden]), #rsvp2-success:not([hidden])::before{ animation:none; }
+  }
+  .rsvp2-success{
+    margin-top:18px; border:1.5px solid var(--accent); background:#FFF9EC; color:var(--ink);
+    padding:14px 16px; font-size:15.5px; line-height:1.6;
+  }
   .rsvp-stats{ display:flex; gap:10px; margin-top:26px; }
   .stat{ flex:1; text-align:center; border:1px dashed var(--line); padding:12px 4px; }
   .stat b{ display:block; font-family:"Press Start 2P",monospace; font-size:17px; color:var(--marun); }
@@ -619,6 +700,28 @@
         <h2 data-txt="rsvp.title">Papan Doa di <em>Dinding Gadang</em></h2>
         <p class="lead" data-txt="rsvp.lead">Kehadiran dunsanak adalah kado terindah. Mohon konfirmasi &amp; titipkan doa terbaik — akan kami pajang di dinding gadang ini.</p>
       </div>
+      <!-- ================= RSVP 2: KONFIRMASI KEHADIRAN ================= -->
+      <div class="panel reveal" id="rsvp2-panel">
+        <span class="gtab emas">Konfirmasi Kehadiran</span>
+        <h3>Konfirmasi Kehadiran</h3>
+        <p class="sub">Mohon konfirmasi kehadiran dunsanak — tarimo kasih banyak.</p>
+        <form id="rsvp2-form">
+          <label for="rsvp2-name">Nama Dunsanak</label>
+          <input id="rsvp2-name" type="text" placeholder="cth. Keluarga Besar Hakim" maxlength="48" autocomplete="name" />
+          <label>Pilihan Kehadiran</label>
+          <div class="seg2" role="group" aria-label="Pilihan kehadiran">
+            <button type="button" class="on" data-rsvp2-st="Hadir">Hadir</button>
+            <button type="button" data-rsvp2-st="Berhalangan">Berhalangan</button>
+            <button type="button" data-rsvp2-st="Masih Ragu">Masih Ragu</button>
+          </div>
+          <button class="btn marun" type="submit" id="rsvp2-submit" style="margin-top:22px; width:100%; justify-content:center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>Konfirmasi Kehadiran</span>
+          </button>
+        </form>
+        <div id="rsvp2-success" class="rsvp2-success" hidden></div>
+      </div>
+
       <div class="panel reveal">
         <span class="gtab" data-txt="rsvp.form_tag">Kirim Ucapan</span>
         <h3 data-txt="rsvp.form_title">Titip Doa, Dunsanak</h3>
@@ -1549,5 +1652,117 @@
   }
 })();
 </script>
+<script>
+/* ============ RSVP 2: Konfirmasi Kehadiran (mandiri) ============
+   Menulis ke tokens/{kode}/wishes {name, attendance, wish:"", createdAt}
+   agar terbaca di panel Kelola Tamu. Script utama memakai IIFE, jadi
+   blok ini tidak memakai sharedDb/sharedToken — ia membaca ?t= sendiri
+   dan memakai Firebase project undangan-digital-f4310 (sama seperti template). */
+(function(){
+  "use strict";
+  var q = function(s, c){ return (c || document).querySelector(s); };
+  var qa = function(s, c){ return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var params = new URLSearchParams(window.location.search);
+
+  var panel = q("#rsvp2-panel");
+  if(!panel) return;
+
+  var toastTimer = null;
+  function toast(msg){
+    var t = q("#toast");
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add("show");
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+  }
+
+  /* pre-fill nama dari ?to= */
+  var nameInput = q("#rsvp2-name");
+  var guest = params.get("to");
+  if(guest && nameInput) nameInput.value = guest.slice(0, 48);
+
+  /* pilihan kehadiran — class .seg2 agar terisolasi dari .seg lama */
+  var attendance = "Hadir";
+  qa(".seg2 button", panel).forEach(function(b){
+    b.addEventListener("click", function(){
+      qa(".seg2 button", panel).forEach(function(x){ x.classList.remove("on"); });
+      b.classList.add("on");
+      attendance = b.getAttribute("data-rsvp2-st") || "Hadir";
+    });
+  });
+
+  var successBox = q("#rsvp2-success");
+  function showSuccess(msg){
+    if(successBox){ successBox.textContent = msg; successBox.hidden = false; }
+    toast(msg);
+  }
+
+  function getDb(){
+    if(typeof firebase === "undefined") return null;
+    try{
+      if(!firebase.apps.length){
+        firebase.initializeApp({
+          apiKey: "AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
+          authDomain: "undangan-digital-f4310.firebaseapp.com",
+          projectId: "undangan-digital-f4310",
+          storageBucket: "undangan-digital-f4310.firebasestorage.app",
+          messagingSenderId: "220097197481",
+          appId: "1:220097197481:web:03ccc55291a89f4063c0b8",
+          measurementId: "G-6EDDZ5FHF4"
+        });
+      }
+      return firebase.firestore();
+    }catch(e){ return null; }
+  }
+
+  q("#rsvp2-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = (nameInput.value || "").trim();
+    if(!name){ toast("Mohon isi nama dunsanak dulu."); nameInput.focus(); return; }
+
+    var code = params.get("t");
+    var doc = { name: name, attendance: attendance, wish: "", createdAt: null };
+    var wrote = false;
+
+    if(code){
+      var db = getDb();
+      if(db){
+        try{
+          if(typeof firebase !== "undefined")
+            doc.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          var pr = db.collection("tokens").doc(code).collection("wishes").add(doc);
+          if(pr && pr.catch) pr.catch(function(){});
+          wrote = true;
+        }catch(e){}
+      }
+    }
+
+    if(wrote){
+      showSuccess("Tarimo kasih, " + name.split(" ")[0] +
+        "! Kehadiran dunsanak tercatat: " + attendance + ".");
+    }else{
+      showSuccess("Tarimo kasih, " + name.split(" ")[0] +
+        "! Kehadiran dunsanak tercatat: " + attendance +
+        " (tercatat lokal — hubungkan ?t= token untuk menyimpan ke dinding bersama).");
+    }
+  });
+})();
+</script>
+<script>
+/* rsvp2: animasi masuk — tambah class in-view ke panel saat terlihat di layar */
+(function(){
+  var panel = document.getElementById("rsvp2-panel");
+  if(!panel){ return; }
+  if(!("IntersectionObserver" in window)){ panel.classList.add("in-view"); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ panel.classList.add("in-view"); io.disconnect(); }
+    });
+  }, { threshold: 0.2 });
+  io.observe(panel);
+})();
+</script>
+
 </body>
 </html>
