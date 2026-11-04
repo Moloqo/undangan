@@ -259,6 +259,33 @@ body.opened #musicBtn{opacity:1;pointer-events:auto}
 .att button{flex:1;font-family:var(--sans);font-size:12.5px;font-weight:500;padding:11px 4px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;transition:all .2s}
 .att button.sel{background:var(--char);border-color:var(--char);color:var(--gold-pale)}
 .wish-form .btn{width:100%;justify-content:center;margin-top:20px}
+
+/* ---------- RSVP2 mobile-first + animations (Konfirmasi Kehadiran) ---------- */
+#rsvp2 .wish-form{padding:26px 22px;max-width:100%}
+#rsvp2 .wish-form input{font-size:16px;min-height:52px;padding:14px 16px;border-radius:16px}
+#rsvp2 .wish-form input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,141,62,.20)}
+#rsvp2Att{flex-direction:column;gap:10px;margin-top:2px}
+#rsvp2Att button{width:100%;min-height:48px;font-size:14px;letter-spacing:.05em;padding:13px 18px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:11px;border:1px solid var(--line);background:#fff;transition:transform .28s cubic-bezier(.34,1.3,.64,1),background .25s ease,color .25s ease,border-color .25s ease,box-shadow .25s ease}
+#rsvp2Att button .att-ico{width:26px;height:26px;flex:none;border-radius:50%;border:1.5px solid var(--gold-soft);color:var(--gold-deep);display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;transition:background .25s ease,color .25s ease,border-color .25s ease,transform .28s cubic-bezier(.34,1.56,.64,1)}
+#rsvp2Att button.sel{background:linear-gradient(150deg,var(--gold),var(--gold-deep));border-color:var(--gold-deep);color:#FFFDF6;transform:scale(1.02);box-shadow:0 12px 24px rgba(138,109,47,.32)}
+#rsvp2Att button.sel .att-ico{background:#FFFDF6;border-color:#FFFDF6;color:var(--gold-deep);transform:scale(1.08)}
+#rsvp2.in-view #rsvp2Att button{animation:rsvp2OptIn .55s cubic-bezier(.22,.8,.3,1) backwards}
+#rsvp2.in-view #rsvp2Att button:nth-child(1){animation-delay:.05s}
+#rsvp2.in-view #rsvp2Att button:nth-child(2){animation-delay:.13s}
+#rsvp2.in-view #rsvp2Att button:nth-child(3){animation-delay:.21s}
+@keyframes rsvp2OptIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+#rsvp2-submit{min-height:52px}
+#rsvp2-submit:active{transform:scale(.97)}
+@media (hover:hover){#rsvp2-submit:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(138,109,47,.40)}}
+@media (hover:none){#rsvp2-submit:hover{transform:none;background:var(--gold)}}
+#rsvp2-ok{animation:rsvp2OkIn .5s ease backwards}
+#rsvp2-ok::before{content:"\2713";display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin-right:10px;border-radius:50%;background:var(--gold);color:#FFFDF6;font-size:15px;vertical-align:-8px;animation:rsvp2Pop .55s cubic-bezier(.34,1.56,.64,1) .08s backwards}
+@keyframes rsvp2OkIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rsvp2Pop{from{transform:scale(0)}to{transform:scale(1)}}
+@media (min-width:640px){
+  #rsvp2Att{flex-direction:row;gap:10px}
+  #rsvp2Att button{padding:12px 8px;font-size:13px}
+}
 .wall{margin-top:24px;display:grid;gap:12px}
 .wish{background:var(--ivory);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
 .wish .whead{display:flex;align-items:center;gap:10px}
@@ -604,7 +631,26 @@ body.opened #drift{opacity:1}
     <h2 class="sec-title rv d1" data-txt="rsvp.title">Dinding Doa</h2>
     <p class="sec-sub rv d2" data-txt="rsvp.sub">Setiap doa yang terucap menjadi kado terindah bagi kami</p>
 
-    <form class="wish-form rv" id="wishForm" novalidate>
+    <!-- ================= KONFIRMASI KEHADIRAN (RSVP) ================= -->
+  <section id="rsvp2">
+    <p class="eyebrow rv">R S V P</p>
+    <h2 class="sec-title rv d1">Konfirmasi Kehadiran</h2>
+    <p class="sec-sub rv d2">Kehadiran Anda adalah hadiah terindah — mohon konfirmasikan agar kami bisa menyiapkan yang terbaik</p>
+    <form class="wish-form rv" id="rsvp2Form" novalidate>
+      <label for="rsvp2-name">Nama</label>
+      <input id="rsvp2-name" type="text" maxlength="60" placeholder="Nama Anda" autocomplete="name" />
+      <label>Kehadiran</label>
+      <div class="att" id="rsvp2Att" role="group" aria-label="Konfirmasi kehadiran">
+        <button type="button" data-att="Hadir" class="sel"><span class="att-ico" aria-hidden="true">✓</span>Hadir</button>
+        <button type="button" data-att="Berhalangan"><span class="att-ico" aria-hidden="true">✕</span>Berhalangan</button>
+        <button type="button" data-att="Masih Ragu"><span class="att-ico" aria-hidden="true">?</span>Masih Ragu</button>
+      </div>
+      <button class="btn" type="submit" id="rsvp2-submit">Konfirmasi Kehadiran</button>
+      <p class="sec-sub" id="rsvp2-ok" style="display:none;color:var(--gold-deep);margin-top:14px"></p>
+    </form>
+  </section>
+
+  <form class="wish-form rv" id="wishForm" novalidate>
       <label for="wName" data-txt="rsvp.label_name">Nama</label>
       <input id="wName" type="text" maxlength="60" placeholder="Nama Anda" autocomplete="name" data-txt="rsvp.name_placeholder" />
       <label for="wFrom" data-txt="rsvp.label_from">Alamat / Domisili</label>
@@ -929,6 +975,52 @@ try{
   var gname=(qparams.get("to")||"").replace(/\s+/g," ").trim();
   if(gname){ var wnEl=$("#wName"); if(wnEl&&!wnEl.value) wnEl.value=gname.slice(0,60); }
 }catch(e){}
+
+/* ---------- RSVP2 stagger reveal: adds .in-view to #rsvp2 on scroll ---------- */
+(function(){var s=document.getElementById("rsvp2");if(!s)return;if(!("IntersectionObserver" in window)){s.classList.add("in-view");return;}var o=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){s.classList.add("in-view");o.disconnect();}});},{threshold:.2});o.observe(s);})();
+
+/* ---------- RSVP section (Konfirmasi Kehadiran -> tokens/{kode}/wishes) ---------- */
+var rsvp2Att="Hadir";
+$$("#rsvp2Att button").forEach(function(b){
+  b.addEventListener("click",function(){
+    $$("#rsvp2Att button").forEach(function(x){ x.classList.remove("sel"); });
+    b.classList.add("sel"); rsvp2Att=b.getAttribute("data-att");
+  });
+});
+/* prefill nama RSVP dari ?to= */
+try{
+  var rto=(qparams.get("to")||"").replace(/\s+/g," ").trim();
+  var rnEl=$("#rsvp2-name");
+  if(rto&&rnEl&&!rnEl.value) rnEl.value=rto.slice(0,60);
+}catch(e){}
+$("#rsvp2Form").addEventListener("submit",function(ev){
+  ev.preventDefault();
+  var name=$("#rsvp2-name").value.replace(/\s+/g," ").trim();
+  if(!name){ showToast("Isi nama Anda dulu, ya"); $("#rsvp2-name").focus(); return; }
+  var btn=$("#rsvp2-submit");
+  btn.disabled=true; btn.style.opacity=".65";
+  function rsvp2Done(){
+    var msg=$("#rsvp2-ok");
+    if(msg){
+      msg.textContent="Terima kasih, "+name.split(" ")[0]+" — konfirmasi kehadiran Anda ("+rsvp2Att+") sudah kami terima ✦";
+      msg.style.display="block";
+    }
+    showToast("Terima kasih, "+name.split(" ")[0]+"! Konfirmasi Anda tersimpan ✦");
+    btn.disabled=false; btn.style.opacity=""; btn.textContent="Sudah Terkonfirmasi";
+  }
+  if(wishDb&&tokenIsActive&&tokenCode){
+    try{
+      var rp=wishDb.collection("tokens").doc(tokenCode).collection("wishes").add({
+        name:name, attendance:rsvp2Att, wish:"",
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      if(rp&&rp.then){ rp.then(function(){ rsvp2Done(); }).catch(function(){}); }
+      else rsvp2Done();
+    }catch(e){ rsvp2Done(); }
+  }else{
+    rsvp2Done();
+  }
+});
 
 /* ---------- state bersama untuk dinding ucapan & WhatsApp RSVP ---------- */
 var wishDb=null;          /* instance Firestore bersama untuk dinding ucapan */

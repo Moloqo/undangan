@@ -604,6 +604,55 @@ body.opened #drift{opacity:1}
     <p class="sec-sub rv" style="margin-top:20px" data-txt="amplop.note">Kado fisik dapat dikirim ke alamat pada bagian Informasi Tamu ❀</p>
   </section>
 
+  <!-- ================= RSVP ================= -->
+  <style>
+    #rsvp2Msg{margin:14px 0 0;text-align:center;font-size:14px;color:var(--rose)}
+    /* ===== RSVP: mobile-first layout + animasi ringan (tema bunga: --rose, --line, --sans) ===== */
+    #rsvp2{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,.8,.3,1)}
+    #rsvp2.in-view{opacity:1;transform:none}
+    #rsvp2 .wish-form{padding:26px 22px}
+    #rsvp2-name{font-size:16px;padding:14px 16px;border-width:1.5px;transition:border-color .25s ease,box-shadow .25s ease}
+    #rsvp2-name:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(180,80,110,.14)}
+    #rsvp2AttGroup{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
+    #rsvp2AttGroup button{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:14.5px;opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.9,.3,1.15),background-color .25s ease,border-color .25s ease,box-shadow .25s ease,color .25s ease}
+    #rsvp2AttGroup button::before{content:"";flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:14px;font-weight:700;line-height:1;background:rgba(180,80,110,.1);color:var(--rose);transition:background-color .25s ease,color .25s ease}
+    #rsvp2AttGroup button:nth-child(1)::before{content:"\2713"}
+    #rsvp2AttGroup button:nth-child(2)::before{content:"\2715"}
+    #rsvp2AttGroup button:nth-child(3)::before{content:"?"}
+    #rsvp2.in-view #rsvp2AttGroup button{opacity:1;transform:none}
+    #rsvp2.in-view #rsvp2AttGroup button:nth-child(1){transition-delay:.08s,.08s,0s,0s,0s,0s}
+    #rsvp2.in-view #rsvp2AttGroup button:nth-child(2){transition-delay:.16s,.16s,0s,0s,0s,0s}
+    #rsvp2.in-view #rsvp2AttGroup button:nth-child(3){transition-delay:.24s,.24s,0s,0s,0s,0s}
+    #rsvp2AttGroup button.sel,#rsvp2.in-view #rsvp2AttGroup button.sel{background:var(--rose);border-color:var(--rose);color:#FFF7F0;transform:scale(1.02);box-shadow:0 12px 26px rgba(180,80,110,.3)}
+    #rsvp2AttGroup button.sel::before{background:rgba(255,255,255,.22);color:#FFF7F0}
+    @media(min-width:640px){#rsvp2AttGroup{grid-template-columns:repeat(3,1fr);gap:10px}}
+    #rsvp2Form #rsvp2-submit{min-height:52px}
+    #rsvp2-submit:active{transform:scale(.97)}
+    @media(hover:hover){#rsvp2-submit:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(180,80,110,.42)}}
+    #rsvp2Msg:not([hidden]){animation:rsvp2MsgIn .5s cubic-bezier(.2,.9,.3,1.15) both}
+    #rsvp2Msg:not([hidden])::before{content:"\2713";display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;margin-right:8px;border-radius:50%;background:var(--rose);color:#FFF7F0;font-size:13px;font-weight:700;vertical-align:middle;animation:rsvp2Pop .5s .12s cubic-bezier(.2,.9,.3,1.4) both}
+    @keyframes rsvp2MsgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    @keyframes rsvp2Pop{0%{transform:scale(0)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+  </style>
+  <section id="rsvp2">
+    <p class="eyebrow rv" data-txt="rsvp2.kicker">RSVP</p>
+    <h2 class="sec-title rv d1" data-txt="rsvp2.title">Konfirmasi Kehadiran</h2>
+    <p class="sec-sub rv d2" data-txt="rsvp2.sub">Mohon konfirmasi kehadiran Anda &mdash; kehadiran dan doa restu Anda sangat berarti bagi kami</p>
+
+    <form class="wish-form rv" id="rsvp2Form" novalidate>
+      <label for="rsvp2-name" data-txt="rsvp2.label_name">Nama</label>
+      <input id="rsvp2-name" type="text" maxlength="60" placeholder="Nama Anda" autocomplete="name" data-txt="rsvp2.name_placeholder" />
+      <label data-txt="rsvp2.label_attendance">Pilihan Kehadiran</label>
+      <div class="att" id="rsvp2AttGroup" role="group" aria-label="Pilihan kehadiran">
+        <button type="button" data-att="Hadir" class="sel" data-txt="rsvp2.opt_attend">Hadir</button>
+        <button type="button" data-att="Berhalangan" data-txt="rsvp2.opt_absent">Berhalangan</button>
+        <button type="button" data-att="Masih Ragu" data-txt="rsvp2.opt_maybe">Masih Ragu</button>
+      </div>
+      <button class="btn" type="submit" id="rsvp2-submit" data-txt="rsvp2.submit">Konfirmasi Kehadiran</button>
+      <p id="rsvp2Msg" role="status" hidden></p>
+    </form>
+  </section>
+
   <!-- ================= DOA & RSVP ================= -->
   <section id="doa">
     <p class="eyebrow rv" data-txt="rsvp.kicker">Doa &amp; Ucapan</p>
@@ -843,6 +892,47 @@ $("#wishForm").addEventListener("submit",function(ev){
     showToast("Terima kasih, "+name.split(" ")[0]+"! Ucapan Anda sudah terkirim ❀");
   }
   card.scrollIntoView({behavior:reduced?"auto":"smooth",block:"center"});
+});
+
+/* ---------- RSVP: fade-up section saat masuk viewport ---------- */
+(function(){
+  var sec=document.getElementById("rsvp2");
+  if(!sec) return;
+  if(!("IntersectionObserver" in window)){ sec.classList.add("in-view"); return; }
+  var r2io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){ sec.classList.add("in-view"); r2io.disconnect(); } });
+  },{threshold:.15});
+  r2io.observe(sec);
+})();
+
+/* ---------- RSVP standalone (Konfirmasi Kehadiran) ---------- */
+var rsvp2Att="Hadir";
+$$("#rsvp2AttGroup button").forEach(function(b){
+  b.addEventListener("click",function(){
+    $$("#rsvp2AttGroup button").forEach(function(x){ x.classList.remove("sel"); });
+    b.classList.add("sel"); rsvp2Att=b.getAttribute("data-att");
+  });
+});
+/* pre-fill nama dari ?to= */
+var _to=(new URLSearchParams(location.search).get("to")||"").trim();
+if(_to){ var _ni=document.getElementById("rsvp2-name"); if(_ni) _ni.value=_to; }
+$("#rsvp2Form").addEventListener("submit",function(ev){
+  ev.preventDefault();
+  var n=$("#rsvp2-name").value.replace(/\s+/g," ").trim();
+  var msgEl=$("#rsvp2Msg");
+  if(!n){ if(msgEl){ msgEl.hidden=false; msgEl.textContent="Isi nama Anda dulu, ya."; } $("#rsvp2-name").focus(); return; }
+  /* Token aktif: simpan ke dinding ucapan bersama Firestore tokens/{kode}/wishes.
+     Diam-diam bila gagal — pesan sukses lokal di bawah tidak pernah terganggu. */
+  if (wishDb && tokenIsActive && tokenCode) {
+    try {
+      var wp2=wishDb.collection("tokens").doc(tokenCode).collection("wishes").add({
+        name:n, attendance:rsvp2Att, wish:"",
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      if(wp2&&wp2.catch) wp2.catch(function(){});
+    } catch(e){}
+  }
+  if(msgEl){ msgEl.hidden=false; msgEl.textContent="Terima kasih, "+n.split(" ")[0]+"! Konfirmasi kehadiran Anda sudah terkirim \u2740"; }
 });
 
 /* ---------- lightbox ---------- */

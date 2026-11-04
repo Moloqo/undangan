@@ -729,6 +729,123 @@
         </div>
       </section>
 
+      <!-- ================= RSVP 2 : KONFIRMASI KEHADIRAN ================= -->
+      <section class="wrap rv rsvp2-section">
+        <div class="floral-div" aria-hidden="true"><svg viewBox="0 0 320 48"><use href="#sp-divider"/></svg></div>
+        <p class="kicker">RSVP</p>
+        <h2 class="sec-title">Konfirmasi Kehadiran</h2>
+        <p class="sec-sub">Mohon konfirmasi kehadiran Anda melalui formulir berikut.</p>
+        <form class="rsvp" id="rsvpForm2">
+          <label for="rsvp2-name">Nama</label>
+          <input id="rsvp2-name" type="text" autocomplete="name" placeholder="Nama Anda" />
+          <label>Kehadiran</label>
+          <div class="rsvp2-opts">
+            <label class="rsvp2-opt"><input type="radio" name="rsvp2-att" value="Hadir" checked /><span class="rsvp2-ico" aria-hidden="true">&#10003;</span><span>Hadir</span></label>
+            <label class="rsvp2-opt"><input type="radio" name="rsvp2-att" value="Berhalangan" /><span class="rsvp2-ico" aria-hidden="true">&#10005;</span><span>Berhalangan</span></label>
+            <label class="rsvp2-opt"><input type="radio" name="rsvp2-att" value="Masih Ragu" /><span class="rsvp2-ico" aria-hidden="true">?</span><span>Masih Ragu</span></label>
+          </div>
+          <p class="rsvp2-ok" id="rsvp2-ok" hidden><span class="rsvp2-ok-ico" aria-hidden="true">&#10003;</span><span>Terima kasih! Konfirmasi kehadiran Anda telah tercatat.</span></p>
+          <button class="btn" id="rsvp2-submit" type="submit">Konfirmasi Kehadiran</button>
+        </form>
+      </section>
+      <style>
+        /* ---------- RSVP 2 : opsi kehadiran (blush rose, mobile-first + animasi) ---------- */
+        /* Layout: tumpuk vertikal penuh di mobile; 3 kolom sejajar di desktop (>=640px) */
+        form.rsvp .rsvp2-opts { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+        form.rsvp label.rsvp2-opt {
+          position: relative; display: flex; align-items: center; gap: 12px;
+          margin: 0; min-height: 48px; padding: 13px 18px; cursor: pointer;
+          -webkit-tap-highlight-color: transparent; user-select: none;
+          font-size: 16px; font-weight: 400; letter-spacing: 0.04em; text-transform: none;
+          color: var(--ink-soft); background: var(--surface);
+          border: 1px solid var(--line-rose); border-radius: 14px;
+          /* state awal untuk stagger saat section masuk viewport */
+          opacity: 0; translate: 0 14px; scale: 1;
+          transition: opacity 0.5s ease, translate 0.5s ease, scale 0.28s cubic-bezier(0.34, 1.45, 0.64, 1),
+            box-shadow 0.28s ease, background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+        }
+        /* stagger 80ms via nth-child — delay hanya untuk opacity/translate agar pilih/batal tetap responsif */
+        .rsvp2-section.in-view form.rsvp .rsvp2-opt { opacity: 1; translate: 0 0; }
+        .rsvp2-section.in-view form.rsvp .rsvp2-opt:nth-child(1) { transition-delay: 80ms, 80ms, 0ms, 0ms, 0ms, 0ms, 0ms; }
+        .rsvp2-section.in-view form.rsvp .rsvp2-opt:nth-child(2) { transition-delay: 160ms, 160ms, 0ms, 0ms, 0ms, 0ms, 0ms; }
+        .rsvp2-section.in-view form.rsvp .rsvp2-opt:nth-child(3) { transition-delay: 240ms, 240ms, 0ms, 0ms, 0ms, 0ms, 0ms; }
+        /* radio asli disembunyikan visual, tetap dapat fokus keyboard */
+        form.rsvp .rsvp2-opt input {
+          position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: 0; padding: 0;
+          opacity: 0; pointer-events: none; border: 0; min-height: 0; appearance: none;
+        }
+        form.rsvp .rsvp2-opt span:last-child { line-height: 1.4; }
+        /* ikon lingkaran per opsi */
+        form.rsvp .rsvp2-ico {
+          flex: none; width: 30px; height: 30px; border-radius: 50%;
+          display: inline-flex; align-items: center; justify-content: center;
+          font-size: 15px; line-height: 1; font-weight: 500;
+          color: var(--rose-deep); background: var(--rose-soft); border: 1px solid var(--line-rose);
+          transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease,
+            transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        /* opsi terpilih: terisi gradasi rose-deep, teks kontras, membesar + bayangan */
+        form.rsvp .rsvp2-opt:has(input:checked) {
+          background: linear-gradient(135deg, var(--rose-deep), var(--rose));
+          border-color: var(--accent); color: #FFF9F0; font-weight: 500;
+          scale: 1.02; box-shadow: 0 10px 24px rgba(185, 126, 118, 0.35);
+        }
+        form.rsvp .rsvp2-opt:has(input:checked) .rsvp2-ico {
+          background: #FFF9F0; color: var(--rose-deep); border-color: #FFF9F0; transform: scale(1.08);
+        }
+        form.rsvp .rsvp2-opt:has(input:focus-visible) { outline: 2px solid var(--rose-deep); outline-offset: 2px; }
+        form.rsvp .rsvp2-opt:active { scale: 0.99; }
+        @media (hover: hover) {
+          form.rsvp .rsvp2-opt:hover { border-color: var(--rose-deep); box-shadow: 0 6px 16px rgba(185, 126, 118, 0.18); }
+          form.rsvp .rsvp2-opt:has(input:checked):hover { box-shadow: 0 12px 26px rgba(185, 126, 118, 0.42); }
+        }
+        @media (min-width: 640px) {
+          form.rsvp .rsvp2-opts { flex-direction: row; }
+          form.rsvp label.rsvp2-opt { flex: 1 1 0; min-width: 0; justify-content: center; text-align: center; }
+        }
+        /* input nama: glow fokus warna aksen rose */
+        form.rsvp #rsvp2-name:focus {
+          outline: none; border-color: var(--rose-deep);
+          box-shadow: 0 0 0 4px rgba(185, 126, 118, 0.16), 0 8px 20px rgba(150, 96, 88, 0.1);
+        }
+        /* tombol kirim: terangkat saat hover (desktop saja) */
+        @media (hover: hover) {
+          form.rsvp #rsvp2-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(185, 126, 118, 0.35); }
+        }
+        form.rsvp #rsvp2-submit:active { transform: scale(0.97); }
+        /* pesan sukses: fade-in + slide-up, ikon ✓ pop */
+        form.rsvp .rsvp2-ok[hidden] { display: none; }
+        form.rsvp .rsvp2-ok {
+          margin: 26px 0 0; padding: 16px 18px; border-radius: 10px;
+          display: flex; align-items: center; justify-content: center; gap: 12px;
+          background: var(--rose-soft); color: var(--rose-deep);
+          border: 1px solid var(--line-rose);
+          font-size: 16.5px; line-height: 1.6; text-align: center; font-weight: 400;
+        }
+        form.rsvp .rsvp2-ok:not([hidden]) { animation: rsvp2OkIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        @keyframes rsvp2OkIn {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: none; }
+        }
+        .rsvp2-ok-ico {
+          flex: none; width: 34px; height: 34px; border-radius: 50%;
+          display: inline-flex; align-items: center; justify-content: center;
+          font-size: 17px; line-height: 1; color: #FFF9F0;
+          background: linear-gradient(135deg, var(--rose-deep), var(--rose));
+          box-shadow: 0 6px 14px rgba(185, 126, 118, 0.35);
+        }
+        form.rsvp .rsvp2-ok:not([hidden]) .rsvp2-ok-ico { animation: rsvp2OkPop 0.5s 0.12s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        @keyframes rsvp2OkPop {
+          0% { transform: scale(0); }
+          60% { transform: scale(1.25); }
+          100% { transform: scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          form.rsvp .rsvp2-opt { opacity: 1; translate: 0 0; transition: none; }
+          form.rsvp .rsvp2-ok:not([hidden]), form.rsvp .rsvp2-ok:not([hidden]) .rsvp2-ok-ico { animation: none; }
+        }
+      </style>
+
       <!-- ================= RSVP ================= -->
       <section class="wrap rv">
         <div class="floral-div" aria-hidden="true"><svg viewBox="0 0 320 48"><use href="#sp-divider"/></svg></div>
@@ -1475,6 +1592,54 @@
         musicBtn.addEventListener("click", function () {
           if (musicOn) stopMusic(); else startMusic();
         });
+
+        /* ---------- RSVP 2 : tambah .in-view saat section masuk viewport (stagger opsi) ---------- */
+        (function () {
+          var sec2 = document.querySelector(".rsvp2-section");
+          if (!sec2) return;
+          if ("IntersectionObserver" in window) {
+            var io2 = new IntersectionObserver(function (entries) {
+              entries.forEach(function (e) {
+                if (e.isIntersecting) { sec2.classList.add("in-view"); io2.disconnect(); }
+              });
+            }, { threshold: 0.18 });
+            io2.observe(sec2);
+          } else {
+            sec2.classList.add("in-view");
+          }
+        })();
+
+        /* ---------- RSVP 2 : Konfirmasi Kehadiran ---------- */
+        (function () {
+          var form2 = document.getElementById("rsvpForm2");
+          var name2 = document.getElementById("rsvp2-name");
+          var ok2 = document.getElementById("rsvp2-ok");
+          if (!form2 || !name2 || !ok2) return;
+          /* pre-fill nama tamu dari ?to= */
+          var guest2 = (new URLSearchParams(location.search).get("to") || "").trim();
+          if (guest2 && !name2.value) name2.value = guest2;
+          form2.addEventListener("submit", function (ev) {
+            ev.preventDefault();
+            var name = name2.value.trim();
+            if (!name) { showToast("Mohon isi nama terlebih dahulu"); name2.focus(); return; }
+            var attEl = form2.querySelector('input[name="rsvp2-att"]:checked');
+            var att = attEl ? attEl.value : "Hadir";
+            /* Tulis ke Firestore tokens/{kode}/wishes — diam-diam bila gagal. */
+            if (wishDb && tokenIsActive && tokenCode) {
+              try {
+                var writePromise = wishDb.collection("tokens").doc(tokenCode).collection("wishes").add({
+                  name: name,
+                  attendance: att,
+                  wish: "",
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                if (writePromise && writePromise.catch) writePromise.catch(function () {});
+              } catch (e) {}
+            }
+            ok2.hidden = false;
+            ok2.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          });
+        })();
       })();
     
         /* Text Override System */
