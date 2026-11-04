@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Check-in Tamu — INVITO</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#0f0d0a;color:#f5efe2;min-height:100vh}
+.header{background:#1a1712;padding:16px 20px;text-align:center;border-bottom:1px solid rgba(185,138,47,.3)}
+.header h1{font-family:Georgia,serif;font-size:20px;color:#e8c86a}
+.header p{font-size:12px;color:#888;margin-top:4px}
+.scanner-wrap{position:relative;max-width:500px;margin:20px auto;padding:0 20px}
+#video{width:100%;border-radius:16px;background:#000;display:block}
+.scan-overlay{position:absolute;inset:20px;pointer-events:none;border:2px solid rgba(232,200,106,.6);border-radius:16px}
+.scan-line{position:absolute;left:10%;right:10%;height:2px;background:#e8c86a;animation:scan 2s ease-in-out infinite}
+@keyframes scan{0%,100%{top:20%}50%{top:80%}}
+.result{max-width:500px;margin:20px auto;padding:0 20px}
+.result-card{background:#1a1712;border:1px solid rgba(185,138,47,.4);border-radius:14px;padding:24px;text-align:center;display:none}
+.result-card.show{display:block;animation:pop .3s}
+@keyframes pop{from{transform:scale(.95);opacity:0}}
+.result-card .icon{font-size:48px;margin-bottom:12px}
+.result-card h2{font-family:Georgia,serif;font-size:22px;margin-bottom:8px}
+.result-card p{color:#aaa;font-size:14px}
+.result-card.success{border-color:#4caf50}
+.result-card.success .icon{color:#4caf50}
+.result-card.error{border-color:#f44336}
+.stats{max-width:500px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:#1a1712;border-radius:12px;padding:16px;text-align:center;border:1px solid rgba(185,138,47,.2)}
+.stat b{font-size:28px;display:block;color:#e8c86a}
+.stat span{font-size:12px;color:#888}
+.manual{max-width:500px;margin:20px auto;padding:0 20px}
+.manual input{width:100%;padding:14px;background:#1a1712;border:1px solid rgba(185,138,47,.3);border-radius:10px;color:#fff;font-size:16px;margin-bottom:10px}
+.manual button{width:100%;padding:14px;background:#b98a2f;color:#fff;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer}
+#tokenInput{max-width:500px;margin:40px auto;padding:0 20px;text-align:center}
+#tokenInput input{width:100%;padding:16px;font-size:18px;text-align:center;text-transform:uppercase;background:#1a1712;border:1px solid rgba(185,138,47,.4);border-radius:12px;color:#fff;margin-bottom:12px;letter-spacing:.1em}
+#tokenInput button{width:100%;padding:16px;background:#b98a2f;color:#fff;border:0;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>✦ INVITO Check-in ✦</h1>
+  <p>Scan QR tamu untuk mencatat kehadiran</p>
+</div>
+
+<div id="tokenInput">
+  <p style="margin-bottom:16px;color:#aaa">Masukkan kode token undangan</p>
+  <input id="tokenCode" placeholder="KODE TOKEN" maxlength="12">
+  <button onclick="startCheckin()">Mulai Check-in</button>
+</div>
+
+<div id="checkinUI" class="hidden">
+  <div class="scanner-wrap">
+    <video id="video" playsinline></video>
+    <div class="scan-overlay"><div class="scan-line"></div></div>
+  </div>
+  <div class="result"><div class="result-card" id="resultCard"></div></div>
+  <div class="stats">
+    <div class="stat"><b id="statTotal">0</b><span>Total Tamu</span></div>
+    <div class="stat"><b id="statChecked">0</b><span>Sudah Check-in</span></div>
+  </div>
+  <div class="manual">
+    <p style="font-size:13px;color:#888;margin-bottom:8px;text-align:center">atau masukkan nama manual</p>
+    <input id="manualName" placeholder="Nama tamu">
+    <button onclick="manualCheckin()">Catat Kehadiran</button>
+  </div>
+</div>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+<script>
+// Firebase config (same as catalog)
+var firebaseConfig = {
+  apiKey: "<redacted>",
+  authDomain: "undangan-digital-f4310.firebaseapp.com",
+  projectId: "undangan-digital-f4310",
+  messagingSenderId: "220097197481",
+  appId: "1:220097197481:web:03ccc55291a89f4063c0b8"
+};
+try{ firebase.initializeApp(firebaseConfig); }catch(e){}
+var db = firebase.firestore();
+
+var currentCode = null;
+var video = document.getElementById('video');
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var scanning = false;
+var lastScan = 0;
+
+function getParam(n){ return new URLSearchParams(location.search).get(n); }
+
+function startCheckin(){
+  var code = (document.getElementById('tokenCode').value||'').trim().toUpperCase() || getParam('t');
+  if(!code || code.length < 4){ alert('Masukkan kode token'); return; }
+  currentCode = code;
+  document.getElementById('tokenInput').classList.add('hidden');
+  document.getElementById('checkinUI').classList.remove('hidden');
+  loadStats();
+  startCamera();
+}
+
+function startCamera(){
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(stream){
+      video.srcObject = stream;
+      video.play();
+      scanning = true;
+      requestAnimationFrame(tick);
+    })
+    .catch(function(){ showResult('error', '⚠️', 'Kamera tidak bisa diakses', 'Izinkan akses kamera atau gunakan input manual.'); });
+}
+
+function tick(){
+  if(!scanning) return;
+  if(video.readyState === video.HAVE_ENOUGH_DATA){
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var qr = jsQR(img.data, canvas.width, canvas.height);
+    if(qr && qr.data && Date.now() - lastScan > 2000){
+      lastScan = Date.now();
+      handleQR(qr.data);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function handleQR(data){
+  // QR format: INVITO:CODE:GUESTNAME or URL with params
+  var guest = data;
+  var m = data.match(/INVITO:([^:]+):(.+)/);
+  if(m){ guest = decodeURIComponent(m[2]); }
+  else {
+    try {
+      var u = new URL(data);
+      guest = u.searchParams.get('to') || u.searchParams.get('g') || data;
+    } catch(e){}
+  }
+  doCheckin(guest.trim());
+}
+
+function doCheckin(guestName){
+  if(!guestName) return;
+  var ref = db.collection('tokens').doc(currentCode).collection('checkins').doc();
+  ref.set({
+    guest: guestName,
+    at: firebase.firestore.FieldValue.serverTimestamp(),
+    by: 'scanner'
+  }).then(function(){
+    showResult('success', '✅', guestName, 'Berhasil check-in!');
+    loadStats();
+  }).catch(function(){
+    showResult('error', '⚠️', 'Gagal', 'Coba lagi.');
+  });
+}
+
+function manualCheckin(){
+  var n = document.getElementById('manualName').value.trim();
+  if(!n){ alert('Masukkan nama tamu'); return; }
+  doCheckin(n);
+  document.getElementById('manualName').value = '';
+}
+
+function showResult(type, icon, title, sub){
+  var c = document.getElementById('resultCard');
+  c.className = 'result-card show ' + type;
+  c.innerHTML = '<div class="icon">'+icon+'</div><h2>'+title+'</h2><p>'+sub+'</p>';
+  setTimeout(function(){ c.classList.remove('show'); }, 3000);
+}
+
+function loadStats(){
+  if(!currentCode) return;
+  db.collection('tokens').doc(currentCode).get().then(function(snap){
+    var data = (snap.data()||{}).data||{};
+    var guests = data.guests||[];
+    document.getElementById('statTotal').textContent = guests.length;
+  });
+  db.collection('tokens').doc(currentCode).collection('checkins').get().then(function(snap){
+    document.getElementById('statChecked').textContent = snap.size;
+  });
+}
+
+// Auto-start if token in URL
+window.onload = function(){
+  var t = getParam('t');
+  if(t){ document.getElementById('tokenCode').value = t; startCheckin(); }
+};
+</script>
+</body>
+</html>
