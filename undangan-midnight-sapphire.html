@@ -465,6 +465,78 @@ body.loaded .cover-inner .floaty{animation:floaty 7s ease-in-out 1.6s infinite}
   <p class="gift-note rv" data-txt="amplop.note">Kado fisik dapat dikirim ke alamat pada bagian Informasi Tamu 🤍</p>
 </section>
 
+<!-- ================= KONFIRMASI KEHADIRAN (RSVP) ================= -->
+<style>
+#rsvp2Form{background:rgba(255,255,255,.045);border:1px solid var(--silver-line);border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:14px}
+#rsvp2Form .flabel{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--silver-soft)}
+#rsvp2Form input[type="text"]{font-family:var(--sans);font-size:16px;color:var(--ink);border:1px solid var(--silver-line);border-radius:12px;padding:14px;background:var(--navy-input);width:100%}
+#rsvp2Form input::placeholder{color:#6b7484}
+.rsvp2-pills{display:flex;gap:10px;flex-wrap:wrap}
+.rsvp2-pills input{position:absolute;opacity:0;pointer-events:none}
+.rsvp2-pill{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 22px;border-radius:999px;border:1px solid var(--silver-line);background:rgba(255,255,255,.04);color:var(--silver-soft);font-family:var(--sans);font-size:14px;letter-spacing:.08em;cursor:pointer;transition:border-color .25s,color .25s,background .25s}
+.rsvp2-pill:hover{border-color:var(--gold);color:var(--gold-soft)}
+.rsvp2-pills input:checked+.rsvp2-pill{background:linear-gradient(135deg,var(--gold-soft),var(--gold) 55%,var(--gold-deep));color:#101c3a;border-color:transparent;font-weight:500}
+#rsvp2-msg{display:none;margin:0;font-size:14px;line-height:1.6;color:var(--gold-soft);text-align:center}
+#rsvp2-msg.ok,#rsvp2-msg.err{display:block}
+#rsvp2-msg.err{color:#f0a3a3}
+/* ---------- RSVP-2: mobile-first layout + animations (2026-11-05) ---------- */
+#rsvp2Form{padding:32px 22px;gap:16px}
+#rsvp2Form input[type="text"]{transition:border-color .25s ease,box-shadow .25s ease}
+#rsvp2Form input[type="text"]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,97,.22),0 0 20px rgba(201,169,97,.12)}
+.rsvp2-pills{display:grid;grid-template-columns:1fr;gap:12px}
+.rsvp2-pill{display:flex;width:100%;min-height:52px;padding:12px 20px;border-radius:999px;line-height:1.4;text-align:center;transition:border-color .3s ease,color .3s ease,background .3s ease,transform .3s cubic-bezier(.22,.61,.36,1),box-shadow .3s ease}
+.rsvp2-pill::before{content:"";display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:0 0 22px;margin-right:10px;border-radius:50%;border:1px solid currentColor;font-size:13px;line-height:1;opacity:.85}
+.rsvp2-pills label[for="rsvp2-att-hadir"]::before{content:"\2713"}
+.rsvp2-pills label[for="rsvp2-att-berhalangan"]::before{content:"\2715"}
+.rsvp2-pills label[for="rsvp2-att-ragu"]::before{content:"?"}
+.rsvp2-pills input:checked+.rsvp2-pill{transform:scale(1.02);box-shadow:0 10px 26px rgba(201,169,97,.30),0 2px 8px rgba(0,0,0,.35)}
+@keyframes rsvp2-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+#rsvp2.in-view .rsvp2-pill{animation:rsvp2-rise .55s cubic-bezier(.22,.61,.36,1) backwards}
+#rsvp2.in-view .rsvp2-pill:nth-of-type(1){animation-delay:0ms}
+#rsvp2.in-view .rsvp2-pill:nth-of-type(2){animation-delay:80ms}
+#rsvp2.in-view .rsvp2-pill:nth-of-type(3){animation-delay:160ms}
+#rsvp2-submit{width:100%;transition:transform .22s ease,box-shadow .22s ease}
+#rsvp2-submit:active{transform:scale(.97)}
+@keyframes rsvp2-msg-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rsvp2-pop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+#rsvp2-msg.ok{animation:rsvp2-msg-in .5s ease both}
+#rsvp2-msg.ok::before{content:"\2713";display:inline-block;width:26px;height:26px;margin-right:10px;border-radius:50%;background:linear-gradient(135deg,var(--gold-soft),var(--gold) 55%,var(--gold-deep));color:#101c3a;font-size:15px;font-weight:700;line-height:26px;text-align:center;vertical-align:-6px;animation:rsvp2-pop .5s cubic-bezier(.34,1.56,.64,1) both}
+@media (min-width:640px){
+.rsvp2-pills{grid-template-columns:repeat(3,1fr)}
+.rsvp2-pill{min-height:56px;padding:12px 8px;font-size:13px}
+}
+@media (hover:hover){
+#rsvp2-submit:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(201,169,97,.38)}
+}
+@media (prefers-reduced-motion:reduce){
+#rsvp2.in-view .rsvp2-pill{animation:none}
+#rsvp2-msg.ok,#rsvp2-msg.ok::before{animation:none}
+.rsvp2-pill,.rsvp2-pills input:checked+.rsvp2-pill{transform:none!important}
+#rsvp2-submit:active{transform:none}
+}
+</style>
+<section id="rsvp2">
+  <p class="eyebrow rv" data-txt="rsvp2.kicker">RSVP</p>
+  <h2 class="sec-title rv" data-txt="rsvp2.title">Konfirmasi Kehadiran</h2>
+  <p class="sec-sub rv" data-txt="rsvp2.intro">Mohon konfirmasi kehadiran Anda sebelum hari bahagia tiba</p>
+  <img class="divider rv" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAABGCAYAAABc4yWjAAADwElEQVR4nO3cPW4aQRgG4CHJJdK4cUsVIYXCh3CV1G7dusoJUrl1m9quOEQKW7JSubUUpckpkk1BVgLEegEv87PzPBIS4DX6NJ4dXr5ZEwIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGPWNM1Z6hoAUniTugAAAOISAAEAKiMAAlVqt39tAwM1EgABACojAAIAVEYABACojAAIVMd1f0DtBEAAgMoIgED1dASB2giAAACVEQChAg+3F3epa8iFbl8/8wXGTwAEort/fGpS15AT4wHEJgDCyLXdHF0ddmG+QB0EQCCqXLtdqbaGcx0PYNwEQBgxXZx1rv97mfkC9XiXugAoxf3j083q4/lsepmqlkM93F7cffz87VPqOkJYdr7ms+kkdR25yHE8cpovXcZwXkIKOoAkc//4dLO5eOdqW525155jNyf2dmfTNGert6GPf62ctn9znC99SjwvWyWtf4xTVp82qUdJn9r7Funcat/1jTxFZ2cz8Azd8Tp2aJtMJt+HfL1jj8cucp4vLyntvFxV0vrHeGUfAO8fn0JY1jkJy46l+8e7H8tJx/O/Itawj656W1nUPXm+/nDo7zanVz+GrGXD110OOiT85HBN376hcI+u35cDytlZxvNlV0Wcl1vksv79DSE0/2/uH+d+mM+m2XT5N5UQAE/CMpys3t72PHbMYcfEsuh4/jxiDftY9Pz8PEINnSbP14N1pZrTq6EC1fvXvsC2QJhD4OuzLRAOtNX7e4DXyHW+HGLR8/PzCDUcYtHx/HnEGkII4U9YBpX2tvl423OO2e+YMJ9Nf+7494gu+wDIOJW0BVLSVtO+13HF3tY7xpZnqlA4xHZw6i3g3OfLS0o6LzeVtP4xXgIgybSLYAmLX9ebTc61d725p3wTjxl4hgyGQ1/710odAFflOF/6lHhetkpa/xgnXwNDMiUtfPPZ9NKn9tebz6aTWP/5ui209YXCYwW9LjHHY4xKPi9LqZPx0gGEEdvs6uTQzVkNPLE7XrkFwBDSjsemHOcLcBy+BxBIInXYyY3xAGISAGHEdHDWvdThS9H9y435AvUQAIGodLrWGQ8gBQEQRq7t6ujusAvzBeogAALR6XqtMx5AbBYdoDrb/hvYNYBATXQAAQAqIwAC1dP9A2ojAAIAVEYABKqj4wfUTgAEAKiMAAgAUBkBEAAAgDps+z5AgBroAAIAVEYABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACrxD2CgJQL/ZKE5AAAAAElFTkSuQmCC" alt="">
+  <form id="rsvp2Form" class="rv">
+    <label class="flabel" for="rsvp2-name" data-txt="rsvp2.namelabel">Nama</label>
+    <input id="rsvp2-name" type="text" placeholder="Nama Anda" autocomplete="name" data-txt="rsvp2.nameplaceholder">
+    <span class="flabel" data-txt="rsvp2.attendlabel">Kehadiran</span>
+    <div class="rsvp2-pills" role="radiogroup" aria-label="Konfirmasi kehadiran">
+      <input type="radio" name="rsvp2-att" id="rsvp2-att-hadir" value="Hadir" checked>
+      <label class="rsvp2-pill" for="rsvp2-att-hadir" data-txt="rsvp2.opt.hadir">Hadir</label>
+      <input type="radio" name="rsvp2-att" id="rsvp2-att-berhalangan" value="Berhalangan">
+      <label class="rsvp2-pill" for="rsvp2-att-berhalangan" data-txt="rsvp2.opt.berhalangan">Berhalangan</label>
+      <input type="radio" name="rsvp2-att" id="rsvp2-att-ragu" value="Masih Ragu">
+      <label class="rsvp2-pill" for="rsvp2-att-ragu" data-txt="rsvp2.opt.ragu">Masih Ragu</label>
+    </div>
+    <p id="rsvp2-msg" role="status"></p>
+    <button class="btn" id="rsvp2-submit" type="submit" data-txt="rsvp2.submit">Konfirmasi Kehadiran</button>
+  </form>
+</section>
+
 <!-- ================= DINDING DOA ================= -->
 <section id="doa">
   <p class="eyebrow rv" data-txt="rsvp.kicker">Doa &amp; Ucapan</p>
@@ -625,6 +697,9 @@ stag(".gift-note", 640, 0, "rv");
 stag("#doa .eyebrow, #doa .sec-title, #doa .sec-sub", 0, 100, "rv");
 stag("#wishEmpty", 400, 0, "rv");
 stag("#rsvpForm", 500, 0, "rv");
+/* rsvp2: konfirmasi kehadiran */
+stag("#rsvp2 .eyebrow, #rsvp2 .sec-title, #rsvp2 .sec-sub", 0, 100, "rv");
+stag("#rsvp2Form", 300, 0, "rv");
 /* footer */
 stag("footer .thanks", 0, 0, "rv");
 stag("footer .eyebrow", 150, 0, "rv");
@@ -770,6 +845,52 @@ form.addEventListener("submit", function (ev) {
     showToast("Membuka WhatsApp — terima kasih!");
   } else { showToast("Terima kasih, ucapan terkirim 🤍"); }
 });
+/* ---------- RSVP-2: Konfirmasi Kehadiran (ringkas) ---------- */
+var rsvp2Form = document.getElementById("rsvp2Form");
+if (rsvp2Form) {
+  /* pre-fill ?to= seperti form utama */
+  if (guest) {
+    var rsvp2NameInput = document.getElementById("rsvp2-name");
+    if (rsvp2NameInput && !rsvp2NameInput.value) rsvp2NameInput.value = guest;
+  }
+  rsvp2Form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var msg = document.getElementById("rsvp2-msg");
+    function rsvp2Msg(text, ok) {
+      if (!msg) { showToast(text); return; }
+      msg.textContent = text;
+      msg.className = ok ? "ok" : "err";
+    }
+    var name = document.getElementById("rsvp2-name").value.trim();
+    var attEl = rsvp2Form.querySelector('input[name="rsvp2-att"]:checked');
+    var att = attEl ? attEl.value : "";
+    if (!name) { rsvp2Msg("Mohon isi nama Anda terlebih dahulu", false); return; }
+    try {
+      if (wishDb && tokenIsActive && tokenCode) {
+        var p2 = wishDb.collection("tokens").doc(tokenCode).collection("wishes").add({
+          name: name, attendance: att, wish: "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        if (p2 && p2.catch) p2.catch(function () {});
+      }
+      rsvp2Msg("Terima kasih, " + name + " \u2014 konfirmasi kehadiran Anda tercatat \uD83E\uDD0D", true);
+      showToast("Konfirmasi kehadiran terkirim \uD83E\uDD0D");
+    } catch (e) {
+      rsvp2Msg("Maaf, konfirmasi gagal dikirim. Silakan coba lagi.", false);
+    }
+  });
+}
+/* ---------- RSVP-2: section in-view (drives pill stagger) ---------- */
+(function () {
+  var rsvp2Sec = document.getElementById("rsvp2");
+  if (!rsvp2Sec || !("IntersectionObserver" in window)) return;
+  var rsvp2IO = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { rsvp2Sec.classList.add("in-view"); rsvp2IO.disconnect(); }
+    });
+  }, { threshold: 0.15 });
+  rsvp2IO.observe(rsvp2Sec);
+})();
 function renderSharedWish(data) {
   return wishCard(
     nonEmpty(data.name) ? String(data.name) : "Tamu",

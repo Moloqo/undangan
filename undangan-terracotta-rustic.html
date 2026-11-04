@@ -167,6 +167,40 @@ h2.sec-title{font-family:var(--serif);font-size:36px;font-weight:600;text-align:
 #rsvpForm input,#rsvpForm select,#rsvpForm textarea{font-family:var(--sans);font-size:16px;color:var(--espresso);border:1px solid var(--gold-soft);border-radius:12px;padding:14px;background:var(--cream);width:100%}
 #rsvpForm input:focus,#rsvpForm select:focus,#rsvpForm textarea:focus{outline:2px solid var(--terra-soft);border-color:var(--terra)}
 #rsvpForm textarea{min-height:110px;resize:vertical}
+/* ---------- rsvp2: konfirmasi kehadiran ---------- */
+#rsvp2{background:linear-gradient(180deg,var(--cream),var(--parch));opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,.61,.36,1)}
+#rsvp2.in-view{opacity:1;transform:none}
+#rsvp2Form{background:#fffdf7;border:1px solid var(--gold-soft);border-radius:20px;padding:30px 26px;display:flex;flex-direction:column;gap:15px;box-shadow:0 12px 28px rgba(138,63,32,.10)}
+@media (max-width:420px){#rsvp2Form{padding:26px 20px}}
+#rsvp2Form .fld-label{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--espresso-soft);font-weight:500}
+#rsvp2Form input[type="text"]{font-family:var(--sans);font-size:16px;color:var(--espresso);border:1px solid var(--gold-soft);border-radius:12px;padding:14px;background:var(--cream);width:100%}
+#rsvp2Form input[type="text"]:focus{outline:2px solid var(--terra-soft);border-color:var(--terra);box-shadow:0 0 0 4px rgba(180,86,47,.14)}
+.rsvp2-pills{display:grid;grid-template-columns:1fr;gap:12px;width:100%}
+@media (min-width:640px){.rsvp2-pills{grid-template-columns:repeat(3,1fr);gap:14px}}
+.rsvp2-pill{position:relative;margin:0;display:block;opacity:0;transform:translateY(14px) scale(.97);transition:opacity .55s ease,transform .55s cubic-bezier(.22,.61,.36,1)}
+#rsvp2.in-view .rsvp2-pill{opacity:1;transform:none}
+#rsvp2.in-view .rsvp2-pill:nth-child(1){transition-delay:.08s}
+#rsvp2.in-view .rsvp2-pill:nth-child(2){transition-delay:.16s}
+#rsvp2.in-view .rsvp2-pill:nth-child(3){transition-delay:.24s}
+.rsvp2-pill input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.rsvp2-pill span{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;padding:13px 16px;border-radius:14px;border:1.5px solid var(--gold-soft);background:var(--cream);color:var(--espresso-soft);font-size:15px;letter-spacing:.05em;cursor:pointer;font-weight:500;transition:transform .25s ease,box-shadow .25s ease,background .25s ease,color .25s ease,border-color .25s ease}
+.rsvp2-pill span::before{content:"";display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 auto;border-radius:50%;border:1.5px solid var(--gold-deep);font-size:13px;line-height:1;font-family:var(--sans);font-style:normal;transition:background .25s ease,color .25s ease,border-color .25s ease,transform .25s ease}
+.rsvp2-pill:nth-child(1) span::before{content:"\2713";color:var(--terra-deep)}
+.rsvp2-pill:nth-child(2) span::before{content:"\2715";color:var(--terra-deep)}
+.rsvp2-pill:nth-child(3) span::before{content:"?";color:var(--terra-deep)}
+.rsvp2-pill input:checked + span{transform:scale(1.02);background:linear-gradient(135deg,var(--terra),var(--terra-deep));color:#fff8f0;border-color:var(--terra-deep);box-shadow:0 10px 24px rgba(180,86,47,.32)}
+.rsvp2-pill input:checked + span::before{background:#fff8f0;color:var(--terra-deep);border-color:#fff8f0;transform:scale(1.08)}
+.rsvp2-pill input:focus-visible + span{outline:2px solid var(--terra-soft);outline-offset:2px}
+#rsvp2-submit{width:100%;min-height:52px;transition:transform .18s ease,box-shadow .25s ease}
+#rsvp2-submit:active{transform:scale(.97)}
+@media (hover:hover){#rsvp2-submit:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(180,86,47,.36)}}
+@media (hover:none){#rsvp2-submit:hover{transform:none}}
+.rsvp2-msg{text-align:center;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--terra-deep);line-height:1.7;margin:2px 0 0}
+#rsvp2-msg[hidden]{display:none}
+.rsvp2-msg:not([hidden]){animation:rsvp2MsgIn .55s cubic-bezier(.22,.61,.36,1) both}
+.rsvp2-msg:not([hidden])::before{content:"\2713";display:inline-flex;align-items:center;justify-content:center;margin-right:8px;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--terra),var(--terra-deep));color:#fff8f0;font-style:normal;font-family:var(--sans);font-size:15px;animation:rsvp2Pop .55s cubic-bezier(.34,1.56,.64,1) .1s both}
+@keyframes rsvp2MsgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes rsvp2Pop{0%{transform:scale(0)}60%{transform:scale(1.28)}100%{transform:scale(1)}}
 /* ---------- footer ---------- */
 footer{padding:74px 30px 100px;text-align:center;background:linear-gradient(180deg,var(--cream),var(--sand))}
 footer .foot-sprig{width:74px;margin:0 auto 18px;opacity:.9}
@@ -226,6 +260,9 @@ body.loaded #cover .cnr{opacity:.92}
 .cover-inner > *{opacity:1!important;transform:none!important;transition:none!important}
 #cover .cnr{opacity:.92!important;transition:none!important}
 .mote,.scroll-hint,.floaty{animation:none!important}
+#rsvp2{opacity:1!important;transform:none!important;transition:none!important}
+.rsvp2-pill{opacity:1!important;transform:none!important;transition:none!important}
+.rsvp2-msg::before{animation:none!important}
 }
 
 /* ---------- loading screen: infinity emas ---------- */
@@ -467,6 +504,26 @@ body.loaded #cover .cnr{opacity:.92}
   <p class="gift-note rv" data-txt="amplop.hint">Doa restu Anda adalah hadiah terindah bagi kami &mdash; namun jika berkenan memberi tanda kasih, kami menghaturkan terima kasih yang sebesar-besarnya.</p>
 </section>
 
+<!-- ================= KONFIRMASI KEHADIRAN ================= -->
+<section id="rsvp2">
+  <p class="eyebrow rv" data-txt="rsvp2.label">RSVP</p>
+  <h2 class="sec-title rv" data-txt="rsvp2.title">Konfirmasi Kehadiran</h2>
+  <svg class="divider rv" viewBox="0 0 220 26" aria-hidden="true"><g fill="none" stroke="#c98f3d" stroke-width="1.6" stroke-linecap="round"><path d="M14 13 H92 M128 13 H206"/><path d="M98 13 q-6 -7 -14 -8 M98 13 q-6 7 -14 8 M122 13 q6 -7 14 -8 M122 13 q6 7 14 8"/><circle cx="8" cy="13" r="2.2" fill="#b4562f" stroke="none"/><circle cx="212" cy="13" r="2.2" fill="#b4562f" stroke="none"/></g><path d="M110 5 C106 9 106 17 110 21 C114 17 114 9 110 5 Z" fill="#b4562f"/></svg>
+  <p class="sec-sub rv" data-txt="rsvp2.sub">Mohon kesediaan Anda untuk mengonfirmasi kehadiran &mdash; kehadiran Anda adalah doa terindah bagi kami.</p>
+  <form id="rsvp2Form" class="rv">
+    <span class="fld-label" data-txt="rsvp2.namelabel">Nama</span>
+    <input id="rsvp2-name" type="text" maxlength="60" placeholder="Nama Anda" autocomplete="name" data-txt="rsvp2.nameplaceholder">
+    <span class="fld-label" data-txt="rsvp2.attlabel">Kehadiran</span>
+    <div class="rsvp2-pills" role="radiogroup" aria-label="Konfirmasi kehadiran">
+      <label class="rsvp2-pill"><input type="radio" name="rsvp2-att" value="Hadir" checked><span data-txt="rsvp2.opt_hadir">Hadir</span></label>
+      <label class="rsvp2-pill"><input type="radio" name="rsvp2-att" value="Berhalangan"><span data-txt="rsvp2.opt_berhalangan">Berhalangan</span></label>
+      <label class="rsvp2-pill"><input type="radio" name="rsvp2-att" value="Masih Ragu"><span data-txt="rsvp2.opt_ragu">Masih Ragu</span></label>
+    </div>
+    <button class="btn" id="rsvp2-submit" type="submit" data-txt="rsvp2.submit">Konfirmasi Kehadiran</button>
+    <p id="rsvp2-msg" class="rsvp2-msg" hidden></p>
+  </form>
+</section>
+
 <!-- ================= DINDING DOA ================= -->
 <section id="doa">
   <p class="eyebrow rv" data-txt="rsvp.label">Doa &amp; Ucapan</p>
@@ -692,7 +749,53 @@ body.loaded #cover .cnr{opacity:.92}
     }
   });
 
-  /* ================================================================
+    /* ---------- rsvp2: fade-up seksi + stagger opsi ---------- */
+    (function () {
+      var r2sec = document.getElementById("rsvp2");
+      if (!r2sec) return;
+      if ("IntersectionObserver" in window) {
+        var io2 = new IntersectionObserver(function (en) {
+          en.forEach(function (e) { if (e.isIntersecting) { r2sec.classList.add("in-view"); io2.disconnect(); } });
+        }, { threshold: 0.15 });
+        io2.observe(r2sec);
+      } else { r2sec.classList.add("in-view"); }
+    })();
+
+    /* ---------- rsvp2: konfirmasi kehadiran (section baru) ---------- */
+  (function () {
+    var r2Form = document.getElementById("rsvp2Form");
+    var r2Name = document.getElementById("rsvp2-name");
+    var r2Msg = document.getElementById("rsvp2-msg");
+    if (!r2Form || !r2Name || !r2Msg) return;
+    try {
+      var r2guest = (new URLSearchParams(location.search).get("to") || "").trim();
+      if (r2guest && !r2Name.value) r2Name.value = r2guest;
+    } catch (e) {}
+    r2Form.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var name = r2Name.value.trim();
+      var picked = r2Form.querySelector('input[name="rsvp2-att"]:checked');
+      var att = picked ? picked.value : "Hadir";
+      if (!name) { showToast("Mohon isi nama terlebih dahulu"); r2Name.focus(); return; }
+      if (wishDb && tokenIsActive && tokenCode) {
+        try {
+          var p2 = wishDb.collection("tokens").doc(tokenCode).collection("wishes").add({
+            name: name,
+            attendance: att,
+            wish: "",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          if (p2 && p2.catch) p2.catch(function () {});
+        } catch (e) {}
+      }
+      r2Msg.hidden = false;
+      r2Msg.textContent = "Terima kasih, " + name + " \u2014 kehadiran Anda (" + att + ") telah terkonfirmasi.";
+      showToast("Matur nuwun, konfirmasi kehadiran terkirim");
+      try { r2Form.reset(); r2Name.value = name; } catch (e) {}
+    });
+  })();
+
+/* ================================================================
      DATA CUSTOMER (?t=KODE) — hidrasi dari Firestore tokens/{code}
      ================================================================ */
   var customerWaNumber = "";

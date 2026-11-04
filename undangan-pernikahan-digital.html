@@ -673,6 +673,176 @@ footer .fnote{margin-top:16px;font-size:13px;color:rgba(235,220,185,.65);}
     </div>
   </section>
 
+  <!-- RSVP2: konfirmasi kehadiran cepat (tulis ke wishes via pola token template) -->
+  <style>
+    /* ---------- RSVP2: mobile-first + animasi ---------- */
+    #rsvp2{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.61,.36,1);}
+    #rsvp2.in-view{opacity:1;transform:none;}
+    form#rsvp2Form{
+      background:var(--surface);border:2px solid var(--ink);box-shadow:7px 7px 0 var(--shadow);
+      padding:30px 24px;max-width:560px;margin:0 auto;
+    }
+    form#rsvp2Form button[type="submit"]{width:100%;}
+    #rsvp2-name{font-size:16px;} /* anti iOS auto-zoom (sudah 16px via .field, ditegaskan) */
+    #rsvp2-name:focus{box-shadow:0 0 0 3px rgba(184,134,43,.28);} /* glow aksen emas tema */
+    /* opsi kehadiran: 1 kolom full-width di mobile, 3 kolom di desktop */
+    #rsvp2 .att-pills{display:flex;flex-direction:column;gap:12px;margin-top:10px;}
+    @media(min-width:640px){
+      #rsvp2 .att-pills{flex-direction:row;}
+      #rsvp2 .att-pill{flex:1 1 0;}
+    }
+    /* stagger: opsi muncul satu per satu saat section masuk viewport */
+    #rsvp2 .att-pill{position:relative;cursor:pointer;opacity:0;transform:translateY(14px);
+      transition:opacity .45s ease,transform .45s ease;}
+    #rsvp2 .att-pill:nth-child(1){transition-delay:.08s;}
+    #rsvp2 .att-pill:nth-child(2){transition-delay:.16s;}
+    #rsvp2 .att-pill:nth-child(3){transition-delay:.24s;}
+    #rsvp2.in-view .att-pill{opacity:1;transform:none;transition-delay:0s;}
+    #rsvp2 .att-pill input{position:absolute;opacity:0;pointer-events:none;}
+    #rsvp2 .att-pill span{
+      display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;
+      min-height:54px;padding:13px 10px;
+      font-family:"VT323",monospace;font-size:22px;letter-spacing:.06em;line-height:1.2;
+      color:var(--ink);background:var(--surface);
+      border:2px solid var(--ink);box-shadow:5px 5px 0 var(--shadow);
+      transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,color .18s ease,border-color .18s ease;
+    }
+    #rsvp2 .att-pill .att-ic{
+      display:inline-flex;align-items:center;justify-content:center;flex:none;
+      width:26px;height:26px;border:2px solid currentColor;
+      font-size:18px;line-height:1;color:var(--accent-deep);
+      transition:background-color .18s ease,color .18s ease,border-color .18s ease;
+    }
+    #rsvp2 .att-pill input:checked + span{
+      background:var(--accent);color:#241A02;border-color:var(--ink);
+      transform:scale(1.02);box-shadow:7px 7px 0 var(--shadow);
+    }
+    #rsvp2 .att-pill input:checked + span .att-ic{color:#241A02;}
+    #rsvp2 .att-pill input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px;}
+    /* tombol submit: hover lift khusus desktop, press scale 0.97 */
+    #rsvp2-submit{transition:transform .15s ease,box-shadow .15s ease;}
+    @media (hover:hover){
+      #rsvp2-submit:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--shadow);}
+    }
+    #rsvp2-submit:active{transform:translate(3px,3px) scale(.97);box-shadow:2px 2px 0 var(--shadow);}
+    /* notifikasi sukses: fade-in + slide-up, ikon ✓ pop */
+    #rsvp2Note{min-height:28px;text-align:center;font-family:"VT323",monospace;font-size:21px;color:var(--accent-deep);margin-top:14px;}
+    #rsvp2Note.pop{animation:rsvp2NoteIn .5s ease both;}
+    #rsvp2Note.pop.ok::before{
+      content:"\2713";display:inline-flex;align-items:center;justify-content:center;
+      width:26px;height:26px;margin-right:10px;vertical-align:-4px;
+      background:var(--accent);color:#241A02;border:2px solid var(--ink);
+      font-size:18px;line-height:1;animation:rsvp2Pop .45s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes rsvp2NoteIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+    @keyframes rsvp2Pop{0%{transform:scale(0);}60%{transform:scale(1.25);}100%{transform:scale(1);}}
+    @media (prefers-reduced-motion:reduce){
+      #rsvp2,#rsvp2 .att-pill{opacity:1;transform:none;transition:none;}
+      #rsvp2Note.pop,#rsvp2Note.pop.ok::before{animation:none;}
+    }
+  </style>
+  <section id="rsvp2" class="wrap">
+    <div style="max-width:680px;margin:0 auto;">
+      <div class="sec-head reveal">
+        <span class="vt">— KONFIRMASI KEHADIRAN —</span>
+        <h2>Konfirmasi Kehadiran</h2>
+        <div class="pix-divider" aria-hidden="true"><span class="dline"></span><span class="dsq"></span><span class="dline"></span></div>
+        <p>Mohon kabari kami apakah panjenengan berkenan hadir — cukup isi nama dan pilih kehadiran di bawah ini.</p>
+      </div>
+
+      <form id="rsvp2Form" class="reveal">
+        <div class="field">
+          <label for="rsvp2-name">Nama</label>
+          <input id="rsvp2-name" type="text" maxlength="48" placeholder="cth. Keluarga Besar Hartono" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label>Kehadiran</label>
+          <div class="att-pills" role="radiogroup" aria-label="Konfirmasi kehadiran">
+            <label class="att-pill"><input type="radio" name="rsvp2-att" value="Hadir" checked /><span><b class="att-ic" aria-hidden="true">✓</b>Hadir</span></label>
+            <label class="att-pill"><input type="radio" name="rsvp2-att" value="Berhalangan" /><span><b class="att-ic" aria-hidden="true">✕</b>Berhalangan</span></label>
+            <label class="att-pill"><input type="radio" name="rsvp2-att" value="Masih Ragu" /><span><b class="att-ic" aria-hidden="true">?</b>Masih Ragu</span></label>
+          </div>
+        </div>
+        <button class="btn gold" type="submit" id="rsvp2-submit">KONFIRMASI KEHADIRAN</button>
+        <p id="rsvp2Note" role="status"></p>
+      </form>
+    </div>
+  </section>
+  <script>
+  (function(){
+    /* Pre-fill nama dari ?to= (pola template). */
+    try {
+      var guest = (new URLSearchParams(location.search).get('to') || '').trim();
+      if (guest) {
+        var nm = document.getElementById('rsvp2-name');
+        if (nm) nm.value = guest.slice(0, 60);
+      }
+    } catch(e){}
+    var form = document.getElementById('rsvp2Form');
+    var note = document.getElementById('rsvp2Note');
+    if (!form || !note) return;
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var name = document.getElementById('rsvp2-name').value.trim();
+      if (!name) {
+        note.textContent = 'Mohon isi nama terlebih dahulu ya.';
+        note.style.color = 'var(--terra)';
+        return;
+      }
+      var att = 'Hadir';
+      var sel = form.querySelector('input[name="rsvp2-att"]:checked');
+      if (sel) att = sel.value;
+      /* Token aktif → simpan konfirmasi ke Firestore subkoleksi wishes (pola token template). */
+      try {
+        if (window.__wishDb && window.__wishCode && typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue) {
+          var w = window.__wishDb.collection('tokens').doc(window.__wishCode).collection('wishes').add({
+            name: name, attendance: att, wish: '',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          if (w && w.catch) w.catch(function(){
+            note.textContent = 'Gagal menyimpan, coba lagi ya.';
+            note.style.color = 'var(--terra)';
+          });
+        }
+      } catch(e){}
+      form.reset();
+      note.textContent = 'Matur nuwun, ' + name + '! Konfirmasi kehadiran panjenengan sudah tersimpan.';
+      note.style.color = 'var(--accent-deep)';
+    });
+  })();
+  </script>
+  <script>
+  (function(){
+    /* RSVP2: animasi masuk section + pop notifikasi (ADITIF -- logika submit/Firestore di atas tidak diubah). */
+    var sec = document.getElementById('rsvp2');
+    var note = document.getElementById('rsvp2Note');
+    if (sec) {
+      if ('IntersectionObserver' in window) {
+        var io2 = new IntersectionObserver(function(es){
+          es.forEach(function(en){
+            if (en.isIntersecting) { sec.classList.add('in-view'); io2.disconnect(); }
+          });
+        }, { threshold: 0.12 });
+        io2.observe(sec);
+      } else {
+        sec.classList.add('in-view');
+      }
+    }
+    if (note && 'MutationObserver' in window) {
+      var mo = new MutationObserver(function(){
+        var ok = !!note.textContent && note.style.color !== 'var(--terra)';
+        note.classList.remove('pop', 'ok');
+        void note.offsetWidth; /* restart animasi tiap pesan baru */
+        if (note.textContent) {
+          if (ok) note.classList.add('ok');
+          note.classList.add('pop');
+        }
+      });
+      mo.observe(note, { childList: true, characterData: true, subtree: true });
+    }
+  })();
+  </script>
+
   <!-- RSVP -->
   <section id="rsvp" class="wrap sec-alt" style="max-width:none;">
     <div style="max-width:680px;margin:0 auto;">
