@@ -39,6 +39,15 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#0f0d0a;c
 #tokenInput input{width:100%;padding:16px;font-size:18px;text-align:center;text-transform:uppercase;background:#1a1712;border:1px solid rgba(185,138,47,.4);border-radius:12px;color:#fff;margin-bottom:12px;letter-spacing:.1em}
 #tokenInput button{width:100%;padding:16px;background:#b98a2f;color:#fff;border:0;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer}
 .hidden{display:none!important}
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.popup-card{background:#1a1712;border:2px solid #4caf50;border-radius:20px;padding:36px 28px;text-align:center;max-width:340px;width:100%;animation:pop .3s}
+.popup-card.warn{border-color:#f5a623}
+.popup-icon{font-size:64px;margin-bottom:12px}
+.popup-card h2{font-family:Georgia,serif;font-size:26px;color:#4caf50;margin-bottom:8px;letter-spacing:.05em}
+.popup-card.warn h2{color:#f5a623}
+.popup-card p{color:#ccc;font-size:15px;margin:4px 0}
+.popup-card #popupName{font-size:20px;font-weight:700;color:#fff}
+.popup-card button{margin-top:20px;width:100%;padding:14px;background:#b98a2f;color:#fff;border:0;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer}
 .history{max-width:500px;margin:0 auto 20px;padding:0 20px}
 .history-title{font-size:13px;color:#888;margin-bottom:8px;text-align:center}
 #checkinList{list-style:none}
@@ -167,18 +176,53 @@ function handleQR(data){
 
 function doCheckin(guestName){
   if(!guestName) return;
-  var ref = db.collection('tokens').doc(currentCode).collection('checkins').doc();
-  ref.set({
-    guest: guestName,
-    at: firebase.firestore.FieldValue.serverTimestamp(),
-    by: 'scanner'
-  }).then(function(){
-    showResult('success', '✅', guestName, 'Berhasil check-in! Nama sudah tercatat di bawah.');
-    loadStats();
+  var col = db.collection('tokens').doc(currentCode).collection('checkins');
+  // Cek dulu: nama ini sudah check-in belum? (1 QR = 1x check-in)
+  col.get().then(function(snap){
+    var key = guestName.trim().toLowerCase();
+    var dup = null;
+    snap.forEach(function(doc){ var d = doc.data()||{};
+      if(((d.guest||'').trim()).toLowerCase() === key) dup = d;
+    });
+    if(dup){
+      var tm = dup.at && dup.at.toDate ? dup.at.toDate().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '';
+      showPopup(false, guestName, 'Sudah check-in sebelumnya' + (tm ? ' pukul ' + tm : '') + '. 1 QR hanya bisa 1x scan.');
+      if(navigator.vibrate) navigator.vibrate([100,50,100]);
+      return;
+    }
+    col.doc().set({
+      guest: guestName,
+      at: firebase.firestore.FieldValue.serverTimestamp(),
+      by: 'scanner'
+    }).then(function(){
+      showPopup(true, guestName, 'Berhasil check-in! Nama sudah tercatat di bawah.');
+      showResult('success', '✅', guestName, 'Berhasil check-in! Nama sudah tercatat di bawah.');
+      loadStats();
+    }).catch(function(){
+      showResult('error', '⚠️', 'Gagal', 'Coba lagi.');
+    });
   }).catch(function(){
     showResult('error', '⚠️', 'Gagal', 'Coba lagi.');
   });
 }
+function showPopup(ok, name, sub){
+  var p = document.getElementById('scanPopup');
+  var card = p.querySelector('.popup-card');
+  document.getElementById('popupIcon').textContent = ok ? '✅' : '⚠️';
+  document.getElementById('popupTitle').textContent = ok ? 'SCAN BERHASIL' : 'SUDAH CHECK-IN';
+  document.getElementById('popupName').textContent = name;
+  document.getElementById('popupSub').textContent = sub || '';
+  card.className = 'popup-card' + (ok ? '' : ' warn');
+  p.style.display = 'flex';
+  if(ok && navigator.vibrate) navigator.vibrate(200);
+}
+function closePopup(){
+  document.getElementById('scanPopup').style.display = 'none';
+}
+// Tutup popup kalau klik di luar kartu
+document.getElementById('scanPopup').addEventListener('click', function(e){
+  if(e.target === this) closePopup();
+});
 
 function manualCheckin(){
   var n = document.getElementById('manualName').value.trim();
@@ -269,5 +313,14 @@ window.onload = function(){
   if(t){ document.getElementById('tokenCode').value = t; startCheckin(); }
 };
 </script>
+<div id="scanPopup" class="popup-overlay" style="display:none">
+  <div class="popup-card">
+    <div class="popup-icon" id="popupIcon">✅</div>
+    <h2 id="popupTitle">SCAN BERHASIL</h2>
+    <p id="popupName"></p>
+    <p id="popupSub"></p>
+    <button onclick="closePopup()">OK</button>
+  </div>
+</div>
 </body>
 </html>
