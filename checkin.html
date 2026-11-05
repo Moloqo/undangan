@@ -39,6 +39,9 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#0f0d0a;c
 #tokenInput input{width:100%;padding:16px;font-size:18px;text-align:center;text-transform:uppercase;background:#1a1712;border:1px solid rgba(185,138,47,.4);border-radius:12px;color:#fff;margin-bottom:12px;letter-spacing:.1em}
 #tokenInput button{width:100%;padding:16px;background:#b98a2f;color:#fff;border:0;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer}
 .hidden{display:none!important}
+.upload-qr{max-width:500px;margin:0 auto;padding:0 20px;text-align:center}
+.upload-btn{display:inline-block;padding:13px 24px;background:#1a1712;border:1.5px solid #b98a2f;color:#e8c86a;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px}
+.retry-btn{display:block;width:100%;padding:12px;background:transparent;border:1px solid rgba(185,138,47,.3);color:#aaa;border-radius:10px;font-size:14px;cursor:pointer;margin-top:4px}
 </style>
 </head>
 <body>
@@ -57,6 +60,12 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#0f0d0a;c
   <div class="scanner-wrap">
     <video id="video" playsinline></video>
     <div class="scan-overlay"><div class="scan-line"></div></div>
+  </div>
+  <div class="upload-qr">
+    <p style="font-size:13px;color:#888;margin-bottom:8px;text-align:center">kamera gak bisa? upload foto QR-nya</p>
+    <label for="qrFile" class="upload-btn">📷 Upload Foto QR</label>
+    <input type="file" id="qrFile" accept="image/*" style="display:none">
+    <button type="button" id="retryCam" class="retry-btn" onclick="startCamera()">🔄 Coba Kamera Lagi</button>
   </div>
   <div class="result"><div class="result-card" id="resultCard"></div></div>
   <div class="stats">
@@ -111,7 +120,7 @@ function startCamera(){
       scanning = true;
       requestAnimationFrame(tick);
     })
-    .catch(function(){ showResult('error', '⚠️', 'Kamera tidak bisa diakses', 'Izinkan akses kamera atau gunakan input manual.'); });
+    .catch(function(err){ showResult('error', '⚠️', 'Kamera tidak bisa diakses', 'Coba tombol "Coba Kamera Lagi" di bawah, atau upload foto QR / input manual.'); });
 }
 
 function tick(){
@@ -172,6 +181,32 @@ function showResult(type, icon, title, sub){
   c.innerHTML = '<div class="icon">'+icon+'</div><h2>'+title+'</h2><p>'+sub+'</p>';
   setTimeout(function(){ c.classList.remove('show'); }, 3000);
 }
+
+// Upload foto QR (fallback kalau kamera gak bisa)
+document.getElementById('qrFile').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var img = new Image();
+    img.onload = function(){
+      var c = document.createElement('canvas');
+      c.width = img.width; c.height = img.height;
+      var cx = c.getContext('2d');
+      cx.drawImage(img, 0, 0);
+      try {
+        var imgData = cx.getImageData(0, 0, c.width, c.height);
+        var qr = jsQR(imgData.data, c.width, c.height);
+        if(qr && qr.data){ handleQR(qr.data); }
+        else { showResult('error', '⚠️', 'QR tidak terbaca', 'Coba foto yang lebih jelas / lebih dekat.'); }
+      } catch(err){ showResult('error', '⚠️', 'Gagal membaca gambar', 'Coba foto lain.'); }
+    };
+    img.onerror = function(){ showResult('error', '⚠️', 'File tidak valid', 'Pilih gambar QR yang valid.'); };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
 
 function loadStats(){
   if(!currentCode) return;
