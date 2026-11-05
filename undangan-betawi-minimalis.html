@@ -1756,7 +1756,7 @@
                 if (!snap || snap.empty) return;
                 document.querySelectorAll(".demo-wish").forEach(function (t) { t.style.display = "none"; });
                 snap.forEach(function (docSnap) {
-                  wall.appendChild(renderSharedWish(docSnap.data() || {}));
+                  var _d = docSnap.data() || {}; if(!((_d.wish||_d.message||"").trim())) return; wall.appendChild(renderSharedWish(_d));
                 });
               })
               .catch(function () {});

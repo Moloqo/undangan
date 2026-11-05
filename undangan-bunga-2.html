@@ -1794,7 +1794,7 @@
         .then(function(snap){
           if (!snap || snap.empty) return; /* tak ada ucapan bersama → dinding demo apa adanya */
           var wall = document.getElementById('wall');
-          snap.forEach(function(docSnap){ wall.appendChild(renderSharedWish(docSnap.data() || {})); });
+          snap.forEach(function(docSnap){ var _d = docSnap.data() || {}; if(!((_d.wish||_d.message||"").trim())) return; wall.appendChild(renderSharedWish(_d)); });
         })
         .catch(function(){ /* rules/jaringan gagal → diam, perilaku lokal tetap */ });
     } catch (e) { /* diam — perilaku lokal tetap */ }

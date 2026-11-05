@@ -1131,6 +1131,7 @@
           if(!snap || snap.empty) return;
           snap.forEach(function(docSnap){
             var w = docSnap.data() || {};
+            if(!((w.wish||w.message||'').trim())) return;
             var key = wishStatusKey(w.attendance);
             wall.appendChild(buildWishCard(txt(w.name) || "Tamu", key, txt(w.wish)));
             counts[key]++;
