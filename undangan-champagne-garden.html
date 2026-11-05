@@ -408,7 +408,7 @@ body.loaded .cover-inner .floaty{animation:floaty 7s ease-in-out 1.6s infinite}
 </section>
 
 <!-- ================= AMPLOP DIGITAL ================= -->
-<section id="amplop">
+<section class="rsvp2-section" id="amplop">
   <p class="eyebrow rv" data-txt="amplop.label">Tanda Kasih</p>
   <h2 class="sec-title rv" data-txt="amplop.title">Amplop Digital</h2>
   <p class="sec-sub rv" data-txt="amplop.hint">Doa Anda sudah lebih dari cukup — namun jika berkenan memberi tanda kasih:</p>
@@ -437,7 +437,7 @@ body.loaded .cover-inner .floaty{animation:floaty 7s ease-in-out 1.6s infinite}
 #rsvp2 .rsvp2-pill.sel{border-color:var(--gold-deep);background:linear-gradient(135deg,var(--gold) 0%,var(--gold-deep) 100%);color:#fff;font-weight:500;transform:scale(1.02);box-shadow:0 8px 22px rgba(163,127,62,.32)}
 #rsvp2 .rsvp2-pill.sel::before{background:rgba(255,255,255,.22);border-color:transparent;transform:scale(1.1)}
 #rsvp2 .rsvp2-pill{opacity:0}
-#rsvp2.in-view .rsvp2-pill{animation:rsvp2-rise .55s cubic-bezier(.22,.61,.36,1) backwards}
+#rsvp2.in-view .rsvp2-pill{animation:rsvp2-rise .55s cubic-bezier(.22,.61,.36,1) both}
 #rsvp2.in-view .rsvp2-pill:nth-child(1){animation-delay:.05s}
 #rsvp2.in-view .rsvp2-pill:nth-child(2){animation-delay:.13s}
 #rsvp2.in-view .rsvp2-pill:nth-child(3){animation-delay:.21s}
@@ -470,9 +470,9 @@ body.loaded .cover-inner .floaty{animation:floaty 7s ease-in-out 1.6s infinite}
     <label for="rsvp2-name" data-txt="rsvp2.namelabel">Nama</label>
     <input id="rsvp2-name" type="text" data-txt="rsvp2.nameplaceholder" placeholder="Nama Anda" autocomplete="name">
     <div class="rsvp2-pills" role="radiogroup" aria-label="Kehadiran">
-      <button type="button" class="rsvp2-pill sel" data-att="Hadir" data-txt="rsvp2.attyes">Hadir</button>
-      <button type="button" class="rsvp2-pill" data-att="Berhalangan" data-txt="rsvp2.attno">Berhalangan</button>
-      <button type="button" class="rsvp2-pill" data-att="Masih Ragu" data-txt="rsvp2.attmaybe">Masih Ragu</button>
+      <button type="button" class="rsvp2-pill sel" data-att="Hadir">Hadir</button>
+      <button type="button" class="rsvp2-pill" data-att="Berhalangan">Berhalangan</button>
+      <button type="button" class="rsvp2-pill" data-att="Masih Ragu">Masih Ragu</button>
     </div>
     <button class="btn" id="rsvp2-submit" type="button" data-txt="rsvp2.submit">Konfirmasi Kehadiran</button>
     <p id="rsvp2-msg" role="status" hidden></p>
