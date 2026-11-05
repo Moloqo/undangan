@@ -527,6 +527,36 @@
       @keyframes rsvp2NoteIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
       @keyframes rsvp2OkPop { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
+      /* ---- QR check-in: tampil setelah RSVP cepat berhasil ---- */
+      #rsvp2-qr {
+        margin-top: 26px; padding: 26px 20px 22px; text-align: center;
+        background: var(--card); border: 2px solid var(--gold); border-radius: 18px;
+        box-shadow: 0 10px 28px rgba(181, 126, 18, .16);
+      }
+      #rsvp2-qr[hidden] { display: none; }
+      #rsvp2-qr.show { animation: rsvp2QrIn .55s ease backwards; }
+      @keyframes rsvp2QrIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+      .rsvp2-qr-check {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 44px; height: 44px; margin: 0 0 10px; border-radius: 50%;
+        background: var(--green); color: #fff; font-size: 24px; font-weight: 800; line-height: 1;
+      }
+      .rsvp2-qr-title { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--red); margin: 0 0 4px; line-height: 1.2; }
+      .rsvp2-qr-name { font-weight: 700; color: var(--ink); margin: 0 0 6px; font-size: 17px; }
+      .rsvp2-qr-sub { color: var(--muted); font-size: 14.5px; line-height: 1.55; margin: 0 0 16px; }
+      #rsvp2-qrcode {
+        display: inline-block; padding: 12px; background: #fff;
+        border: 2px solid var(--line); border-radius: 12px; line-height: 0;
+        overflow-wrap: anywhere;
+      }
+      #rsvp2-qrcode img, #rsvp2-qrcode canvas { display: block; width: 200px !important; height: 200px !important; }
+      #rsvp2-qr-download { width: 100%; margin-top: 18px; }
+      .rsvp2-qr-demo { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+      .rsvp2-qr-demo[hidden] { display: none; }
+      @media (prefers-reduced-motion: reduce) {
+        #rsvp2-qr.show { animation: none; }
+      }
+
       /* ---- animasi masuk section: fade-up + stagger (kelas in-view via IntersectionObserver) ---- */
       @keyframes rsvp2Rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
       #rsvp-cepat.rsvp2 #rsvp2Form > div {
@@ -885,6 +915,17 @@
           <button class="btn btn-solid btn-send" type="submit" id="rsvp2-submit" data-txt="rsvp2.submit">Konfirmasi Kehadiran</button>
           <p class="form-note" id="rsvp2-note" role="status"></p>
         </form>
+
+        <!-- QR CHECK-IN: tampil setelah RSVP cepat berhasil submit -->
+        <div id="rsvp2-qr" hidden>
+          <p class="rsvp2-qr-check" aria-hidden="true">&#10003;</p>
+          <p class="rsvp2-qr-title" data-txt="rsvp2.qrtitle">QR Check-in Anda</p>
+          <p class="rsvp2-qr-name" id="rsvp2-qr-guest"></p>
+          <p class="rsvp2-qr-sub" data-txt="rsvp2.qrsub">Simpan QR ini &mdash; tunjukkan saat check-in &amp; penukaran souvenir.</p>
+          <div id="rsvp2-qrcode" role="img" aria-label="QR code check-in"></div>
+          <button class="btn btn-solid" type="button" id="rsvp2-qr-download" data-txt="rsvp2.qrdownload">Download QR</button>
+          <p class="rsvp2-qr-demo" id="rsvp2-qr-demo" hidden>Mode demo &mdash; QR ini hanya contoh, belum terhubung ke token undangan.</p>
+        </div>
       </section>
 
       <!-- 10 · RSVP & UCAPAN -->
@@ -1003,6 +1044,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
       (function () {
         "use strict";
@@ -1199,7 +1241,62 @@
             }
             rsvp2Name.value = "";
             rsvp2Note.textContent = "Terima kasih! Konfirmasi kehadiran Anda telah tercatat.";
+            var attLower = String(pilihan || "").toLowerCase();
+            if (attLower.indexOf("hadir") > -1 || attLower.indexOf("ragu") > -1) {
+              showRsvp2Qr(nama);
+            }
+            rsvp2Form.style.display = "none";
           });
+        }
+
+        /* ---- QR check-in: tampilkan QR setelah RSVP cepat tercatat ---- */
+        function showRsvp2Qr(namaTamu) {
+          var qrBox = document.getElementById("rsvp2-qr");
+          var qrTarget = document.getElementById("rsvp2-qrcode");
+          var qrGuest = document.getElementById("rsvp2-qr-guest");
+          var qrDemo = document.getElementById("rsvp2-qr-demo");
+          var dlBtn = document.getElementById("rsvp2-qr-download");
+          if (!qrBox || !qrTarget) { return; }
+          var code = (typeof tokenCode === "string" && tokenCode.trim()) ? tokenCode.trim().toUpperCase() : "DEMO";
+          var qrData = "INVITO:" + code + ":" + namaTamu;
+          qrTarget.innerHTML = "";
+          var rendered = false;
+          if (typeof QRCode !== "undefined") {
+            try {
+              new QRCode(qrTarget, {
+                text: qrData,
+                width: 200,
+                height: 200,
+                colorDark: "#1c1a17",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+              });
+              rendered = true;
+            } catch (e) { rendered = false; }
+          }
+          if (!rendered) { qrTarget.textContent = qrData; }
+          if (qrGuest) { qrGuest.textContent = namaTamu; }
+          if (qrDemo) { qrDemo.hidden = (code !== "DEMO"); }
+          if (dlBtn) {
+            dlBtn.style.display = rendered ? "" : "none";
+            dlBtn.onclick = function () {
+              var canvas = qrTarget.querySelector("canvas");
+              var img = qrTarget.querySelector("img");
+              var url = "";
+              if (canvas && canvas.toDataURL) { try { url = canvas.toDataURL("image/png"); } catch (e) {} }
+              if (!url && img && img.src) { url = img.src; }
+              if (!url) { return; }
+              var safe = String(namaTamu).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "tamu";
+              var a = document.createElement("a");
+              a.href = url;
+              a.download = "qr-checkin-" + safe + ".png";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+            };
+          }
+          qrBox.hidden = false;
+          qrBox.classList.add("show");
         }
 
         /* ---- RSVP cepat: tambah kelas in-view saat section terlihat (animasi masuk) ---- */

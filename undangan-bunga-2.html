@@ -399,6 +399,19 @@
   @media(prefers-reduced-motion:reduce){
     #rsvp2-seg button, #rsvp2-success, #rsvp2-success::before{animation:none; transition:none; opacity:1; transform:none}
   }
+
+  /* ---------- RSVP2: QR check-in (tampil setelah submit RSVP) ---------- */
+  #rsvp2-qr{margin-top:6px; text-align:center; animation:rsvp2-qr-in .6s cubic-bezier(.22,.8,.3,1)}
+  #rsvp2-qr[hidden]{display:none}
+  @keyframes rsvp2-qr-in{from{opacity:0; transform:translateY(14px) scale(.97)}to{opacity:1; transform:none}}
+  #rsvp2-qr .qr-title{font-family:"Cormorant Garamond",serif; font-size:26px; font-weight:600; color:var(--ink); margin:0 0 6px}
+  #rsvp2-qr .qr-thanks{font-size:14.5px; color:var(--accent-deep); font-weight:500; margin:0 0 8px}
+  #rsvp2-qr .qr-sub{font-size:14px; margin:0 0 18px}
+  #rsvp2-qrcode{display:inline-block; background:#fff; padding:14px; border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow)}
+  #rsvp2-qrcode img, #rsvp2-qrcode canvas{display:block; margin:0 auto}
+  #rsvp2-qr-download{width:100%; justify-content:center; min-height:48px; margin-top:18px}
+  #rsvp2-qr .qr-demo{font-size:12px; margin:12px 0 0}
+  @media(prefers-reduced-motion:reduce){ #rsvp2-qr{animation:none} }
   .wall{display:flex; flex-direction:column; gap:14px}
   .wish{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:20px 20px 16px; text-align:left}
   .wish.fresh{animation:wishin .8s cubic-bezier(.22,.8,.3,1)}
@@ -794,9 +807,17 @@
         <button type="button" data-val="Berhalangan" data-txt="rsvp2.opt_absent">Berhalangan</button>
         <button type="button" data-val="Masih Ragu" data-txt="rsvp2.opt_maybe">Masih Ragu</button>
       </div>
-      <p id="rsvp2-success" class="center" data-txt="rsvp2.success_msg" style="display:none;color:var(--accent-deep);font-size:14.5px;margin:0 0 14px;font-weight:500">Terima kasih, konfirmasi kehadiran Anda sudah kami terima.</p>
       <button class="btn btn-primary" type="submit" id="rsvp2-submit" data-txt="rsvp2.submit" style="width:100%;justify-content:center">Konfirmasi Kehadiran</button>
     </form>
+    <p id="rsvp2-success" class="center" data-txt="rsvp2.success_msg" style="display:none;color:var(--accent-deep);font-size:14.5px;margin:0 0 14px;font-weight:500">Terima kasih, konfirmasi kehadiran Anda sudah kami terima.</p>
+    <div id="rsvp2-qr" hidden>
+      <p class="qr-title" data-txt="rsvp2.qr_title">QR Check-in Anda</p>
+      <p class="qr-thanks" id="rsvp2-qr-thanks"></p>
+      <p class="qr-sub" data-txt="rsvp2.qr_sub">Tunjukkan QR ini saat check-in &amp; penukaran souvenir.</p>
+      <div id="rsvp2-qrcode" role="img" aria-label="QR code check-in"></div>
+      <button class="btn btn-primary" type="button" id="rsvp2-qr-download" data-txt="rsvp2.qr_download">Download QR</button>
+      <p class="qr-demo" id="rsvp2-qr-demo" hidden>Mode demo — tanpa kode token (?t=), QR ini memakai kode DEMO dan tidak terhubung ke check-in.</p>
+    </div>
   </section>
   <script>
   /* ===== RSVP cepat (Konfirmasi Kehadiran) — tulis ke tokens/{kode}/wishes ===== */
@@ -834,7 +855,65 @@
       } catch(e){}
       var ok = document.getElementById("rsvp2-success");
       ok.style.display = "";
-      ok.scrollIntoView({behavior:"smooth", block:"center"});
+      /* QR check-in: hanya untuk Hadir / Masih Ragu — Berhalangan / Tidak Hadir tidak dapat QR */
+      var att2 = String(attend2 || "").toLowerCase();
+      var showQr2 = (att2.indexOf("hadir") > -1 || att2.indexOf("ragu") > -1) && att2.indexOf("tidak") === -1;
+      if(showQr2){ rsvp2ShowQr(n); }
+      document.getElementById("rsvp2Form").style.display = "none";
+      var qrBox = document.getElementById("rsvp2-qr");
+      if(showQr2 && qrBox){ qrBox.scrollIntoView({behavior:"smooth", block:"center"}); }
+    });
+    /* ===== QR check-in (INVITO:{kode}:{nama}) — render + download ===== */
+    var rsvp2QrName = "";
+    function rsvp2TokenCode(){
+      try { return (new URLSearchParams(location.search).get("t") || "").trim().toUpperCase(); }
+      catch(e){ return ""; }
+    }
+    function rsvp2ShowQr(name){
+      var box = document.getElementById("rsvp2-qr");
+      var holder = document.getElementById("rsvp2-qrcode");
+      if(!box || !holder){ return; }
+      var code = rsvp2TokenCode() || "DEMO";
+      var data = "INVITO:" + code + ":" + name;
+      rsvp2QrName = name;
+      holder.innerHTML = "";
+      if(typeof QRCode !== "undefined"){
+        new QRCode(holder, {
+          text: data, width: 200, height: 200,
+          colorDark: "#000000", colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        holder.textContent = data;
+      }
+      var thanks = document.getElementById("rsvp2-qr-thanks");
+      if(thanks){ thanks.textContent = "Terima kasih, " + name + " — konfirmasi kehadiran Anda sudah kami terima."; }
+      var demo = document.getElementById("rsvp2-qr-demo");
+      if(demo){ demo.hidden = (code !== "DEMO"); }
+      box.hidden = false;
+    }
+    document.getElementById("rsvp2-qr-download").addEventListener("click", function(){
+      var holder = document.getElementById("rsvp2-qrcode");
+      if(!holder){ return; }
+      var url = "";
+      var canvas = holder.querySelector("canvas");
+      if(canvas){ try { url = canvas.toDataURL("image/png"); } catch(e){} }
+      if(!url){
+        var img = holder.querySelector("img");
+        if(img && img.src){ url = img.src; }
+      }
+      if(!url){
+        if(typeof toast === "function"){ toast("QR belum siap, coba lagi"); }
+        return;
+      }
+      var safe = String(rsvp2QrName || "tamu").toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "tamu";
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "qr-checkin-" + safe + ".png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     });
   })();
 
@@ -1760,5 +1839,6 @@
   }
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>

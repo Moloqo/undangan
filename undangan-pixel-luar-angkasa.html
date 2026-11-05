@@ -297,6 +297,19 @@
       #rsvp2-note{min-height:24px;}
       #rsvp2-note.pop{animation:rsvp2-pop .18s steps(3,end);}
       @keyframes rsvp2-pop{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+      /* ---------- rsvp2: QR check-in setelah RSVP terkirim ---------- */
+      #rsvp2-qr{max-width:460px;margin:0 auto 44px;text-align:center;padding:28px 20px 24px;border:2px solid var(--accent);background:var(--panel);box-shadow:6px 6px 0 var(--shadow);}
+      #rsvp2-qr.show{animation:rsvp2-qr-in .3s steps(4,end);}
+      @keyframes rsvp2-qr-in{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+      .rsvp2-qr-kicker{font-family:"VT323",monospace;font-size:22px;letter-spacing:.3em;color:var(--teal);text-transform:uppercase;margin:0 0 10px;}
+      .rsvp2-qr-title{font-family:"Press Start 2P",monospace;font-size:15px;line-height:1.7;color:var(--accent);margin:0 0 12px;letter-spacing:.04em;}
+      .rsvp2-qr-sub{font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 20px;}
+      .rsvp2-qr-box{display:inline-block;padding:12px;background:#ffffff;border:2px solid var(--gold-2);box-shadow:4px 4px 0 var(--shadow);line-height:0;}
+      #rsvp2-qrcode canvas,#rsvp2-qrcode img{width:200px !important;height:200px !important;display:block;}
+      .rsvp2-qr-name{font-family:"VT323",monospace;font-size:24px;letter-spacing:.06em;color:var(--white);margin:18px 0 4px;}
+      .rsvp2-qr-demo{font-size:12.5px;color:var(--pink);margin:6px 0 0;letter-spacing:.04em;}
+      #rsvp2-qr-download{width:100%;min-height:56px;margin-top:20px;}
+      @media(min-width:640px){#rsvp2-qr-download{width:auto;min-width:280px;}}
 
       /* ---------- penutup & footer ---------- */
       .closing{text-align:center;}
@@ -754,6 +767,15 @@
                 <button class="btn purple" type="submit" id="rsvp2-submit">KONFIRMASI KEHADIRAN &#10022;</button>
                 <p class="form-note" id="rsvp2-note" aria-live="polite"></p>
               </form>
+              <div id="rsvp2-qr" hidden>
+                <p class="rsvp2-qr-kicker">— QR CHECK-IN —</p>
+                <h3 class="rsvp2-qr-title">SIMPAN QR INI</h3>
+                <p class="rsvp2-qr-sub">Tunjukkan QR ini saat check-in &amp; penukaran souvenir.</p>
+                <div class="rsvp2-qr-box"><div id="rsvp2-qrcode"></div></div>
+                <p class="rsvp2-qr-name" id="rsvp2-qr-name" aria-live="polite"></p>
+                <p class="rsvp2-qr-demo" id="rsvp2-qr-demo" hidden>Mode demo — tanpa kode token, QR ini hanya contoh.</p>
+                <button type="button" class="btn" id="rsvp2-qr-download">DOWNLOAD QR &#10022;</button>
+              </div>
             </div>
           </section>
 
@@ -854,6 +876,91 @@
           if(note.textContent.trim()) note.classList.add("pop");
         }).observe(note,{childList:true,characterData:true,subtree:true});
       }
+    })();
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+    /* ---------- rsvp2: QR check-in setelah RSVP terkirim ---------- */
+    (function(){
+      "use strict";
+      var form=document.getElementById("rsvp2-form");
+      var note=document.getElementById("rsvp2-note");
+      var nameInput=document.getElementById("rsvp2-name");
+      var qrBox=document.getElementById("rsvp2-qr");
+      var qrEl=document.getElementById("rsvp2-qrcode");
+      var qrName=document.getElementById("rsvp2-qr-name");
+      var qrDemo=document.getElementById("rsvp2-qr-demo");
+      var dlBtn=document.getElementById("rsvp2-qr-download");
+      if(!form||!note||!nameInput||!qrBox||!qrEl||!qrName||!qrDemo||!dlBtn) return;
+      var lastName="";
+      /* pilihan kehadiran terakhir (default Hadir) — QR hanya untuk Hadir / Masih Ragu.
+         Ditangkap saat klik opsi / klik tombol submit, karena dbWrite me-reset pilihan
+         ke "hadir" sebelum pesan sukses ditulis, jadi membaca .sel saat observer jalan
+         selalu menghasilkan "hadir" dan tidak bisa diandalkan. */
+      var lastAtt="hadir";
+      function readAtt(){
+        var sel=form.querySelector(".rsvp2-opt.sel");
+        if(sel){ lastAtt=sel.getAttribute("data-att")||"hadir"; }
+        return lastAtt;
+      }
+      var optBtns=form.getElementsByClassName("rsvp2-opt");
+      for(var oi=0;oi<optBtns.length;oi++){
+        optBtns[oi].addEventListener("click",function(){ readAtt(); });
+      }
+      var submitBtn=document.getElementById("rsvp2-submit");
+      if(submitBtn){ submitBtn.addEventListener("click",function(){ readAtt(); }); }
+      function tokenCode(){
+        var code="";
+        try{ code=(new URLSearchParams(window.location.search).get("t")||"").trim().toUpperCase().replace(/[^A-Z0-9]/g,""); }catch(e){}
+        return code;
+      }
+      function sanitize(s){
+        return (s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"tamu";
+      }
+      function showQR(name){
+        lastName=name;
+        var code=tokenCode();
+        var data="INVITO:"+(code||"DEMO")+":"+name;
+        qrEl.innerHTML="";
+        if(typeof QRCode!=="undefined"){
+          new QRCode(qrEl,{text:data,width:200,height:200,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+        }else{
+          qrEl.textContent="QR gagal dimuat \u2014 periksa koneksi internet lalu kirim ulang RSVP.";
+        }
+        qrName.textContent="\u2726 "+name+" \u2726";
+        qrDemo.hidden=!!code;
+        form.hidden=true;
+        qrBox.hidden=false;
+        qrBox.classList.add("show");
+        try{ qrBox.scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){}
+      }
+      /* sukses = pesan "terkirim!" (Firestore) atau "tercatat!" (mode demo) di #rsvp2-note */
+      if("MutationObserver" in window){
+        new MutationObserver(function(){
+          var txt=note.textContent||"";
+          if(txt.indexOf("terkirim!")!==-1||txt.indexOf("tercatat!")!==-1){
+            var name=nameInput.value.trim();
+            var att=(lastAtt||"hadir").toLowerCase();
+            /* QR check-in hanya untuk Hadir / Masih Ragu; Berhalangan -> pesan sukses biasa saja */
+            if(name && qrBox.hidden && (att.indexOf("hadir")>-1||att.indexOf("ragu")>-1)) showQR(name);
+          }
+        }).observe(note,{childList:true,characterData:true,subtree:true});
+      }
+      dlBtn.addEventListener("click",function(){
+        var url=null;
+        var canvas=qrEl.querySelector("canvas");
+        var img=qrEl.querySelector("img");
+        if(canvas){ try{ url=canvas.toDataURL("image/png"); }catch(e){} }
+        if(!url && img && img.src){ url=img.src; }
+        if(!url) return;
+        var a=document.createElement("a");
+        a.href=url;
+        a.download="qr-checkin-"+sanitize(lastName)+".png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
     })();
     </script>
 
