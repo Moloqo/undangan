@@ -1458,6 +1458,7 @@ footer .fnote{margin-top:16px;font-size:13px;color:rgba(235,220,185,.65);}
           var list = [];
           qs.forEach(function(ds){
             var w = ds.data() || {};
+            if(!((w.wish||w.message||'').trim())) return;
             list.push({ name: txt(w.name) || "Tamu", attendance: txt(w.attendance), wish: txt(w.wish) });
           });
           if (list.length && typeof window.__applySharedWishes === "function") window.__applySharedWishes(list);

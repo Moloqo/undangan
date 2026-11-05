@@ -1568,6 +1568,7 @@ footer{background:var(--paper);color:var(--ink);border-top:1px solid rgba(154,12
             var name = nonEmpty(data.name) ? String(data.name) : 'Tamu';
             var att = nonEmpty(data.attendance) ? String(data.attendance) : '';
             var wish = nonEmpty(data.wish) ? String(data.wish) : '';
+            if(!wish.trim()) return;
             wall.appendChild(buildWishBox(name, att, wish));
           });
           wallEmpty.style.display = 'none';

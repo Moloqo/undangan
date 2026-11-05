@@ -971,7 +971,7 @@ function loadSharedWishes(db, code) {
       .then(function (snap) {
         if (!snap || snap.empty) return;
         if (empty) { empty.remove(); empty = null; }
-        snap.forEach(function (d) { wall.appendChild(renderSharedWish(d.data() || {})); });
+        snap.forEach(function (d) { wall.appendChild((function(_d){ if(!((_d.wish||_d.message||"").trim())) return; return renderSharedWish(_d); })(d.data() || {})); });
       }).catch(function () {});
   } catch (e) {}
 }

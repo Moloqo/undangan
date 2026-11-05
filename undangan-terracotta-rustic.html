@@ -1305,7 +1305,7 @@ body.loaded #cover .cnr{opacity:.92}
           if (!snap || snap.empty) return;
           if (empty) { empty.hidden = true; }
           snap.forEach(function (docSnap) {
-            wall.appendChild(renderSharedWish(docSnap.data() || {}));
+            var _d = docSnap.data() || {}; if(!((_d.wish||_d.message||"").trim())) return; wall.appendChild(renderSharedWish(_d));
           });
         })
         .catch(function () {});
