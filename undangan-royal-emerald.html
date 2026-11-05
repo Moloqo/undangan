@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --emerald:#0f3d2e; --emerald-deep:#0a2b20; --emerald-ink:#071f17;
@@ -189,6 +190,23 @@ h2.sec-title{font-family:var(--serif);font-size:34px;font-weight:600;text-align:
 @keyframes rsvp2MsgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes rsvp2TickPop{0%{transform:scale(0)}70%{transform:scale(1.18)}100%{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){#rsvp2,.att-pills .pill{opacity:1;transform:none;transition:none;animation:none}#rsvp2-msg.show,#rsvp2-msg.show::before{animation:none}}
+/* ---------- RSVP QR check-in (tampil setelah submit RSVP sukses) ---------- */
+#rsvp2-qr[hidden]{display:none}
+#rsvp2-qr{background:#fff;border:1px solid var(--gold-soft);border-radius:18px;padding:28px 24px;margin-top:16px;text-align:center;box-shadow:0 14px 34px rgba(11,77,55,.12)}
+#rsvp2-qr.show{animation:rsvp2QrIn .6s cubic-bezier(.22,.61,.36,1)}
+@keyframes rsvp2QrIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+#rsvp2-qr .rsvp2-qr-eyebrow{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:6px}
+#rsvp2-qr h3{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--emerald);margin:0 0 8px}
+#rsvp2-qr .rsvp2-qr-hint{font-size:15px;line-height:1.7;color:var(--espresso-soft);margin:0 auto 16px;max-width:340px}
+#rsvp2-qr-ok{font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--emerald);padding:12px 16px;border:1px solid var(--gold-soft);border-radius:12px;background:#f6fbf8;margin:0 0 18px}
+#rsvp2-qrcode{display:flex;justify-content:center;align-items:center;margin:0 auto 18px;padding:16px;width:max-content;max-width:100%;background:#fff;border:1px solid var(--gold-soft);border-radius:14px;box-shadow:0 8px 22px rgba(11,77,55,.10)}
+#rsvp2-qrcode img,#rsvp2-qrcode canvas{display:block;width:200px;height:200px;max-width:calc(100vw - 140px);max-height:calc(100vw - 140px)}
+#rsvp2-qr-download{width:100%}
+@media(min-width:560px){#rsvp2-qr-download{width:auto;min-width:280px}}
+#rsvp2-qr-demo{font-size:13px;font-style:italic;color:var(--gold-deep);margin:14px 0 0}
+#rsvp2-qr-demo[hidden]{display:none}
+#rsvp2-qr .rsvp2-qr-note{font-size:13px;line-height:1.6;color:var(--espresso-soft);margin:14px 0 0}
+@media(prefers-reduced-motion:reduce){#rsvp2-qr.show{animation:none}}
 /* ---------- footer ---------- */
 footer{padding:70px 28px 100px;text-align:center;background:linear-gradient(180deg,var(--emerald-ink),#051712)}
 footer .thanks{font-family:var(--serif);font-style:italic;font-size:22px;color:#d9cfae;max-width:360px;margin:0 auto 14px}
@@ -527,6 +545,16 @@ body.loaded .cover-inner .floaty{animation:floaty 7s ease-in-out 1.6s infinite}
     <p id="rsvp2-msg" role="status" aria-live="polite"></p>
     <button class="btn" id="rsvp2-submit" type="submit" data-txt="rsvp2.submit">Konfirmasi Kehadiran</button>
   </form>
+  <div id="rsvp2-qr" hidden>
+    <p class="rsvp2-qr-eyebrow" data-txt="rsvp2.qrlabel">QR Check-in Anda</p>
+    <h3 data-txt="rsvp2.qrtitle">Simpan QR Ini</h3>
+    <p class="rsvp2-qr-hint" data-txt="rsvp2.qrhint">Tunjukkan QR ini saat check-in &amp; penukaran souvenir di hari acara.</p>
+    <p id="rsvp2-qr-ok" role="status" aria-live="polite"></p>
+    <div id="rsvp2-qrcode" role="img" aria-label="QR code check-in"></div>
+    <button type="button" class="btn" id="rsvp2-qr-download" data-txt="rsvp2.qrdownload">Download QR</button>
+    <p id="rsvp2-qr-demo" hidden>Mode demo — QR ini memakai kode DEMO karena undangan dibuka tanpa token.</p>
+    <p class="rsvp2-qr-note" data-txt="rsvp2.qrnote">Simpan tangkapan layar QR ini sebagai cadangan — satu QR berlaku untuk satu nama tamu.</p>
+  </div>
 </section>
 
 <!-- ================= DINDING DOA ================= -->
@@ -824,6 +852,68 @@ stag("#rsvpForm2", 500, 0, "rv");
   if (!rsvp2Form || !rsvp2Name || !rsvp2Msg) return;
   /* pre-fill ?to= */
   if (typeof guest === "string" && guest && !rsvp2Name.value) rsvp2Name.value = guest;
+  /* ---------- QR check-in: tampil setelah RSVP sukses ---------- */
+  var rsvp2QrBox = document.getElementById("rsvp2-qr");
+  var rsvp2QrCode = document.getElementById("rsvp2-qrcode");
+  var rsvp2QrOk = document.getElementById("rsvp2-qr-ok");
+  var rsvp2QrDemo = document.getElementById("rsvp2-qr-demo");
+  var rsvp2QrDl = document.getElementById("rsvp2-qr-download");
+  var rsvp2QrName = "";
+  function rsvp2QrShow(name, att, okMsg) {
+    /* QR hanya untuk tamu Hadir / Masih Ragu — Berhalangan tidak dapat QR,
+       pesan sukses biasa (rsvp2Msg) tetap tampil. */
+    var a = String(att || "").toLowerCase();
+    if (a.indexOf("tidak") > -1) return; /* "Tidak Hadir" bukan hadir */
+    if (a.indexOf("hadir") === -1 && a.indexOf("ragu") === -1) return;
+    if (!rsvp2QrBox || !rsvp2QrCode) return;
+    rsvp2QrName = name;
+    var code = (typeof tokenCode === "string" && tokenCode) ? tokenCode : "DEMO";
+    if (rsvp2QrOk) rsvp2QrOk.textContent = okMsg;
+    if (rsvp2QrDemo) rsvp2QrDemo.hidden = (code !== "DEMO");
+    rsvp2QrCode.innerHTML = "";
+    if (typeof QRCode === "undefined") {
+      rsvp2QrCode.textContent = "QR tidak dapat dimuat — periksa koneksi internet Anda.";
+    } else {
+      try {
+        new QRCode(rsvp2QrCode, {
+          text: "INVITO:" + code + ":" + name,
+          width: 200, height: 200,
+          colorDark: "#071f17", colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (e) {
+        rsvp2QrCode.textContent = "QR tidak dapat dibuat — coba lagi.";
+      }
+    }
+    rsvp2Form.style.display = "none";
+    rsvp2QrBox.hidden = false;
+    rsvp2QrBox.classList.add("show");
+    rsvp2QrBox.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  function rsvp2QrFileName() {
+    var s = String(rsvp2QrName || "tamu").replace(/[^a-zA-Z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+    return "qr-checkin-" + (s || "tamu") + ".png";
+  }
+  if (rsvp2QrDl) {
+    rsvp2QrDl.addEventListener("click", function () {
+      if (!rsvp2QrCode) return;
+      var dataUrl = "";
+      var canvas = rsvp2QrCode.querySelector("canvas");
+      if (canvas) { try { dataUrl = canvas.toDataURL("image/png"); } catch (e) {} }
+      if (!dataUrl) {
+        var img = rsvp2QrCode.querySelector("img");
+        if (img && img.src) dataUrl = img.src;
+      }
+      if (!dataUrl) { showToast("QR belum siap — coba lagi sebentar"); return; }
+      var a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = rsvp2QrFileName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast("QR check-in tersimpan 🤍");
+    });
+  }
   rsvp2Form.addEventListener("submit", function (ev) {
     ev.preventDefault();
     var name = rsvp2Name.value.trim();
@@ -838,14 +928,14 @@ stag("#rsvpForm2", 500, 0, "rv");
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         if (p && p.then) {
-          p.then(function () { rsvp2Msg.textContent = okMsg; rsvp2Msg.classList.add("show"); })
+          p.then(function () { rsvp2Msg.textContent = okMsg; rsvp2Msg.classList.add("show"); rsvp2QrShow(name, att, okMsg); })
            .catch(function () { showToast("Gagal menyimpan \u2014 coba lagi"); });
         } else {
-          rsvp2Msg.textContent = okMsg; rsvp2Msg.classList.add("show");
+          rsvp2Msg.textContent = okMsg; rsvp2Msg.classList.add("show"); rsvp2QrShow(name, att, okMsg);
         }
         if (p && p.catch) p.catch(function () {});
       } else {
-        rsvp2Msg.textContent = okMsg; rsvp2Msg.classList.add("show");
+        rsvp2Msg.textContent = okMsg; rsvp2Msg.classList.add("show"); rsvp2QrShow(name, att, okMsg);
       }
     } catch (e) { showToast("Terjadi kesalahan \u2014 coba lagi"); }
     rsvp2Form.reset();
