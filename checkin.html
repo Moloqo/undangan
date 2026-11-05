@@ -77,12 +77,12 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#0f0d0a;c
   </div>
   <div class="result"><div class="result-card" id="resultCard"></div></div>
   <div class="stats">
-    <div class="stat"><b id="statTotal">0</b><span>Total Tamu</span></div>
-    <div class="stat"><b id="statChecked">0</b><span>Sudah Check-in</span></div>
+    <div class="stat"><b id="statTotal">…</b><span>Total Tamu</span></div>
+    <div class="stat"><b id="statChecked">…</b><span>Sudah Check-in</span></div>
   </div>
   <div class="history">
     <p class="history-title">Riwayat Check-in</p>
-    <ul id="checkinList"><li class="empty">Belum ada yang check-in</li></ul>
+    <ul id="checkinList"><li class="empty">Memuat...</li></ul>
   </div>
   <div class="manual">
     <p style="font-size:13px;color:#888;margin-bottom:8px;text-align:center">atau masukkan nama manual</p>
@@ -242,7 +242,20 @@ function loadStats(){
   db.collection('tokens').doc(currentCode).get().then(function(snap){
     var data = (snap.data()||{}).data||{};
     var guests = data.guests||[];
-    document.getElementById('statTotal').textContent = guests.length;
+    // Tambah nama RSVP Hadir/Ragu yang belum ada di daftar tamu
+    db.collection('tokens').doc(currentCode).collection('wishes').get().then(function(ws){
+      var names = {};
+      guests.forEach(function(g){ names[(g||'').trim().toLowerCase()] = true; });
+      var extra = 0;
+      ws.forEach(function(doc){ var w = doc.data()||{};
+        var att = (w.attendance||'').toLowerCase();
+        if(att.indexOf('hadir') > -1 && att.indexOf('berhalangan') === -1){
+          var k = ((w.name||'').trim()).toLowerCase();
+          if(k && !names[k]){ names[k] = true; extra++; }
+        }
+      });
+      document.getElementById('statTotal').textContent = guests.length + extra;
+    }).catch(function(){ document.getElementById('statTotal').textContent = guests.length; });
   });
   db.collection('tokens').doc(currentCode).collection('checkins').orderBy('at','desc').limit(30).get().then(function(snap){
     document.getElementById('statChecked').textContent = snap.size;

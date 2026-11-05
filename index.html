@@ -4034,6 +4034,7 @@ function ktRenderRingkasan(){
   var sent = KT.guests.filter(function(g){ return KT.sentMap[g]; }).length;
   var belumKirim = total - sent;
   var wishes = KT.wishes;
+  var realWishes = wishes.filter(function(w){ return ((w.wish||w.message||'').trim()); });
   var hadir = wishes.filter(function(w){ return /hadir/i.test(w.attendance||'') && !/berhalangan/i.test(w.attendance||''); });
   var pct = total ? Math.round(hadir.length/total*100) : 0;
   var r = Math.round(2*Math.PI*26);
@@ -4051,15 +4052,15 @@ function ktRenderRingkasan(){
   // stats
   html += '<div class="kt-stats">'
     + '<div class="kt-card"><div class="kt-label">TOTAL TAMU</div><div class="kt-big">'+total+'</div><div class="kt-note">di daftar tamu · '+sent+' sudah dikirim</div></div>'
-    + '<div class="kt-card"><div class="kt-label">TOTAL UCAPAN</div><div class="kt-big">'+wishes.length+'</div><div class="kt-note">'+(total?Math.round(wishes.length/total*100):0)+'% tamu merespons</div></div>'
+    + '<div class="kt-card"><div class="kt-label">TOTAL UCAPAN</div><div class="kt-big">'+realWishes.length+'</div><div class="kt-note">'+(total?Math.round(realWishes.length/total*100):0)+'% tamu merespons</div></div>'
     + '<div class="kt-card" style="display:flex;align-items:center;gap:14px"><div style="flex:1"><div class="kt-label">HADIR</div><div class="kt-big">'+hadir.length+'</div><div class="kt-note">'+pct+'% dari total tamu</div></div>'
     + '<svg class="kt-ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="#f0e9db" stroke-width="7"/><circle cx="32" cy="32" r="26" fill="none" stroke="#b98a2f" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+(pct/100*r)+' '+r+'" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1a17">'+pct+'%</text></svg></div>'
     + '</div>';
   // recent activity cols
   html += '<div class="kt-cols">';
   html += '<div class="kt-card"><div class="kt-list-head"><div><h3>02 Aktivitas terbaru</h3><small>Ucapan paling baru dari para tamu.</small></div><a onclick="KT.tab=\'ucapan\';ktSyncNav();ktRender()">Lihat semua →</a></div>';
-  if(!wishes.length) html += '<div class="kt-empty">Belum ada ucapan. Bagikan link undangan supaya tamu bisa kirim ucapan.</div>';
-  else wishes.slice(0,3).forEach(function(w){
+  if(!realWishes.length) html += '<div class="kt-empty">Belum ada ucapan. Bagikan link undangan supaya tamu bisa kirim ucapan.</div>';
+  else realWishes.slice(0,3).forEach(function(w){
     html += '<div class="kt-item"><div class="kt-item-top"><b>'+ktEsc(w.name||'Tamu')+'</b>'+ktAttPill(w.attendance)+'</div><div class="kt-item-msg">“'+ktEsc(w.wish||'')+'”</div><div class="kt-item-sub">'+ktTime(w.createdAt)+'</div></div>';
   });
   html += '</div>';
@@ -4401,8 +4402,13 @@ function kt2LoadStats(){
   if(!window.db || !KT2.code) return;
   var ref = db.collection('tokens').doc(KT2.code);
   ref.collection('wishes').get().then(function(s){
-    var el = document.getElementById('kt2WishCount'); if(el) el.textContent = s.size;
-    var el2 = document.getElementById('kt2RsvpCount'); if(el2) el2.textContent = s.size;
+    var rsvpN = 0, wishN = 0;
+    s.forEach(function(doc){ var w = doc.data()||{};
+      if((w.attendance||'').trim()) rsvpN++;
+      if(((w.wish||w.message||'').trim())) wishN++;
+    });
+    var el = document.getElementById('kt2WishCount'); if(el) el.textContent = wishN;
+    var el2 = document.getElementById('kt2RsvpCount'); if(el2) el2.textContent = rsvpN;
   }).catch(function(){});
   ref.collection('checkins').get().then(function(s){
     var el = document.getElementById('kt2CheckinCount'); if(el) el.textContent = s.size;
@@ -4446,8 +4452,12 @@ function kt2Rsvp(main){
     var el = document.getElementById('kt2RsvpList');
     if(snap.empty){ el.innerHTML = '<div class="kt2-empty"><div class="big">📭</div><p>Belum ada RSVP masuk.</p></div>'; return; }
     var html = '<table class="kt2-table"><thead><tr><th>Nama</th><th>Status</th><th>Waktu</th></tr></thead><tbody>';
+    var seenNames = {};
     snap.forEach(function(doc){
       var w = doc.data();
+      var nameKey = ((w.name||w.from||'?').trim()).toLowerCase();
+      if(seenNames[nameKey]) return; // dedupe: keep latest (ordered desc)
+      seenNames[nameKey] = true;
       var att = (w.attendance||'').toLowerCase();
       var pill = att.indexOf('hadir') > -1 && att.indexOf('berhalangan') === -1 ? '<span class="pill green">Hadir</span>'
         : att.indexOf('ragu') > -1 || att.indexOf('mungkin') > -1 ? '<span class="pill gold">Ragu</span>'
@@ -4469,7 +4479,10 @@ function kt2Checkin(main){
   var guests = (KT2.data||{}).guests || [];
   db.collection('tokens').doc(KT2.code).collection('checkins').orderBy('at','desc').get().then(function(snap){
     document.getElementById('kt2CiCount').textContent = snap.size;
-    document.getElementById('kt2CiPending').textContent = Math.max(0, guests.length - snap.size);
+    var checkedNames = {};
+    snap.forEach(function(doc){ var g = ((doc.data()||{}).guest||'').trim().toLowerCase(); if(g) checkedNames[g] = true; });
+    var matched = guests.filter(function(g){ return checkedNames[(g||'').trim().toLowerCase()]; }).length;
+    document.getElementById('kt2CiPending').textContent = Math.max(0, guests.length - matched);
     var el = document.getElementById('kt2CiList');
     if(snap.empty){ el.innerHTML = '<div class="kt2-empty"><div class="big">📷</div><p>Belum ada yang check-in.<br>Buka scanner untuk mulai.</p></div>'; return; }
     var html = '<h3>Daftar Check-in</h3><table class="kt2-table"><thead><tr><th>Nama</th><th>Waktu</th></tr></thead><tbody>';
@@ -4570,6 +4583,8 @@ function kt2AddGuest(){
   if(!window.db || !KT2.code){ alert('Koneksi bermasalah'); return; }
   var guests = (KT2.data||{}).guests || [];
   if(guests.indexOf(name) > -1){ alert('Nama sudah ada'); return; }
+  var btn = input.nextElementSibling;
+  if(btn){ btn.disabled = true; btn.textContent = 'Menyimpan...'; }
   guests.push(name);
   var curRev = KT2.revisionsUsed || 0;
   // Also need top-level revisionsUsed for the rule check
@@ -4581,7 +4596,7 @@ function kt2AddGuest(){
     KT2.data.guests = guests;
     KT2.revisionsUsed = curRev + 1;
     kt2Show('tamu');
-  }).catch(function(e){ alert('Gagal: ' + e.message); });
+  }).catch(function(e){ if(btn){ btn.disabled = false; btn.textContent = 'Tambah'; } alert('Gagal: ' + e.message); });
 }
 function kt2DelGuest(i){
   if(!confirm('Hapus tamu ini?')) return;
@@ -4648,4 +4663,4 @@ function ktOpen(){
 </script>
 
 </body>
-</html>, 0)
+</html>
