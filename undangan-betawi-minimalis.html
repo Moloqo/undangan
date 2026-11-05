@@ -516,13 +516,13 @@
       }
 
       /* pesan sukses: fade-in + slide-up, ikon centang pop */
-      #rsvp2-note:not(:empty) { animation: rsvp2NoteIn .5s ease backwards; }
+      #rsvp2-note:not(:empty) { animation: rsvp2NoteIn .5s ease both; }
       #rsvp2-note:not(:empty)::before {
         content: "\2713"; display: inline-flex; align-items: center; justify-content: center;
         width: 24px; height: 24px; margin-right: 8px; border-radius: 50%;
         background: var(--green); color: #fff; font-size: 14px; font-weight: 800; line-height: 1;
         vertical-align: -5px;
-        animation: rsvp2OkPop .45s cubic-bezier(.2, 1.4, .4, 1) backwards;
+        animation: rsvp2OkPop .45s cubic-bezier(.2, 1.4, .4, 1) both;
       }
       @keyframes rsvp2NoteIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
       @keyframes rsvp2OkPop { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
@@ -534,7 +534,7 @@
         box-shadow: 0 10px 28px rgba(181, 126, 18, .16);
       }
       #rsvp2-qr[hidden] { display: none; }
-      #rsvp2-qr.show { animation: rsvp2QrIn .55s ease backwards; }
+      #rsvp2-qr.show { animation: rsvp2QrIn .55s ease both; }
       @keyframes rsvp2QrIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
       .rsvp2-qr-check {
         display: inline-flex; align-items: center; justify-content: center;
@@ -575,7 +575,7 @@
       #rsvp-cepat.rsvp2.in-view .rsvp2-opt:nth-child(2) { transition-delay: .2s; }
       #rsvp-cepat.rsvp2.in-view .rsvp2-opt:nth-child(3) { transition-delay: .28s; }
       #rsvp-cepat.rsvp2:not(.in-view) #rsvp2-submit { opacity: 0; }
-      #rsvp-cepat.rsvp2.in-view #rsvp2-submit { animation: rsvp2Rise .6s ease .32s backwards; }
+      #rsvp-cepat.rsvp2.in-view #rsvp2-submit { animation: rsvp2Rise .6s ease .32s both; }
       @media (prefers-reduced-motion: reduce) {
         #rsvp-cepat.rsvp2 #rsvp2Form > div, #rsvp-cepat.rsvp2 .rsvp2-opt { opacity: 1; transform: none; transition: none; }
         #rsvp-cepat.rsvp2 #rsvp2-submit, #rsvp-cepat.rsvp2:not(.in-view) #rsvp2-submit { opacity: 1; animation: none; }
@@ -893,7 +893,7 @@
       </section>
 
       <!-- 9B · KONFIRMASI KEHADIRAN (RSVP cepat, tanpa doa) -->
-      <section class="reveal rsvp2" id="rsvp-cepat">
+      <section class="rsvp2-section reveal rsvp2" id="rsvp-cepat">
         <div class="divider"><i class="small"></i><i></i><i class="small"></i></div>
         <p class="label" data-txt="rsvp2.label">RSVP</p>
         <h2 class="title" data-txt="rsvp2.title">Konfirmasi Kehadiran</h2>
