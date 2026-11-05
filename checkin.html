@@ -39,6 +39,14 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#0f0d0a;c
 #tokenInput input{width:100%;padding:16px;font-size:18px;text-align:center;text-transform:uppercase;background:#1a1712;border:1px solid rgba(185,138,47,.4);border-radius:12px;color:#fff;margin-bottom:12px;letter-spacing:.1em}
 #tokenInput button{width:100%;padding:16px;background:#b98a2f;color:#fff;border:0;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer}
 .hidden{display:none!important}
+.history{max-width:500px;margin:0 auto 20px;padding:0 20px}
+.history-title{font-size:13px;color:#888;margin-bottom:8px;text-align:center}
+#checkinList{list-style:none}
+#checkinList li{background:#1a1712;border:1px solid rgba(185,138,47,.25);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+#checkinList li .nm{font-weight:700;color:#f5efe2;font-size:15px}
+#checkinList li .tm{font-size:12px;color:#888;white-space:nowrap}
+#checkinList li.empty{justify-content:center;color:#888;font-size:14px}
+#checkinList li.new{animation:pop .3s;border-color:#4caf50}
 .upload-qr{max-width:500px;margin:0 auto;padding:0 20px;text-align:center}
 .upload-btn{display:inline-block;padding:13px 24px;background:#1a1712;border:1.5px solid #b98a2f;color:#e8c86a;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px}
 .retry-btn{display:block;width:100%;padding:12px;background:transparent;border:1px solid rgba(185,138,47,.3);color:#aaa;border-radius:10px;font-size:14px;cursor:pointer;margin-top:4px}
@@ -71,6 +79,10 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#0f0d0a;c
   <div class="stats">
     <div class="stat"><b id="statTotal">0</b><span>Total Tamu</span></div>
     <div class="stat"><b id="statChecked">0</b><span>Sudah Check-in</span></div>
+  </div>
+  <div class="history">
+    <p class="history-title">Riwayat Check-in</p>
+    <ul id="checkinList"><li class="empty">Belum ada yang check-in</li></ul>
   </div>
   <div class="manual">
     <p style="font-size:13px;color:#888;margin-bottom:8px;text-align:center">atau masukkan nama manual</p>
@@ -161,7 +173,7 @@ function doCheckin(guestName){
     at: firebase.firestore.FieldValue.serverTimestamp(),
     by: 'scanner'
   }).then(function(){
-    showResult('success', '✅', guestName, 'Berhasil check-in!');
+    showResult('success', '✅', guestName, 'Berhasil check-in! Nama sudah tercatat di bawah.');
     loadStats();
   }).catch(function(){
     showResult('error', '⚠️', 'Gagal', 'Coba lagi.');
@@ -175,11 +187,28 @@ function manualCheckin(){
   document.getElementById('manualName').value = '';
 }
 
+function renderCheckinList(snap){
+  var ul = document.getElementById('checkinList');
+  if(!ul) return;
+  if(snap.empty){ ul.innerHTML = '<li class="empty">Belum ada yang check-in</li>'; return; }
+  var html = '';
+  snap.forEach(function(doc){
+    var d = doc.data()||{};
+    var tm = '';
+    if(d.at && d.at.toDate){ tm = d.at.toDate().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}); }
+    html += '<li><span class="nm">' + escapeHtml(d.guest||'?') + '</span><span class="tm">' + tm + '</span></li>';
+  });
+  ul.innerHTML = html;
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
 function showResult(type, icon, title, sub){
   var c = document.getElementById('resultCard');
   c.className = 'result-card show ' + type;
   c.innerHTML = '<div class="icon">'+icon+'</div><h2>'+title+'</h2><p>'+sub+'</p>';
-  setTimeout(function(){ c.classList.remove('show'); }, 3000);
+  if(type === 'success' && navigator.vibrate) navigator.vibrate(200);
+  // Sukses nempel sampai scan berikutnya; error hilang setelah 4 detik
+  if(type !== 'success'){ setTimeout(function(){ c.classList.remove('show'); }, 4000); }
 }
 
 // Upload foto QR (fallback kalau kamera gak bisa)
@@ -215,8 +244,9 @@ function loadStats(){
     var guests = data.guests||[];
     document.getElementById('statTotal').textContent = guests.length;
   });
-  db.collection('tokens').doc(currentCode).collection('checkins').get().then(function(snap){
+  db.collection('tokens').doc(currentCode).collection('checkins').orderBy('at','desc').limit(30).get().then(function(snap){
     document.getElementById('statChecked').textContent = snap.size;
+    renderCheckinList(snap);
   });
 }
 
