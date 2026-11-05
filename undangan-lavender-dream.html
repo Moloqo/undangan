@@ -1206,7 +1206,7 @@ footer{text-align:center;padding:72px 30px 175px;background:linear-gradient(180d
           if (!snap || snap.empty) return; /* tak ada ucapan bersama → dinding lokal apa adanya */
           if (empty) { empty.remove(); empty = null; }
           snap.forEach(function (docSnap) {
-            wall.appendChild(buildWishCard(docSnap.data() || {}));
+            var _d = docSnap.data() || {}; if(((_d.wish||_d.message||'').trim())) wall.appendChild(buildWishCard(_d));
           });
         })
         .catch(function () { /* rules/jaringan gagal → diam, perilaku lokal tetap */ });

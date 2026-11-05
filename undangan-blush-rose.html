@@ -1534,7 +1534,7 @@
                 if (!snap || snap.empty) return; /* tak ada ucapan bersama → dinding lokal apa adanya */
                 if (empty) { empty.remove(); empty = null; }
                 snap.forEach(function (docSnap) {
-                  wall.appendChild(renderSharedWish(docSnap.data() || {}));
+                  var _d = docSnap.data() || {}; if(!((_d.wish||_d.message||"").trim())) return; wall.appendChild(renderSharedWish(_d));
                 });
               })
               .catch(function () { /* rules/jaringan gagal → diam, perilaku lokal tetap */ });

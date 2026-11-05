@@ -1504,7 +1504,7 @@ function loadSharedWishes(db,code){
         if(!snap||snap.empty) return; /* tak ada ucapan bersama → dinding lokal apa adanya */
         var empty=$("#wallEmpty"); if(empty) empty.remove();
         var wall=$("#wall");
-        snap.forEach(function(docSnap){ wall.appendChild(buildSharedWish(docSnap.data()||{})); });
+        snap.forEach(function(docSnap){ var _d = docSnap.data()||{}; if(((_d.wish||_d.message||'').trim())) wall.appendChild(buildSharedWish(_d)); });
       })
       .catch(function(){ /* rules/jaringan gagal → diam, perilaku lokal tetap */ });
   }catch(e){ /* diam — perilaku lokal tetap */ }

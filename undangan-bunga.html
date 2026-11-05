@@ -1488,6 +1488,7 @@ function applyCustomerData(d){
 
 /* ---------- dinding ucapan bersama (Firestore tokens/{kode}/wishes) ---------- */
 function renderSharedWish(data){
+          if(!((data.wish||data.message||"").trim())) return null;
   var name=nonEmpty(data.name)?String(data.name):"Tamu";
   var from=nonEmpty(data.from)?String(data.from):"";
   var att2=nonEmpty(data.attendance)?String(data.attendance):"Hadir";
