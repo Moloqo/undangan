@@ -416,7 +416,7 @@
       #rsvp2.io-rsvp2 .attend-pills label { opacity: 0; }
       #rsvp2.io-rsvp2.in-view .attend-pills label {
         opacity: 1;
-        animation: rsvp2-pop .55s cubic-bezier(.34,1.35,.64,1) backwards;
+        animation: rsvp2-pop .55s cubic-bezier(.34,1.35,.64,1) both;
       }
       #rsvp2.io-rsvp2.in-view .attend-pills label:nth-child(1) { animation-delay: 60ms; }
       #rsvp2.io-rsvp2.in-view .attend-pills label:nth-child(2) { animation-delay: 140ms; }
@@ -446,7 +446,7 @@
         box-shadow: 0 10px 28px rgba(196, 131, 140, .16);
       }
       #rsvp2-qr[hidden] { display: none; }
-      #rsvp2-qr.show { animation: rsvp2QrIn .55s ease backwards; }
+      #rsvp2-qr.show { animation: rsvp2QrIn .55s ease both; }
       @keyframes rsvp2QrIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
       .rsvp2-qr-check {
         display: inline-flex; align-items: center; justify-content: center;
