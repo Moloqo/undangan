@@ -283,7 +283,7 @@
       .rsvp2-opt.sel .rsvp2-mark{color:#1a1200;}
       /* opsi masuk satu per satu (delay 80ms), stepped */
       #rsvp2.rsvp2-anim:not(.in-view) .rsvp2-opt{opacity:0;}
-      #rsvp2.rsvp2-anim.in-view .rsvp2-opt{animation:rsvp2-opt-in .16s linear backwards;}
+      #rsvp2.rsvp2-anim.in-view .rsvp2-opt{animation:rsvp2-opt-in .16s linear both;}
       #rsvp2.rsvp2-anim.in-view .rsvp2-opt:nth-child(1){animation-delay:.08s;}
       #rsvp2.rsvp2-anim.in-view .rsvp2-opt:nth-child(2){animation-delay:.16s;}
       #rsvp2.rsvp2-anim.in-view .rsvp2-opt:nth-child(3){animation-delay:.24s;}
@@ -709,7 +709,7 @@
       <div class="divider" aria-hidden="true"><span class="dline"></span><span class="dstars">✦ ✦ ✦</span><span class="dline"></span></div>
 
       <!-- ================= RSVP & DINDING DOA ================= -->
-      <section id="rsvp">
+      <section class="rsvp2-section" id="rsvp">
         <div class="wrap">
           <div class="sec-head">
             <span class="vt" data-txt="rsvp.kicker">— RSVP &amp; Ucapan —</span>

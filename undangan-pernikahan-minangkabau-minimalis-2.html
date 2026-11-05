@@ -319,7 +319,7 @@
   #rsvp2-panel .seg2 button.on::before{ border-color:var(--accent); color:var(--accent-soft); }
   /* kemunculan stagger saat panel dapat class in-view */
   #rsvp2-panel.in-view .seg2 button, #rsvp2-panel.in .seg2 button{
-    opacity:1; animation:rsvp2-rise .5s ease backwards;
+    opacity:1; animation:rsvp2-rise .5s ease both;
   }
   #rsvp2-panel.in-view .seg2 button:nth-child(1){ animation-delay:80ms; }
   #rsvp2-panel.in-view .seg2 button:nth-child(2){ animation-delay:160ms; }
@@ -347,7 +347,7 @@
     width:30px; height:30px; margin-right:10px; border-radius:50%; flex:none;
     background:var(--marun); color:var(--cream); border:2px solid var(--accent);
     font-weight:700; font-size:16px; line-height:1;
-    animation:rsvp2-check-pop .5s cubic-bezier(.2,.9,.3,1.4) .1s backwards;
+    animation:rsvp2-check-pop .5s cubic-bezier(.2,.9,.3,1.4) .1s both;
   }
   @keyframes rsvp2-check-pop{ from{ transform:scale(0); } 60%{ transform:scale(1.25); } to{ transform:scale(1); } }
   /* desktop: 3 kolom horizontal */
