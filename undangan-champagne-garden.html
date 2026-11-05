@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@300;400;500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --ivory:#FDF9F2; --cream:#F7F0E2; --blush:#EFD9D4; --blush-deep:#DFA9A4;
@@ -449,6 +450,17 @@ body.loaded .cover-inner .floaty{animation:floaty 7s ease-in-out 1.6s infinite}
 @keyframes rsvp2-msgin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 #rsvp2 #rsvp2-msg:not([hidden]):not([style])::before{content:"\2713";display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;margin-right:8px;vertical-align:-6px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-deep) 100%);color:#fff;font-size:14px;animation:rsvp2-pop .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes rsvp2-pop{0%{transform:scale(0)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+#rsvp2-qr{margin-top:26px;padding:28px 20px 24px;text-align:center;background:#fff;border:1px solid var(--gold-soft);border-radius:18px;box-shadow:0 10px 30px rgba(163,127,62,.12)}
+#rsvp2-qr:not([hidden]){animation:rsvp2-qr-in .6s cubic-bezier(.22,.61,.36,1)}
+@keyframes rsvp2-qr-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+#rsvp2-qr h3{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--espresso);line-height:1.3;margin-bottom:6px}
+#rsvp2-qr .rsvp2-qr-sub{font-family:var(--sans);font-size:14px;color:var(--espresso-soft);max-width:320px;margin:0 auto 20px;line-height:1.7}
+#rsvp2-qrcode{display:inline-block;padding:12px;background:#fff;border:1px solid var(--gold-soft);border-radius:12px;line-height:0}
+#rsvp2-qrcode img,#rsvp2-qrcode canvas{display:block;width:200px!important;height:200px!important}
+#rsvp2-qr-name{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--gold-deep);margin:16px 0 4px}
+#rsvp2-qr-code{font-family:var(--sans);font-size:12px;letter-spacing:.12em;color:var(--espresso-soft);margin-bottom:20px;word-break:break-all}
+#rsvp2-qr-download{width:100%}
+#rsvp2-qr-demo{margin-top:14px;font-family:var(--sans);font-size:12px;color:var(--espresso-soft);font-style:italic}
 </style>
 <section id="rsvp2">
   <p class="eyebrow rv" data-txt="rsvp2.label">RSVP</p>
@@ -464,6 +476,15 @@ body.loaded .cover-inner .floaty{animation:floaty 7s ease-in-out 1.6s infinite}
     </div>
     <button class="btn" id="rsvp2-submit" type="button" data-txt="rsvp2.submit">Konfirmasi Kehadiran</button>
     <p id="rsvp2-msg" role="status" hidden></p>
+  </div>
+  <div id="rsvp2-qr" class="rv" hidden>
+    <h3 data-txt="rsvp2.qrTitle">QR Check-in Anda</h3>
+    <p class="rsvp2-qr-sub" data-txt="rsvp2.qrSub">Simpan QR ini — tunjukkan saat check-in &amp; penukaran souvenir di hari acara</p>
+    <div id="rsvp2-qrcode" role="img" aria-label="QR code check-in"></div>
+    <p id="rsvp2-qr-name"></p>
+    <p id="rsvp2-qr-code"></p>
+    <button class="btn" id="rsvp2-qr-download" type="button" data-txt="rsvp2.qrDownload">Download QR</button>
+    <p id="rsvp2-qr-demo" hidden>Mode demo — QR ini memakai kode DEMO karena undangan dibuka tanpa token (?t=).</p>
   </div>
 </section>
 
@@ -1113,6 +1134,61 @@ musicBtn.addEventListener("click", function () { if (musicOn) stopMusic(); else 
   var msgEl = document.getElementById("rsvp2-msg");
   if (!nameEl || !submitBtn || !msgEl) return;
   var attVal = "Hadir";
+  /* ---------- QR check-in: tampil setelah RSVP sukses ---------- */
+  var qrBox = document.getElementById("rsvp2-qr");
+  var qrEl = document.getElementById("rsvp2-qrcode");
+  var qrNameEl = document.getElementById("rsvp2-qr-name");
+  var qrCodeEl = document.getElementById("rsvp2-qr-code");
+  var qrDlBtn = document.getElementById("rsvp2-qr-download");
+  var qrDemoEl = document.getElementById("rsvp2-qr-demo");
+  var qrGuestName = "";
+  function qrFileName(name) {
+    var s = String(name || "tamu").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return "qr-checkin-" + (s || "tamu") + ".png";
+  }
+  function showRsvpQr(name) {
+    if (!qrBox || !qrEl) return;
+    var code = (typeof tokenCode === "string" && tokenCode) ? tokenCode : "DEMO";
+    var data = "INVITO:" + code + ":" + name;
+    qrGuestName = name;
+    qrEl.innerHTML = "";
+    if (typeof QRCode !== "undefined") {
+      try {
+        new QRCode(qrEl, { text: data, width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+      } catch (e) { qrEl.textContent = data; }
+    } else { qrEl.textContent = data; }
+    if (qrNameEl) qrNameEl.textContent = name;
+    if (qrCodeEl) qrCodeEl.textContent = data;
+    if (qrDemoEl) qrDemoEl.hidden = (code !== "DEMO");
+    /* sembunyikan form (pesan sukses #rsvp2-msg tetap terlihat) */
+    var nameLabel = document.querySelector('#rsvp2 label[for="rsvp2-name"]');
+    if (nameLabel) nameLabel.style.display = "none";
+    nameEl.style.display = "none";
+    var pillsWrap = document.querySelector("#rsvp2 .rsvp2-pills");
+    if (pillsWrap) pillsWrap.style.display = "none";
+    submitBtn.style.display = "none";
+    qrBox.hidden = false;
+    try { qrBox.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
+  }
+  if (qrDlBtn) {
+    qrDlBtn.addEventListener("click", function () {
+      var dataUrl = "";
+      var canvas = qrEl ? qrEl.querySelector("canvas") : null;
+      if (canvas) { try { dataUrl = canvas.toDataURL("image/png"); } catch (e) {} }
+      if (!dataUrl && qrEl) {
+        var img = qrEl.querySelector("img");
+        if (img && img.src && img.src.indexOf("data:image") === 0) dataUrl = img.src;
+      }
+      if (!dataUrl) { showToast("QR belum siap, silakan coba lagi"); return; }
+      var a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = qrFileName(qrGuestName);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  }
   function showMsg(t, ok) {
     msgEl.hidden = false;
     msgEl.textContent = t;
@@ -1131,7 +1207,7 @@ musicBtn.addEventListener("click", function () { if (musicOn) stopMusic(); else 
     var name = nameEl.value.trim();
     if (!name) { showMsg("Mohon isi nama Anda terlebih dahulu", false); nameEl.focus(); return; }
     submitBtn.disabled = true;
-    function finish(text, ok) { showMsg(text, ok); submitBtn.disabled = false; }
+    function finish(text, ok) { showMsg(text, ok); submitBtn.disabled = false; if (ok) { var a = String(attVal || "").toLowerCase(); if (a.indexOf("hadir") > -1 || a.indexOf("ragu") > -1) showRsvpQr(name); } }
     try {
       if (wishDb && tokenIsActive && tokenCode && typeof firebase !== "undefined") {
         wishDb.collection("tokens").doc(tokenCode).collection("wishes").add({
