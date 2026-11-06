@@ -882,7 +882,7 @@ function kt2Rsvp(main){
   db.collection('tokens').doc(KT2.code).collection('wishes').orderBy('createdAt','desc').get().then(function(snap){
     var el = document.getElementById('kt2RsvpList');
     if(snap.empty){ el.innerHTML = '<div class="kt2-empty"><div class="big">📭</div><p>Belum ada RSVP masuk.</p></div>'; return; }
-    var html = '<table class="kt2-table"><thead><tr><th>Nama</th><th>Status</th><th>Waktu</th></tr></thead><tbody>';
+    var html = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="kt2-table"><thead><tr><th>Nama</th><th>Status</th><th>Waktu</th></tr></thead><tbody>';
     var seenNames = {};
     snap.forEach(function(doc){
       var w = doc.data();
@@ -895,7 +895,7 @@ function kt2Rsvp(main){
         : '<span class="pill gray">Berhalangan</span>';
       html += '<tr><td><b>'+kt2Esc(w.name||w.from||'?')+'</b></td><td>'+pill+'</td><td style="color:#888;font-size:13px">'+kt2Time(w.createdAt)+'</td></tr>';
     });
-    el.innerHTML = html + '</tbody></table>';
+    el.innerHTML = html + '</tbody></table></div>';
   });
 }
 function kt2Checkin(main){
@@ -916,7 +916,7 @@ function kt2Checkin(main){
     document.getElementById('kt2CiPending').textContent = Math.max(0, guests.length - matched);
     var el = document.getElementById('kt2CiList');
     if(snap.empty){ el.innerHTML = '<div class="kt2-empty"><div class="big">📷</div><p>Belum ada yang check-in.<br>Buka scanner untuk mulai.</p></div>'; return; }
-    var html = '<h3>Daftar Check-in</h3><table class="kt2-table"><thead><tr><th>Nama</th><th>Waktu</th></tr></thead><tbody>';
+    var html = '<h3>Daftar Check-in</h3><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="kt2-table"><thead><tr><th>Nama</th><th>Waktu</th></tr></thead><tbody>';
     var seenCi = {};
     snap.forEach(function(doc){
       var c = doc.data();
@@ -925,21 +925,21 @@ function kt2Checkin(main){
       seenCi[ck] = true;
       html += '<tr><td><b>'+kt2Esc(c.guest||'?')+'</b> <span class="pill green">Hadir</span></td><td style="color:#888;font-size:13px">'+kt2Time(c.at)+'</td></tr>';
     });
-    el.innerHTML = html + '</tbody></table>';
+    el.innerHTML = html + '</tbody></table></div>';
     // Daftar tamu yang BELUM hadir (by nama)
     var pending = guests.filter(function(g){ return !checkedNames[(g||'').trim().toLowerCase()]; });
     var ph = '<div class="kt2-section"><h3>⏳ Belum Hadir (' + pending.length + ')</h3>';
     if(!pending.length){ ph += '<div class="kt2-empty"><div class="big">🎉</div><p>Semua tamu sudah check-in!</p></div>'; }
     else {
-      ph += '<table class="kt2-table"><thead><tr><th>Nama</th><th style="text-align:right">Aksi</th></tr></thead><tbody>';
+      ph += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="kt2-table"><thead><tr><th>Nama</th><th style="text-align:right">Aksi</th></tr></thead><tbody>';
       pending.forEach(function(g){
         ph += '<tr><td><b>' + kt2Esc(g) + '</b> <span class="pill gold">Belum</span></td>' +
-          '<td style="text-align:right;white-space:nowrap">' +
+          '<td style="text-align:right">' +
           '<button class="kt2-btn line small" onclick="kt2CopyGuestByName(\'' + g.replace(/'/g, "\\'") + '\')">Salin Link</button> ' +
           '<button class="kt2-btn dark small" onclick="kt2WaGuestByName(\'' + g.replace(/'/g, "\\'") + '\')">WA</button>' +
           '</td></tr>';
       });
-      ph += '</tbody></table>';
+      ph += '</tbody></table></div>';
     }
     ph += '</div>';
     el.innerHTML += ph;
