@@ -1719,7 +1719,7 @@
           var bkList = normalizeBanks(d);
           setPreviewRow(dl, "Jumlah Rekening", String(bkList.filter(function(b){ return b.bank || b.number; }).length) + " rekening");
           $("revokeBtn").disabled = doc.status === "revoked";
-          $("revokeBtn").textContent = doc.status === "revoked" ? "Token Ini Sudah Dicabut" : "\U0001f5d1\ufe0f Hapus Token Permanen";
+          $("revokeBtn").textContent = doc.status === "revoked" ? "Token Ini Sudah Dicabut" : "🗑️ Hapus Token Permanen";
           $("manageResult").hidden = false;
         }).catch(function(e){
           btn.disabled = false; btn.textContent = "Lihat Data";
@@ -1804,13 +1804,13 @@
           return db.collection("tokens").doc(code).delete();
         }).then(function(){
           historyRemove(code);
-          btn.disabled = false; btn.textContent = "\U0001f5d1\ufe0f Hapus Token Permanen";
+          btn.disabled = false; btn.textContent = "🗑️ Hapus Token Permanen";
           toast("Token " + code + " dihapus permanen.");
           manageCode = ""; $("manageInput").value = ""; $("manageResult").hidden = true;
           renderHistory();
           showMsg($("manageOk"), "Token " + code + " sudah dihapus dari database dan riwayat.");
         }).catch(function(e){
-          btn.disabled = false; btn.textContent = "\U0001f5d1\ufe0f Hapus Token Permanen";
+          btn.disabled = false; btn.textContent = "🗑️ Hapus Token Permanen";
           showMsg($("manageError"), "Gagal menghapus: " + (e && e.message ? e.message : "coba lagi") + ". Pastikan rules Firestore sudah diupdate (izinkan delete).");
         });
       });
