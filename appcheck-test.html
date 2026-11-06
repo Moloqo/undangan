@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>App Check Probe v5 (sementara)</title>
+<title>App Check Probe v6 (sementara)</title>
 <style>body{font-family:monospace;padding:24px;background:#111;color:#0f0}h1{font-size:28px}pre{font-size:18px;white-space:pre-wrap}</style>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
 </head><body>
-<h1>APP CHECK PROBE v5</h1>
+<h1>APP CHECK PROBE v6</h1>
 <pre id="out">MENUNGGU...</pre>
 <script>
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -30,9 +30,15 @@ window.addEventListener('load', async () => {
     await sleep(6000);
     log('grecaptcha=' + (typeof grecaptcha) + ' enterprise=' + (typeof grecaptcha !== 'undefined' && typeof grecaptcha.enterprise));
     try {
-      const rt = await withTimeout(grecaptcha.enterprise.execute('6LdYdxMuAAAAAGKxEAs-ipgajYzYN4FCVquGiyRE', {action: 'probe'}), 20000, 'ENTERPRISE_EXECUTE');
-      log('ENTERPRISE_EXECUTE_OK len=' + (rt ? rt.length : 0));
-    } catch (e) { log('ENTERPRISE_EXECUTE_FAIL ' + (e.code || e.message)); }
+      const div = document.createElement('div');
+      document.body.appendChild(div);
+      const wid = grecaptcha.enterprise.render(div, {sitekey: '6LdYdxMuAAAAAGKxEAs-ipgajYzYN4FCVquGiyRE', size: 'invisible'});
+      log('RENDER_OK widgetId=' + wid);
+      try {
+        const rt = await withTimeout(grecaptcha.enterprise.execute(wid, {action: 'probe'}), 20000, 'ENTERPRISE_EXECUTE');
+        log('ENTERPRISE_EXECUTE_OK len=' + (rt ? rt.length : 0));
+      } catch (e2) { log('ENTERPRISE_EXECUTE_FAIL ' + (e2.code || e2.message)); }
+    } catch (e) { log('RENDER_FAIL ' + (e.code || e.message)); }
     try {
       const t = await withTimeout(firebase.appCheck().getToken(), 20000, 'GETTOKEN');
       log('APPCHECK_TOKEN_OK token=' + !!t.token + ' len=' + (t.token ? t.token.length : 0));
