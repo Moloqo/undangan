@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>App Check Probe v6 (sementara)</title>
+<title>App Check Probe v7 (sementara)</title>
 <style>body{font-family:monospace;padding:24px;background:#111;color:#0f0}h1{font-size:28px}pre{font-size:18px;white-space:pre-wrap}</style>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
 </head><body>
-<h1>APP CHECK PROBE v6</h1>
+<h1>APP CHECK PROBE v7</h1>
 <pre id="out">MENUNGGU...</pre>
 <script>
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -21,8 +21,9 @@ window.addEventListener('load', async () => {
     firebase.initializeApp({
                   apiKey: "AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
                   authDomain: "undangan-digital-f4310.firebaseapp.com",
-                  projectId: "undangan-digital-f4310"
-                });
+                  projectId: "undangan-digital-f4310",
+                  messagingSenderId: "220097197481",
+                  appId: "1:220097197481:web:03ccc55291a89f4063c0b8"                });
     try {
       firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdYdxMuAAAAAGKxEAs-ipgajYzYN4FCVquGiyRE'), true);
       log('ACTIVATE_OK enterprise-provider');
