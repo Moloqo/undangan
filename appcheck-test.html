@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>App Check Probe v2 (sementara)</title>
+<title>App Check Probe v3 (sementara)</title>
 <style>body{font-family:monospace;padding:24px;background:#111;color:#0f0}h1{font-size:28px}pre{font-size:18px;white-space:pre-wrap}</style>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
 </head><body>
-<h1>APP CHECK PROBE v2</h1>
+<h1>APP CHECK PROBE v3</h1>
 <pre id="out">MENUNGGU...</pre>
 <script>
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const withTimeout = (p, ms, label) => Promise.race([p, sleep(ms).then(() => { throw new Error(label + '_TIMEOUT'); })]);
 window.addEventListener('load', async () => {
   const out = document.getElementById('out');
   const log = (s) => { out.textContent += '\n' + s; };
@@ -27,18 +28,18 @@ window.addEventListener('load', async () => {
     await sleep(5000);
     log('grecaptcha=' + (typeof grecaptcha) + ' recaptchaScript=' + performance.getEntriesByType('resource').some(r => r.name.includes('recaptcha/api.js')));
     try {
-      const t = await firebase.appCheck().getToken();
+      const rt = await withTimeout(new Promise(res => grecaptcha.ready(() => res(grecaptcha.execute('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', {action: 'probe'})))), 20000, 'GRECAPTCHA_EXECUTE');
+      log('GRECAPTCHA_EXECUTE_OK len=' + (rt ? rt.length : 0));
+    } catch (e) { log('GRECAPTCHA_EXECUTE_FAIL ' + (e.code || e.message)); }
+    try {
+      const t = await withTimeout(firebase.appCheck().getToken(), 20000, 'GETTOKEN');
       log('APPCHECK_TOKEN_OK token=' + !!t.token + ' len=' + (t.token ? t.token.length : 0));
     } catch (e) { log('APPCHECK_TOKEN_FAIL ' + JSON.stringify({code: e.code, message: e.message})); }
-    await sleep(30000);
-    try {
-      const t2 = await firebase.appCheck().getToken();
-      log('RETRY_TOKEN_OK token=' + !!t2.token);
-    } catch (e) { log('RETRY_TOKEN_FAIL ' + JSON.stringify({code: e.code, message: e.message})); }
     try {
       const d = await firebase.firestore().collection('tokens').doc('AZ5QCPZJFJ').get();
       log('FIRESTORE_READ_OK exists=' + d.exists + ' customer=' + (d.exists ? d.data().customer : '-'));
     } catch (e) { log('FIRESTORE_READ_FAIL ' + (e.code || e.message)); }
+    log('SELESAI');
   } catch (e) {
     out.textContent = 'PROBE_ERROR ' + (e.code || e.message);
   }
