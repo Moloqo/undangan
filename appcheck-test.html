@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>App Check Probe v3 (sementara)</title>
+<title>App Check Probe v4 (sementara)</title>
 <style>body{font-family:monospace;padding:24px;background:#111;color:#0f0}h1{font-size:28px}pre{font-size:18px;white-space:pre-wrap}</style>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
 </head><body>
-<h1>APP CHECK PROBE v3</h1>
+<h1>APP CHECK PROBE v4</h1>
 <pre id="out">MENUNGGU...</pre>
 <script>
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -23,14 +23,16 @@ window.addEventListener('load', async () => {
                   authDomain: "undangan-digital-f4310.firebaseapp.com",
                   projectId: "undangan-digital-f4310"
                 });
-    try { firebase.appCheck().activate('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', true); log('ACTIVATE_OK'); }
-    catch (e) { log('ACTIVATE_FAIL ' + (e.code || e.message)); }
-    await sleep(5000);
-    log('grecaptcha=' + (typeof grecaptcha) + ' recaptchaScript=' + performance.getEntriesByType('resource').some(r => r.name.includes('recaptcha/api.js')));
     try {
-      const rt = await withTimeout(new Promise(res => grecaptcha.ready(() => res(grecaptcha.execute('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', {action: 'probe'})))), 20000, 'GRECAPTCHA_EXECUTE');
-      log('GRECAPTCHA_EXECUTE_OK len=' + (rt ? rt.length : 0));
-    } catch (e) { log('GRECAPTCHA_EXECUTE_FAIL ' + (e.code || e.message)); }
+      firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG'), true);
+      log('ACTIVATE_OK enterprise-provider');
+    } catch (e) { log('ACTIVATE_FAIL ' + (e.code || e.message)); }
+    await sleep(6000);
+    log('grecaptcha=' + (typeof grecaptcha) + ' enterprise=' + (typeof grecaptcha !== 'undefined' && typeof grecaptcha.enterprise));
+    try {
+      const rt = await withTimeout(grecaptcha.enterprise.execute('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', {action: 'probe'}), 20000, 'ENTERPRISE_EXECUTE');
+      log('ENTERPRISE_EXECUTE_OK len=' + (rt ? rt.length : 0));
+    } catch (e) { log('ENTERPRISE_EXECUTE_FAIL ' + (e.code || e.message)); }
     try {
       const t = await withTimeout(firebase.appCheck().getToken(), 20000, 'GETTOKEN');
       log('APPCHECK_TOKEN_OK token=' + !!t.token + ' len=' + (t.token ? t.token.length : 0));
