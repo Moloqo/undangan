@@ -1414,6 +1414,7 @@
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-appcheck-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
     (function(){
@@ -1455,6 +1456,9 @@
         authDomain: "undangan-digital-f4310.firebaseapp.com",
         projectId: "undangan-digital-f4310"
       });
+          /* App Check (reCAPTCHA v3) — bukti request datang dari web INVITO.
+             Tanpa enforcement, request tanpa token tetap jalan (mode monitor). */
+          try{ if(firebase.appCheck){ firebase.appCheck().activate('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', true); } }catch(e){}
           db = firebase.firestore();
         } catch(e){ hideLoader(); return; /* SDK gagal → biarkan demo */ }
 
