@@ -888,17 +888,21 @@ function kt2Rsvp(main){
     if(snap.empty){ el.innerHTML = '<div class="kt2-empty"><div class="big">📭</div><p>Belum ada RSVP masuk.</p></div>'; return; }
     var html = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="kt2-table"><thead><tr><th>Nama</th><th>Status</th><th>Waktu</th></tr></thead><tbody>';
     var seenNames = {};
+    var rsvpRows = 0;
     snap.forEach(function(doc){
       var w = doc.data();
+      if(!(w.attendance||'').trim()) return; // Skip entri doa saja (tanpa attendance) — doa tampil di tab Ucapan
       var nameKey = ((w.name||w.from||'?').trim()).toLowerCase();
       if(seenNames[nameKey]) return; // dedupe: keep latest (ordered desc)
       seenNames[nameKey] = true;
+      rsvpRows++;
       var att = (w.attendance||'').toLowerCase();
       var pill = att.indexOf('hadir') > -1 && att.indexOf('berhalangan') === -1 ? '<span class="pill green">Hadir</span>'
         : att.indexOf('ragu') > -1 || att.indexOf('mungkin') > -1 ? '<span class="pill gold">Ragu</span>'
         : '<span class="pill gray">Berhalangan</span>';
       html += '<tr><td><b>'+kt2Esc(w.name||w.from||'?')+'</b></td><td>'+pill+'</td><td style="color:#888;font-size:13px">'+kt2Time(w.createdAt)+'</td></tr>';
     });
+    if(!rsvpRows){ el.innerHTML = '<div class="kt2-empty"><div class="big">\uD83D\uDCEB</div><p>Belum ada RSVP masuk.</p></div>'; return; }
     el.innerHTML = html + '</tbody></table></div>';
   });
 }
