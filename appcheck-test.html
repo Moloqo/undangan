@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>App Check Probe (sementara)</title>
-<style>body{font-family:monospace;padding:24px;background:#111;color:#0f0}h1{font-size:28px}pre{font-size:20px;white-space:pre-wrap}</style>
+<title>App Check Probe v2 (sementara)</title>
+<style>body{font-family:monospace;padding:24px;background:#111;color:#0f0}h1{font-size:28px}pre{font-size:18px;white-space:pre-wrap}</style>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
 </head><body>
-<h1>APP CHECK PROBE</h1>
+<h1>APP CHECK PROBE v2</h1>
 <pre id="out">MENUNGGU...</pre>
 <script>
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 window.addEventListener('load', async () => {
   const out = document.getElementById('out');
   const log = (s) => { out.textContent += '\n' + s; };
   try {
+    try { indexedDB.deleteDatabase('firebase-app-check-database'); log('IDB_CLEARED'); } catch (e) { log('IDB_CLEAR_SKIP ' + e.message); }
+    await sleep(1000);
     if (typeof firebase === 'undefined') { out.textContent = 'FIREBASE_UNDEFINED'; return; }
     firebase.initializeApp({
                   apiKey: "AIzaSyBt8I9QJS3-TYQsp-mccVulMvvx95-mamw",
@@ -21,14 +24,17 @@ window.addEventListener('load', async () => {
                 });
     try { firebase.appCheck().activate('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', true); log('ACTIVATE_OK'); }
     catch (e) { log('ACTIVATE_FAIL ' + (e.code || e.message)); }
+    await sleep(5000);
+    log('grecaptcha=' + (typeof grecaptcha) + ' recaptchaScript=' + performance.getEntriesByType('resource').some(r => r.name.includes('recaptcha/api.js')));
     try {
       const t = await firebase.appCheck().getToken();
       log('APPCHECK_TOKEN_OK token=' + !!t.token + ' len=' + (t.token ? t.token.length : 0));
-    } catch (e) { log('APPCHECK_TOKEN_FAIL ' + (e.code || e.message)); }
+    } catch (e) { log('APPCHECK_TOKEN_FAIL ' + JSON.stringify({code: e.code, message: e.message})); }
+    await sleep(30000);
     try {
-      const t2 = await firebase.appCheck().getToken(true);
-      log('FORCE_OK token=' + !!t2.token);
-    } catch (e) { log('FORCE_FAIL ' + (e.code || e.message)); }
+      const t2 = await firebase.appCheck().getToken();
+      log('RETRY_TOKEN_OK token=' + !!t2.token);
+    } catch (e) { log('RETRY_TOKEN_FAIL ' + JSON.stringify({code: e.code, message: e.message})); }
     try {
       const d = await firebase.firestore().collection('tokens').doc('AZ5QCPZJFJ').get();
       log('FIRESTORE_READ_OK exists=' + d.exists + ' customer=' + (d.exists ? d.data().customer : '-'));
@@ -38,5 +44,4 @@ window.addEventListener('load', async () => {
   }
 });
 </script>
-<!-- retrigger deploy 2026-11-06 21:14 WIB -->
 </body></html>
