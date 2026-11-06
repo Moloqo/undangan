@@ -648,6 +648,7 @@
 .kt2-nav button .bdg{margin-left:auto;background:rgba(255,255,255,.2);font-size:11px;padding:2px 8px;border-radius:12px}
 .kt2-nav button.active .bdg{background:rgba(0,0,0,.2)}
 .kt2-close{margin:12px;padding:13px;background:rgba(255,255,255,.08);border:0;border-radius:10px;color:#fff;font-size:14px;cursor:pointer}
+.kt2-backlink{display:block;margin:0 12px 12px;padding:13px;text-align:center;border-radius:10px;color:#e8c86a;font-size:14px;text-decoration:none;border:1px solid rgba(232,200,106,.4)}
 .kt2-main{flex:1;overflow-y:auto;padding:32px;max-width:1000px}
 .kt2-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
 .kt2-head h1{font-family:Georgia,serif;font-size:28px;margin:0;color:#1a1a1a}
@@ -685,6 +686,7 @@
   .kt2-nav button{white-space:nowrap;margin:0}
   .kt2-nav button .lbl{display:none}
   .kt2-close{display:none}
+  .kt2-backlink{margin:0 8px 0 0;padding:10px 12px;white-space:nowrap;align-self:center;flex:none}
   .kt2-main{padding:20px 16px}
   .kt2-cards{grid-template-columns:1fr 1fr}
   .kt2-head h1{font-size:22px}
@@ -711,6 +713,7 @@
     <div class="kt2-brand"><h2>INVITO</h2><p>Kelola Tamu</p></div>
     <div class="kt2-couple"><b id="kt2Names">—</b><span id="kt2Date">—</span></div>
     <nav class="kt2-nav" id="kt2Nav"></nav>
+    <a class="kt2-backlink" href="index.html">&larr; Kembali ke Katalog</a>
     <button class="kt2-close" onclick="kt2Close()">✕ Tutup</button>
   </aside>
   <main class="kt2-main" id="kt2Main"></main>
@@ -825,16 +828,21 @@ function kt2LoadStats(){
   if(!window.db || !KT2.code) return;
   var ref = db.collection('tokens').doc(KT2.code);
   ref.collection('wishes').get().then(function(s){
-    var rsvpN = 0, wishN = 0;
+    var rsvpN = 0, wishN = 0, rsvpSeen = {};
     s.forEach(function(doc){ var w = doc.data()||{};
-      if((w.attendance||'').trim()) rsvpN++;
+      // Samakan dengan tabel RSVP: hitung 1x per nama (tabel mendedupe nama)
+      var rk = ((w.name||w.from||'?').trim()).toLowerCase();
+      if((w.attendance||'').trim() && !rsvpSeen[rk]){ rsvpSeen[rk] = true; rsvpN++; }
       if(((w.wish||w.message||'').trim())) wishN++;
     });
     var el = document.getElementById('kt2WishCount'); if(el) el.textContent = wishN;
     var el2 = document.getElementById('kt2RsvpCount'); if(el2) el2.textContent = rsvpN;
   }).catch(function(){});
   ref.collection('checkins').get().then(function(s){
-    var el = document.getElementById('kt2CheckinCount'); if(el) el.textContent = s.size;
+    // Hitung 1x per nama tamu (data lama sebelum 1 QR = 1x bisa dobel)
+    var seenCi = {};
+    s.forEach(function(doc){ var g = ((doc.data()||{}).guest||'').trim().toLowerCase(); if(g) seenCi[g] = true; });
+    var el = document.getElementById('kt2CheckinCount'); if(el) el.textContent = Object.keys(seenCi).length;
   }).catch(function(){});
 }
 function kt2Tamu(main){
@@ -901,18 +909,20 @@ function kt2Checkin(main){
   if(!window.db) return;
   var guests = (KT2.data||{}).guests || [];
   db.collection('tokens').doc(KT2.code).collection('checkins').orderBy('at','desc').get().then(function(snap){
-    document.getElementById('kt2CiCount').textContent = snap.size;
     var checkedNames = {};
     snap.forEach(function(doc){ var g = ((doc.data()||{}).guest||'').trim().toLowerCase(); if(g) checkedNames[g] = true; });
+    document.getElementById('kt2CiCount').textContent = Object.keys(checkedNames).length;
     var matched = guests.filter(function(g){ return checkedNames[(g||'').trim().toLowerCase()]; }).length;
     document.getElementById('kt2CiPending').textContent = Math.max(0, guests.length - matched);
     var el = document.getElementById('kt2CiList');
     if(snap.empty){ el.innerHTML = '<div class="kt2-empty"><div class="big">📷</div><p>Belum ada yang check-in.<br>Buka scanner untuk mulai.</p></div>'; return; }
     var html = '<h3>Daftar Check-in</h3><table class="kt2-table"><thead><tr><th>Nama</th><th>Waktu</th></tr></thead><tbody>';
-    var checkedNames = {};
+    var seenCi = {};
     snap.forEach(function(doc){
       var c = doc.data();
-      checkedNames[((c.guest||'').trim()).toLowerCase()] = true;
+      var ck = ((c.guest||'').trim()).toLowerCase();
+      if(seenCi[ck]) return; // dedupe: data lama sebelum 1 QR = 1x bisa dobel (mis. Dessy) — tampilkan 1x, yang terbaru (orderBy at desc)
+      seenCi[ck] = true;
       html += '<tr><td><b>'+kt2Esc(c.guest||'?')+'</b> <span class="pill green">Hadir</span></td><td style="color:#888;font-size:13px">'+kt2Time(c.at)+'</td></tr>';
     });
     el.innerHTML = html + '</tbody></table>';
