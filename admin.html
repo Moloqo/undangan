@@ -757,6 +757,21 @@
       </div>
     </div>
 
+    <!-- ================= MODAL KONFIRMASI HAPUS =================
+         Pengganti confirm() bawaan browser: dialog bawaan sering tidak
+         muncul / langsung ter-dismiss di HP dan webview, sehingga klik
+         hapus terlihat tidak ngapa-ngapain. Modal di halaman selalu muncul. -->
+    <div class="overlay" id="deleteOverlay" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+      <div class="sheet">
+        <h3 id="deleteTitle">Hapus Token Permanen?</h3>
+        <p>Token <b id="deleteCodeLabel" style="font-family:monospace;"></b> beserta undangan, data tamu, dan semua ucapannya akan hilang dari database dan <b>tidak bisa dikembalikan</b>.</p>
+        <div class="row">
+          <button type="button" class="btn ghost flex" id="deleteCancelBtn">Batal</button>
+          <button type="button" class="btn flex" id="deleteOkBtn" style="background:#b3261e;border-color:#b3261e;color:#fff;">Ya, Hapus Permanen</button>
+        </div>
+      </div>
+    </div>
+
     <div class="toast" id="toast" role="status"></div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -1704,7 +1719,7 @@
           var bkList = normalizeBanks(d);
           setPreviewRow(dl, "Jumlah Rekening", String(bkList.filter(function(b){ return b.bank || b.number; }).length) + " rekening");
           $("revokeBtn").disabled = doc.status === "revoked";
-          $("revokeBtn").textContent = doc.status === "revoked" ? "Token Ini Sudah Dicabut" : "Cabut Token Ini (Revoke)";
+          $("revokeBtn").textContent = doc.status === "revoked" ? "Token Ini Sudah Dicabut" : "\U0001f5d1\ufe0f Hapus Token Permanen";
           $("manageResult").hidden = false;
         }).catch(function(e){
           btn.disabled = false; btn.textContent = "Lihat Data";
@@ -1760,14 +1775,24 @@
           showMsg($("manageError"), "Gagal menyimpan: " + (e && e.message ? e.message : "coba lagi") + ".");
         });
       });
-      $("revokeBtn").addEventListener("click", function(){
+      /* Konfirmasi hapus pakai modal di halaman (bukan confirm() bawaan
+         browser) — confirm() sering tidak muncul di HP/webview. */
+      function openDeleteModal(){
         if (!manageCode) return;
         if (fbFail($("manageError"))) return;
+        $("deleteCodeLabel").textContent = manageCode;
+        $("deleteOverlay").classList.add("show");
+      }
+      function closeDeleteModal(){ $("deleteOverlay").classList.remove("show"); }
+      $("deleteCancelBtn").addEventListener("click", closeDeleteModal);
+      $("deleteOverlay").addEventListener("click", function(e){ if (e.target === this) closeDeleteModal(); });
+      $("revokeBtn").addEventListener("click", function(){ openDeleteModal(); });
+      $("deleteOkBtn").addEventListener("click", function(){
         var code = manageCode;
-        if(!confirm("HAPUS PERMANEN token " + code + "?\n\nUndangan, data tamu, dan semua ucapan akan hilang dari database dan tidak bisa dikembalikan.\n\nLanjut?")) return;
-        if(!confirm("Yakin? Klik OK untuk menghapus permanen.")) return;
+        if (!code) { closeDeleteModal(); return; }
+        closeDeleteModal();
         hideMsg($("manageOk")); hideMsg($("manageError"));
-        var btn = this; btn.disabled = true; btn.textContent = "Menghapus…";
+        var btn = $("revokeBtn"); btn.disabled = true; btn.textContent = "Menghapus…";
         adminWrite(code, { deleteRequested: adminPin }).then(function(){
           var wref = db.collection("tokens").doc(code).collection("wishes");
           return wref.get().then(function(snap){
