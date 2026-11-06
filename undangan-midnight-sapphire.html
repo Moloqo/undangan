@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-appcheck-compat.js"></script>
 <style>
 :root{
   --navy:#101c3a; --navy-deep:#0a1328; --navy-card:#182642; --navy-input:#0c152b;
@@ -1296,6 +1297,9 @@ if (!tokenCode) {
           projectId: "undangan-digital-f4310"
         });
       }
+      /* App Check (reCAPTCHA v3) — bukti request datang dari web INVITO.
+         Tanpa enforcement, request tanpa token tetap jalan (mode monitor). */
+      try{ if(firebase.appCheck){ firebase.appCheck().activate('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', true); } }catch(e){}
       var db = firebase.firestore(); wishDb = db;
       db.collection("tokens").doc(tokenCode).get().then(function(snap){
         if (!snap.exists) { tokenDone(); return; /* tidak ditemukan → demo tidak berubah */ }
