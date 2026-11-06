@@ -884,8 +884,8 @@
       var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InduZ3Nnb2FnY250bXh4Z2Njc3V4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMzEyNDksImV4cCI6MjEwODkwNzI0OX0.pu7TxHZjNYh0foVtJuTnsKNLXmFMSBOtPBUPqrEIPbk";
 
       function fbFail(msgEl){
-        showMsg(msgEl, fbError || "Koneksi ke server gagal. Coba lagi sebentar lagi.");
-        return !db;
+        if(!db){ showMsg(msgEl, fbError || "Koneksi ke server gagal. Coba lagi sebentar lagi."); return true; }
+        return false;
       }
 
       function $(id){ return document.getElementById(id); }
@@ -1414,6 +1414,8 @@
         var list = historyLoad();
         var ul = $("historyList"); ul.innerHTML = "";
         $("historyEmpty").hidden = list.length !== 0;
+        // Bersihkan status sync yang kadaluarsa ("Belum ada token...") kalau riwayat sudah ada isinya
+        if(list.length){ var st = $("historySyncStatus"); if(st && /Belum ada token/.test(st.textContent)) st.textContent = list.length + " token di perangkat ini."; }
         list.slice().reverse().forEach(function(item){
           var li = document.createElement("li");
           var code = document.createElement("span"); code.className = "code"; code.textContent = item.code;
@@ -1658,7 +1660,7 @@
           setPreviewRow(dl, "Revisi", revLabel(mMax, mUsed));
           $("mUnlimited").checked = mMax === null;
           $("mMaxRevisions").disabled = mMax === null;
-          $("mMaxRevisions").value = mMax === null ? 3 : mMax;
+          $("mMaxRevisions").value = mMax === null ? "" : mMax;
           $("mCustomUrl").value = (doc.data && doc.data.customUrl) || "";
           /* Token yang dibuka lewat Kelola ikut dicatat di riwayat perangkat
              ini — jadi token dari perangkat lain bisa mulai disinkronkan
