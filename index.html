@@ -4486,11 +4486,30 @@ function kt2Checkin(main){
     var el = document.getElementById('kt2CiList');
     if(snap.empty){ el.innerHTML = '<div class="kt2-empty"><div class="big">📷</div><p>Belum ada yang check-in.<br>Buka scanner untuk mulai.</p></div>'; return; }
     var html = '<h3>Daftar Check-in</h3><table class="kt2-table"><thead><tr><th>Nama</th><th>Waktu</th></tr></thead><tbody>';
+    var checkedNames = {};
     snap.forEach(function(doc){
       var c = doc.data();
+      checkedNames[((c.guest||'').trim()).toLowerCase()] = true;
       html += '<tr><td><b>'+kt2Esc(c.guest||'?')+'</b> <span class="pill green">Hadir</span></td><td style="color:#888;font-size:13px">'+kt2Time(c.at)+'</td></tr>';
     });
     el.innerHTML = html + '</tbody></table>';
+    // Daftar tamu yang BELUM hadir (by nama)
+    var pending = guests.filter(function(g){ return !checkedNames[(g||'').trim().toLowerCase()]; });
+    var ph = '<div class="kt2-section"><h3>⏳ Belum Hadir (' + pending.length + ')</h3>';
+    if(!pending.length){ ph += '<div class="kt2-empty"><div class="big">🎉</div><p>Semua tamu sudah check-in!</p></div>'; }
+    else {
+      ph += '<table class="kt2-table"><thead><tr><th>Nama</th><th style="text-align:right">Aksi</th></tr></thead><tbody>';
+      pending.forEach(function(g){
+        ph += '<tr><td><b>' + kt2Esc(g) + '</b> <span class="pill gold">Belum</span></td>' +
+          '<td style="text-align:right;white-space:nowrap">' +
+          '<button class="kt2-btn line small" onclick="kt2CopyGuestByName(\'' + g.replace(/'/g, "\\'") + '\')">Salin Link</button> ' +
+          '<button class="kt2-btn dark small" onclick="kt2WaGuestByName(\'' + g.replace(/'/g, "\\'") + '\')">WA</button>' +
+          '</td></tr>';
+      });
+      ph += '</tbody></table>';
+    }
+    ph += '</div>';
+    el.innerHTML += ph;
   });
 }
 function kt2Ucapan(main){
@@ -4548,6 +4567,16 @@ function kt2WaGuest(i){
   var msg = 'Halo '+g+'! Kamu diundang ke pernikahan kami. Buka undangannya di sini ya: '+url;
   kt2MarkSent(g);
   window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+}
+function kt2CopyGuestByName(name){
+  var guests = (KT2.data||{}).guests || [];
+  var i = guests.indexOf(name);
+  if(i > -1) kt2CopyGuest(i);
+}
+function kt2WaGuestByName(name){
+  var guests = (KT2.data||{}).guests || [];
+  var i = guests.indexOf(name);
+  if(i > -1) kt2WaGuest(i);
 }
 function kt2MarkSent(g){
   if(!window.db || !KT2.code || !g) return;
