@@ -881,7 +881,7 @@
             }
             /* App Check (reCAPTCHA v3) — bukti request datang dari web INVITO.
                Tanpa enforcement, request tanpa token tetap jalan (mode monitor). */
-            try{ if(firebase.appCheck){ firebase.appCheck().activate('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', true); } }catch(e){}
+            try{ if(firebase.appCheck){ firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdYdxMuAAAAAGKxEAs-ipgajYzYN4FCVquGiyRE'), true); } }catch(e){}
             db = firebase.firestore();
             fbError = "";
             return true;
