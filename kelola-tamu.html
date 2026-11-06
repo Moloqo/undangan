@@ -721,6 +721,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-appcheck-compat.js"></script>
     <script>
       /* ================= FIREBASE ================= */
       var firebaseConfig = {
@@ -738,6 +739,9 @@
             if (!firebase.apps || !firebase.apps.length) {
               firebase.initializeApp(firebaseConfig);
             }
+            /* App Check (reCAPTCHA v3) — bukti request datang dari web INVITO.
+               Tanpa enforcement, request tanpa token tetap jalan (mode monitor). */
+            try{ if(firebase.appCheck){ firebase.appCheck().activate('6LflJxMuAAAAAGRmOz5QTdfUx5K__zqzAnC3BNQG', true); } }catch(e){}
             db = firebase.firestore();
             window.db = db;
             fbError = "";
